@@ -1,13 +1,9 @@
 <?php
 
+use Src\Support\Str;
 use PhpOffice\PhpSpreadsheet\Cell\Cell;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
-
-function sanitize($var)
-{
-    return htmlentities(strip_tags($var));
-}
 
 /**
  * Find all elements in array matched to predicate.
@@ -75,7 +71,7 @@ function parseLessonCellValue(string $value): array
 
     foreach ($parts as &$part) {
         $part = trim($part);
-        $part = replaceManySpacesWithOne($part);
+        $part = Str::replaceManySpacesWithOne($part);
     }
     unset($part); // предотвратим сайд-эффекты (если не убрать ссылку)
 
@@ -118,7 +114,7 @@ function explodeTeacherAndAuditory(string $string): array
 }
 
 function parseTimeCellValue(string $value, $coord) {
-    $value = replaceManySpacesWithOne($value);
+    $value = Str::replaceManySpacesWithOne($value);
     $value = trim($value);
 
     $result = [
@@ -134,7 +130,7 @@ function parseTimeCellValue(string $value, $coord) {
 
     foreach ($parts as &$part) {
         $part = trim($part);
-        $part = replaceManySpacesWithOne($part);
+        $part = Str::replaceManySpacesWithOne($part);
     }
 
     if (!isset($parts[1])) {
@@ -159,7 +155,7 @@ function formatTime(string $time)
         ' - '
     ], $time);
 
-    $time = replaceManySpacesWithOne($time);
+    $time = Str::replaceManySpacesWithOne($time);
 
     return trim($time);
 }
@@ -168,16 +164,6 @@ function formatDay(string $day)
 {
     $day = mb_strtolower($day);
     return mb_strtoupper(mb_substr($day, 0, 1)).mb_substr($day, 1);
-}
-
-function removeSpaces(string $string): string
-{
-    return preg_replace('/\s+/', '', $string);
-}
-
-function replaceManySpacesWithOne(string $string): string
-{
-    return preg_replace('/\s+/', ' ', $string);
 }
 
 function columnsRange(string $start, string $end): array
@@ -258,7 +244,7 @@ function resolveExcelConfig(Worksheet $sheet, array $config)
 
             $cellValue = getCellValue($sheet->getCell($coordinate));
             $rawCellValue = getCellValue($sheet->getCell($coordinate), true);
-            $cellValue = mb_strtolower(replaceManySpacesWithOne($cellValue));
+            $cellValue = mb_strtolower(Str::replaceManySpacesWithOne($cellValue));
 
             if (in_array($cellValue, $dayWords)) {
                 $config['dayCol']           = $column;
@@ -348,7 +334,7 @@ function formatClassHourLesson(string $lesson): string
         $spacesCount--;
     } while($count === 0 && $spacesCount > 0);
 
-    $lesson = removeSpaces($lesson);
+    $lesson = Str::removeSpaces($lesson);
 
     if ($replacementPerformed) {
         $lesson = str_replace($uniqueChar, $space, $lesson);
@@ -356,11 +342,6 @@ function formatClassHourLesson(string $lesson): string
 
     $lesson = mb_strtolower($lesson);
     return mb_strtoupper(mb_substr($lesson, 0, 1)).mb_substr($lesson, 1);
-}
-
-function showEmpty($value, string $placeholder = '-')
-{
-    return empty(trim($value)) ? $placeholder : $value;
 }
 
 function getRowFromCoordinate(string $coordinate)
@@ -400,27 +381,9 @@ function sheetHasMendeleeva4House(Worksheet $sheet):bool
 
             $cellValue = mb_strtolower($cellValue);
 
-            if (strContains($cellValue, 'менделеева') && strContains($cellValue, '4')) {
+            if (Str::contains($cellValue, 'менделеева') && strContains($cellValue, '4')) {
                 return true;
             }
-        }
-    }
-
-    return false;
-}
-
-/**
- * Determine if a given string contains a given substring.
- *
- * @param  string  $haystack
- * @param  string|string[]  $needles
- * @return bool
- */
-function strContains(string $haystack, $needles): bool
-{
-    foreach ((array) $needles as $needle) {
-        if ($needle !== '' && mb_strpos($haystack, $needle) !== false) {
-            return true;
         }
     }
 
@@ -489,88 +452,16 @@ function isFirstPairTime(string $cellValue)
 
     $time = $parsed['time'];
 
-    return strStartsWith($time, '09:00 - 10:');
-}
-
-function safeFilterInput(int $type, string $varName): string
-{
-    return trim(sanitize(filter_input($type, $varName, FILTER_SANITIZE_STRING)));
-}
-
-/**
- * Begin a string with a single instance of a given value.
- *
- * @param  string  $value
- * @param  string  $prefix
- * @return string
- */
-function strStart($value, $prefix)
-{
-    $quoted = preg_quote($prefix, '/');
-
-    return $prefix.preg_replace('/^(?:'.$quoted.')+/u', '', $value);
-}
-
-/**
- * Determine if a given string starts with a given substring.
- *
- * @param  string  $haystack
- * @param  string|string[]  $needles
- * @return bool
- */
-function strStartsWith(string $haystack, $needles): bool
-{
-    foreach ((array) $needles as $needle) {
-        if ((string) $needle !== '' && strncmp($haystack, $needle, strlen($needle)) === 0) {
-            return true;
-        }
-    }
-
-    return false;
-}
-
-/**
- * Determine if a given string ends with a given substring.
- *
- * @param  string  $haystack
- * @param  string|string[]  $needles
- * @return bool
- */
-function strEndsWith(string $haystack, $needles): bool
-{
-    foreach ((array) $needles as $needle) {
-        if (
-            $needle !== '' && $needle !== null
-            && substr($haystack, -strlen($needle)) === (string) $needle
-        ) {
-            return true;
-        }
-    }
-
-    return false;
+    return Str::startsWith($time, '09:00 - 10:');
 }
 
 function isScheduleLinkValid(string $link, string $pageWithScheduleFiles, array $allowedExtensions): bool
 {
-    return strEndsWith($link, $allowedExtensions) && getHost($link) === getHost($pageWithScheduleFiles);
+    return Str::endsWith($link, $allowedExtensions) && getHost($link) === getHost($pageWithScheduleFiles);
 }
 
 function getHost(string $link): string
 {
     $urlParts = parse_url($link);
     return $urlParts['scheme'] . '://' . $urlParts['host'];
-}
-
-/**
- * Cap a string with a single instance of a given value.
- *
- * @param  string  $value
- * @param  string  $cap
- * @return string
- */
-function strFinish($value, $cap)
-{
-    $quoted = preg_quote($cap, '/');
-
-    return preg_replace('/(?:'.$quoted.')+$/u', '', $value).$cap;
 }

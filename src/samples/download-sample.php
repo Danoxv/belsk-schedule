@@ -1,8 +1,9 @@
 <?php
 
 use Src\Exceptions\TerminateException;
+use Src\Support\Security;
 
-$fileName = safeFilterInput(INPUT_GET, 'f');
+$fileName = Security::safeFilterInput(INPUT_GET, 'f');
 
 if (empty($fileName)) {
     throw new TerminateException('Please pass "f" param with filename for opening. Ex: [...]/download-sample?f=1.xls');

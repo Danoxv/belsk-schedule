@@ -1,4 +1,8 @@
 <?php
+
+use Src\Support\Security;
+use Src\Support\Str;
+
 $config = require ROOT . '/src/config/config.php';
 
 $pageWithFiles = $config['pageWithScheduleFiles'];
@@ -18,15 +22,15 @@ if ($html !== false) {
 
     /** @var DOMElement[] $entries */
     foreach ($entries as $entry) {
-        $linkUri = sanitize($entry->getAttribute('href'));
+        $linkUri = Security::sanitize($entry->getAttribute('href'));
 
-        if (!strEndsWith($linkUri, $config['allowedExtensions'])) {
+        if (!Str::endsWith($linkUri, $config['allowedExtensions'])) {
             continue;
         }
 
         $linkUri = "$host/$linkUri";
 
-        $linkText = sanitize($entry->textContent);
+        $linkText = Security::sanitize($entry->textContent);
 
         $links[] = [
             'uri' => $linkUri,

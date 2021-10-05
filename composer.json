@@ -1,7 +1,8 @@
 {
     "require": {
         "phpoffice/phpspreadsheet": "^1.18",
-        "ext-dom": "*"
+        "ext-dom": "*",
+        "illuminate/support": "^8.63"
     },
     "autoload": {
         "psr-4": {

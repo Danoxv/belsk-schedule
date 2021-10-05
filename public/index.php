@@ -16,20 +16,18 @@ if ($_config['debug'] ?? false) {
 require_once ROOT . '/vendor/autoload.php';
 require_once ROOT . '/src/functions.php';
 
-$_requestUri = safeFilterInput(INPUT_SERVER, 'REQUEST_URI');
+$_requestUri = Src\Support\Security::safeFilterInput(INPUT_SERVER, 'REQUEST_URI');
 $_requestUri = strtok($_requestUri, '?'); // Берём REQUEST_URI без GET-параметров
 
 $_routes = require ROOT . '/src/config/routes.php';
 
-use Src\Exceptions\TerminateException;
-
 try {
     if (!isset($_routes[$_requestUri])) {
-        throw new TerminateException('Страница не найдена (404)');
+        throw new Src\Exceptions\TerminateException('Страница не найдена (404)');
     }
 
     require_once ROOT . '/src/' . $_routes[$_requestUri];
-} catch (TerminateException $exception) {
+} catch (Src\Exceptions\TerminateException $exception) {
     require ROOT . '/src/pages/show-error.php';
 }
 

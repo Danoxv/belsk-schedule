@@ -1,5 +1,7 @@
 <?php
 
+use Src\Support\Security;
+use Src\Support\Str;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use Src\Exceptions\TerminateException;
 
@@ -10,7 +12,7 @@ $maxFileSize    = $config['maxFileSize'];
 $minFileSize    = $config['minFileSize'];
 $allowedMimes   = $config['allowedMimes'];
 
-$inputGroup = safeFilterInput(INPUT_POST, 'group');
+$inputGroup = Security::safeFilterInput(INPUT_POST, 'group');
 
 if (empty($inputGroup)) {
     throw new TerminateException('Группа обязательна');
@@ -20,7 +22,7 @@ if (!in_array($inputGroup, $config['groupsList'], true)) {
     throw new TerminateException('Hack attempt', TerminateException::TYPE_DANGER);
 }
 
-$scheduleLink = safeFilterInput(INPUT_POST, 'scheduleLink');
+$scheduleLink = Security::safeFilterInput(INPUT_POST, 'scheduleLink');
 if ($scheduleLink && !isScheduleLinkValid($scheduleLink, $config['pageWithScheduleFiles'], $config['allowedExtensions'])) {
     throw new TerminateException('Hack attempt', TerminateException::TYPE_DANGER);
 }
@@ -61,7 +63,7 @@ if ($scheduleLink) {
 }
 
 $forceMendeleeva = false;
-if (strContains($originalFileName, 'Менделеева')) {
+if (Str::contains($originalFileName, 'Менделеева')) {
     $forceMendeleeva = true;
 }
 
@@ -84,7 +86,7 @@ if ($debug) {
 }
 
 foreach ($worksheets as $sheet) {
-    if(strStartsWith($sheet->getTitle(), 'МЕХАНИКИ,')) {
+    if(Str::startsWith($sheet->getTitle(), 'МЕХАНИКИ,')) {
 //        $a = $sheet->getCell('C46');
 //        var_dump(getCellValue($a));
 //        die;
@@ -143,7 +145,7 @@ foreach ($worksheets as $sheet) {
                 $cellValue = formatClassHourLesson($cellValue);
             }
 
-            if (strStartsWith(trim($cellValue), $config['skipCellsThatStartsWith'])) {
+            if (Str::startsWith(trim($cellValue), $config['skipCellsThatStartsWith'])) {
                 $cellValue = '';
             }
 
@@ -187,16 +189,16 @@ foreach ($worksheets as $sheet) {
             }
 
             $nextLesson = [
-                'sheetTitle'        => sanitize($sheetTitle),
-                'cell'              => sanitize($cellCoordinate),
+                'sheetTitle'        => Security::sanitize($sheetTitle),
+                'cell'              => Security::sanitize($cellCoordinate),
 
-                'day'               => sanitize($day),
-                'number'            => sanitize($number),
-                'time'              => sanitize($time),
-                'subject'           => sanitize($subject) . ($debug ? " [$cellCoordinate]" : ''),
-                'teacher'           => sanitize($teacher),
-                'auditory'          => sanitize($auditory),
-                'mendeleeva4House'  => sanitize($mendeleeva4House),
+                'day'               => Security::sanitize($day),
+                'number'            => Security::sanitize($number),
+                'time'              => Security::sanitize($time),
+                'subject'           => Security::sanitize($subject) . ($debug ? " [$cellCoordinate]" : ''),
+                'teacher'           => Security::sanitize($teacher),
+                'auditory'          => Security::sanitize($auditory),
+                'mendeleeva4House'  => Security::sanitize($mendeleeva4House),
             ];
 
             if (!isset($scheduleData[$group])) {
@@ -208,9 +210,9 @@ foreach ($worksheets as $sheet) {
                 $prevLesson = &$scheduleData[$group][$lastKey];
 
                 if ($prevLesson['time'] === $nextLesson['time'] && $prevLesson['number'] === $nextLesson['number']) {
-                    $prevLesson['subject'] = showEmpty($prevLesson['subject']) . PHP_EOL . showEmpty($nextLesson['subject']). PHP_EOL . ($debug ? "[{$prevLesson['cell']}]-[$cellCoordinate]" : '');
-                    $prevLesson['teacher'] = showEmpty($prevLesson['teacher']) . PHP_EOL . showEmpty($nextLesson['teacher']). PHP_EOL;
-                    $prevLesson['auditory'] = showEmpty($prevLesson['auditory']) . PHP_EOL . showEmpty($nextLesson['auditory']). PHP_EOL;
+                    $prevLesson['subject'] = Str::empty($prevLesson['subject']) . PHP_EOL . Str::empty($nextLesson['subject']). PHP_EOL . ($debug ? "[{$prevLesson['cell']}]-[$cellCoordinate]" : '');
+                    $prevLesson['teacher'] = Str::empty($prevLesson['teacher']) . PHP_EOL . Str::empty($nextLesson['teacher']). PHP_EOL;
+                    $prevLesson['auditory'] = Str::empty($prevLesson['auditory']) . PHP_EOL . Str::empty($nextLesson['auditory']). PHP_EOL;
                     $prevLesson['mendeleeva4House'] = $nextLesson['mendeleeva4House'];
                     continue;
                 }
@@ -299,7 +301,7 @@ foreach ($days as $day) {
             $lesson['mendeleeva4House'] ? 'Занятие на Менделеева, д. 4' : '',
             $lesson['mendeleeva4House'] ? 'table-success' : ''
         );
-        echo "<td title='$technicalTitle'>" . sanitize($lesson['number']) . '</td>';
+        echo "<td title='$technicalTitle'>" . Security::sanitize($lesson['number']) . '</td>';
         echo "<td>" . $lesson['time']           . '</td>';
         echo "<td>" . nl2br($lesson['subject'])        . '</td>';
         echo "<td>" . nl2br($lesson['teacher']) . '</td>';

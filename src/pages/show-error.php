@@ -1,4 +1,6 @@
 <?php
+
+use Src\Support\Str;
 use Src\Exceptions\TerminateException;
 
 /** @var TerminateException $exception */
@@ -8,7 +10,7 @@ if (!$message) {
     $message = 'Что-то пошло не так.';
 }
 
-$message = strFinish($message, '.');
+$message = Str::finish($message, '.');
 
 $type = $exception->getType();
 ?>
