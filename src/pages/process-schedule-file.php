@@ -3,7 +3,7 @@
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use Src\Exceptions\TerminateException;
 
-$config = require ROOT . '/src/config.php';
+$config = require ROOT . '/src/config/config.php';
 
 $debug          = $config['debug'];
 $maxFileSize    = $config['maxFileSize'];
@@ -60,6 +60,7 @@ if ($scheduleLink) {
     throw new TerminateException('Файл обязателен');
 }
 
+$forceMendeleeva = false;
 if (strContains($originalFileName, 'Менделеева')) {
     $forceMendeleeva = true;
 }

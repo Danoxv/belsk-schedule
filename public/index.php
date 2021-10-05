@@ -4,7 +4,7 @@ $_start = microtime(true);
 
 define('ROOT', dirname(__FILE__, 2));
 
-$_config = require ROOT . '/src/config.php';
+$_config = require ROOT . '/src/config/config.php';
 
 if ($_config['debug'] ?? false) {
     ini_set('display_errors', 1);
@@ -19,7 +19,7 @@ require_once ROOT . '/src/functions.php';
 $_requestUri = safeFilterInput(INPUT_SERVER, 'REQUEST_URI');
 $_requestUri = strtok($_requestUri, '?'); // Берём REQUEST_URI без GET-параметров
 
-$_routes = require ROOT . '/src/routes.php';
+$_routes = require ROOT . '/src/config/routes.php';
 
 use Src\Exceptions\TerminateException;
 

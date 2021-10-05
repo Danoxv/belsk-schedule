@@ -7,7 +7,7 @@ $fileName = safeFilterInput(INPUT_GET, 'f');
 if (empty($fileName)) {
     throw new TerminateException('Please pass "f" param with filename for opening. Ex: [...]/download-sample?f=1.xls');
 }
-$config = require ROOT . '/src/config.php';
+$config = require ROOT . '/src/config/config.php';
 
 $allowedFiles = $config['samples'] ?? [];
 

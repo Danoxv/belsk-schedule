@@ -21,7 +21,7 @@ return [
         '2.xls',
         '3.xls',
     ],
-    'groupsList' => require ROOT . '/src/groups-list.php',
+    'groupsList' => require ROOT . '/src/config/groups-list.php',
     'days' => [
         'Понедельник',
         'Вторник',

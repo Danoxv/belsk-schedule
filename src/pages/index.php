@@ -1,5 +1,5 @@
 <?php
-$config = require ROOT . '/src/config.php';
+$config = require ROOT . '/src/config/config.php';
 
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\DomCrawler\Link;
