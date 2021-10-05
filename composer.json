@@ -1,7 +1,6 @@
 {
     "require": {
         "phpoffice/phpspreadsheet": "^1.18",
-        "symfony/dom-crawler": "^5.3",
         "ext-dom": "*"
     },
     "autoload": {

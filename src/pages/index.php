@@ -1,31 +1,32 @@
 <?php
 $config = require ROOT . '/src/config/config.php';
 
-use Symfony\Component\DomCrawler\Crawler;
-use Symfony\Component\DomCrawler\Link;
-
 $pageWithFiles = $config['pageWithScheduleFiles'];
 $html = @file_get_contents($pageWithFiles);
 
 $links = [];
 
 if ($html !== false) {
-    $crawler = new Crawler($html, getHost($pageWithFiles));
+    $doc = new DOMDocument;
 
-    /** @var Link[] $crawlerLinks */
-    $crawlerLinks = $crawler->filterXPath('//body//a')->links();
+    @$doc->loadHTML($html);
 
-    foreach ($crawlerLinks as $link) {
-        $linkUri = $link->getUri();
+    $xpath = new DOMXPath($doc);
+
+    $entries = $xpath->query('//body//a');
+    $host = getHost($pageWithFiles);
+
+    /** @var DOMElement[] $entries */
+    foreach ($entries as $entry) {
+        $linkUri = sanitize($entry->getAttribute('href'));
 
         if (!strEndsWith($linkUri, $config['allowedExtensions'])) {
             continue;
         }
 
-        $linkUri = sanitize($linkUri);
+        $linkUri = "$host/$linkUri";
 
-        $node = $link->getNode();
-        $linkText = sanitize($node->textContent);
+        $linkText = sanitize($entry->textContent);
 
         $links[] = [
             'uri' => $linkUri,
@@ -33,7 +34,6 @@ if ($html !== false) {
         ];
     }
 }
-
 ?>
 
 <!doctype html>
