@@ -6,9 +6,18 @@ class Lesson
 {
     private Cell $cell;
 
+    /**
+     * @var string
+     */
+    public string $group;
+
     public function __construct(Cell $cell)
     {
         $this->cell = $cell;
+
+        $this->group = $this->cell->getSheet()->getLessonGroupByColumn(
+            $this->cell->getColumn()
+        );
     }
 
     public function getCell()

@@ -5,30 +5,82 @@ namespace Src\Models;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use Src\Config\Config;
 use Src\Config\ExcelConfig;
+use Src\Config\SheetProcessingConfig;
 use Src\Support\Collection;
 use Src\Support\Str;
 
 class Sheet
 {
     private Worksheet $worksheet;
+    private Config $config;
     private ExcelConfig $excelConfig;
+    private SheetProcessingConfig $sheetProcessingConfig;
     private Collection $cells;
+    private Collection $lessons;
 
-    private int $firstRow = 1;
-    private int $lastRow;
+    private bool $isProcessed = false;
 
-    private string $firstColumn = 'A';
-    private string $lastColumn;
+    private ?string $groupColumn = null;
+    private bool $hasMendeleeva4 = false;
 
     /**
      * @param Worksheet $worksheet
+     * @param SheetProcessingConfig $sheetProcessingConfig
      */
-    public function __construct(Worksheet $worksheet)
+    public function __construct(Worksheet $worksheet, SheetProcessingConfig $sheetProcessingConfig)
     {
-        $this->worksheet = clone $worksheet;
-        $this->cells = new Collection();
-        $this->resolveLastRowAndColumn();
-        $this->resolveExcelConfig();
+        $this->worksheet                = clone $worksheet;
+
+        $this->config                   = Config::getInstance();
+        $this->sheetProcessingConfig    = $sheetProcessingConfig;
+        $this->excelConfig              = new ExcelConfig($this);
+
+        $this->cells                    = new Collection();
+        $this->lessons                  = new Collection();
+
+        $this->init();
+    }
+
+    /**
+     * Start Sheet processing:
+     * find and add Cells and Lessons.
+     */
+    public function process()
+    {
+        if (!$this->isProcessable()) {
+            return;
+        }
+
+        $columns = $this->getColumnsRange();
+        $rows = $this->getRowsRange();
+
+        $conf = &$this->sheetProcessingConfig;
+        $hasFilterByGroup = $conf->studentsGroup !== null;
+
+        foreach ($columns as $column) {
+            // Optimization: we are already found and processed selected group.
+            if ($hasFilterByGroup && $this->isGroupColumnFound()) {
+                break;
+            }
+
+            $lessonGroup = $this->getLessonGroupByColumn($column);
+
+            // Apply filter by student's group
+            if ($hasFilterByGroup && $conf->studentsGroup !== $lessonGroup) {
+                continue;
+            }
+
+            if ($hasFilterByGroup) {
+                $this->setGroupColumn($column);
+            }
+
+            foreach ($rows as $row) {
+                $this->processCellAdding($column, $row);
+            }
+        }
+
+        // All done, mark sheet as processed
+        $this->isProcessed = true;
     }
 
     public function getWorksheet(): Worksheet
@@ -39,15 +91,6 @@ class Sheet
     public function getTitle()
     {
         return trim($this->worksheet->getTitle());
-    }
-
-    public function addCell(string $coordinate)
-    {
-        $cellModel = new Cell($coordinate, $this);
-
-        $cellModel->setLesson(new Lesson($cellModel));
-
-        $this->cells->put($coordinate, $cellModel);
     }
 
     /**
@@ -76,26 +119,191 @@ class Sheet
         return trim($cellValue);
     }
 
+    /**
+     * @return ExcelConfig
+     */
     public function getExcelConfig(): ExcelConfig
     {
         return $this->excelConfig;
     }
 
-    public function isProcessable(): bool
+    /**
+     * @return bool
+     */
+    private function isProcessable(): bool
     {
         return $this->excelConfig->isProcessable();
     }
 
     /**
-     * @param string|null $start
-     * @param string|null $end
+     * @return bool
+     */
+    public function isProcessed():bool
+    {
+        return $this->isProcessed;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isGroupColumnFound(): bool
+    {
+        return $this->groupColumn !== null;
+    }
+
+    private function setGroupColumn(string $column)
+    {
+        $this->groupColumn = $column;
+    }
+
+    /**
+     * Resolve Excel config, detect "Has Mendeleeva 4 house".
+     */
+    private function init()
+    {
+        $firstColumn = 'A';
+        $firstRow = 1;
+
+        $highestColRow = $this->worksheet->getHighestRowAndColumn();
+        $highestColumn = $highestColRow['column'];
+        $highestRow = $highestColRow['row'];
+
+        $columns = $this->generateColumnsRange($firstColumn, $highestColumn);
+        $rows = $this->generateRowsRange($firstRow, $highestRow);
+
+        $excelConfig = &$this->excelConfig;
+
+        foreach ($columns as $column) {
+            foreach ($rows as $row) {
+                $coordinate = $column.$row;
+
+                $rawCellValue = $this->getCellValue($coordinate, true);
+                $cellValue = trim($rawCellValue);
+
+                /*
+                 * Resolve Excel config
+                 */
+
+                if (!$excelConfig->isProcessable()) {
+                    $cleanCellValue = Str::lower(Str::replaceManySpacesWithOne($cellValue));
+
+                    if (in_array($cleanCellValue, $this->config->dayWords)) {
+                        $excelConfig->dayCol           = $column;
+                        $excelConfig->groupNamesRow    = $row;
+                        $excelConfig->firstScheduleRow = nextRow($excelConfig->groupNamesRow);
+                    } elseif (in_array($cleanCellValue, $this->config->timeWords)) {
+                        $excelConfig->timeCol          = $column;
+                        $excelConfig->firstGroupCol    = nextColumn($excelConfig->timeCol);
+                        $excelConfig->groupNamesRow    = $row;
+                        $excelConfig->firstScheduleRow = nextRow($excelConfig->groupNamesRow);
+                    } else if (isClassHourLesson($rawCellValue)) {
+                        $excelConfig->classHourLessonColumn = $column;
+                    }
+                }
+
+                /*
+                 * Detect "Has Mendeleeva 4 house"
+                 */
+
+                if ($this->sheetProcessingConfig->forceMendeleeva4) {
+                    $this->hasMendeleeva4 = true;
+                }
+
+                if (!$this->hasMendeleeva4 && $cellValue) {
+                    if (
+                        Str::contains(Str::lower($cellValue), 'менделеева') &&
+                        Str::contains($cellValue, '4')
+                    ) {
+                        $this->hasMendeleeva4 = true;
+                    }
+                }
+            }
+        }
+
+        $excelConfig->lastGroupCol = $highestColumn;
+        $excelConfig->lastScheduleRow = $highestRow;
+        if ($excelConfig->classHourLessonColumn === null) {
+            $excelConfig->classHourLessonColumn = false;
+        }
+    }
+
+    /**
+     * Get processable (potentially with lessons)
+     * columns range.
+     *
      * @return array
      */
-    public function getColumnsRange(string $start = null, string $end = null): array
+    private function getColumnsRange(): array
     {
-        $start = $start ?? $this->firstColumn;
-        $end = $end ?? $this->lastColumn;
+        $start = $this->excelConfig->firstGroupCol;
+        $end = $this->excelConfig->lastGroupCol;
 
+        return $this->generateColumnsRange($start, $end);
+    }
+
+    /**
+     * Get processable (potentially with lessons)
+     * rows range.
+     *
+     * @return array
+     */
+    private function getRowsRange(): array
+    {
+        $start = $this->excelConfig->firstScheduleRow;
+        $end = $this->excelConfig->lastScheduleRow;
+
+        return $this->generateRowsRange($start, $end);
+    }
+
+    private function containsClassHourLesson(string $rawCellValue): bool
+    {
+        if (empty($rawCellValue)) {
+            return false;
+        }
+
+        return $this->formatClassHourLesson($rawCellValue) === 'Классный час';
+    }
+
+    private function formatClassHourLesson(string $rawCellValue): string
+    {
+        $lesson = trim($rawCellValue);
+
+        if (empty($lesson)) {
+            return '';
+        }
+
+        $space = ' ';
+        $uniqueChar = '|';
+
+        $spacesCount = 10;
+        $replacementPerformed = false;
+        do {
+            $lesson = str_replace(str_repeat($space, $spacesCount), $uniqueChar, $lesson, $count);
+
+            if ($count > 0) {
+                $replacementPerformed = true;
+            }
+
+            $spacesCount--;
+        } while($count === 0 && $spacesCount > 0);
+
+        $lesson = Str::removeSpaces($lesson);
+
+        if ($replacementPerformed) {
+            $lesson = str_replace($uniqueChar, $space, $lesson);
+        }
+
+        $lesson = Str::lower($lesson);
+        return Str::ucfirst($lesson);
+    }
+
+    /**
+     * @param string $start
+     * @param string $end
+     * @return array
+     */
+    private function generateColumnsRange(string $start, string $end): array
+    {
         $end++;
         $letters = [];
         while ($start !== $end) {
@@ -105,66 +313,40 @@ class Sheet
     }
 
     /**
-     * @param int|null $start
-     * @param int|null $end
+     * @param int $start
+     * @param int $end
      * @return array
      */
-    public function getRowsRange(int $start = null, int $end = null): array
+    private function generateRowsRange(int $start, int $end): array
     {
-        $start = $start ?? $this->firstRow;
-        $end = $end ?? $this->lastRow;
-
         return range($start, $end);
     }
 
-    private function resolveExcelConfig()
+    public function getLessonGroupByColumn(string $column)
     {
-        $config = Config::getInstance();
-
-        $dayWords = $config->dayWords;
-        $timeWords = $config->timeWords;
-
-        $excelConfig = new ExcelConfig();
-
-        $columns = $this->getColumnsRange();
-        $rows = $this->getRowsRange();
-
-        foreach ($columns as $column) {
-            foreach ($rows as $row) {
-                if ($excelConfig->isProcessable()) {
-                    break(2);
-                }
-
-                $rawCellValue = $this->getCellValue($column.$row, true);
-
-                $cellValue = trim(Str::lower(Str::replaceManySpacesWithOne($rawCellValue)));
-
-                if (in_array($cellValue, $dayWords)) {
-                    $excelConfig->dayCol           = $column;
-                    $excelConfig->groupNamesRow    = $row;
-                    $excelConfig->firstScheduleRow = nextRow($excelConfig->groupNamesRow);
-                } elseif (in_array($cellValue, $timeWords)) {
-                    $excelConfig->timeCol          = $column;
-                    $excelConfig->firstGroupCol    = nextColumn($excelConfig->timeCol);
-                    $excelConfig->groupNamesRow    = $row;
-                    $excelConfig->firstScheduleRow = nextRow($excelConfig->groupNamesRow);
-                } else if (isClassHourLesson($rawCellValue)) {
-                    $excelConfig->classHourLessonColumn = $column;
-                }
-            }
-        }
-
-        if ($excelConfig->classHourLessonColumn === null) {
-            $excelConfig->classHourLessonColumn = false;
-        }
-
-        $this->excelConfig = $excelConfig;
+        return $this->getCellValue($column.$this->excelConfig->groupNamesRow);
     }
 
-    private function resolveLastRowAndColumn()
+    /**
+     * @param string $column
+     * @param int $row
+     */
+    private function processCellAdding(string $column, int $row)
     {
-        $highestColRow = $this->worksheet->getHighestRowAndColumn();
-        $this->lastColumn = $highestColRow['column'];
-        $this->lastRow = $highestColRow['row'];
+        $coordinate = $column.$row;
+
+        /*
+         * Process Cell
+         */
+        $cell = new Cell($coordinate, $this);
+
+        /*
+         * Process Lesson
+         */
+        $lesson = new Lesson($cell);
+
+        $cell->setLesson($lesson);
+
+        $this->cells->put($coordinate, $cell);
     }
 }

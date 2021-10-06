@@ -2,16 +2,27 @@
 
 namespace Src\Config;
 
+use Src\Models\Sheet;
+
 class ExcelConfig
 {
     public $dayCol = null;
     public $timeCol = null;
-    public $firstGroupCol = null;
-
     public $groupNamesRow = null;
+
+    public $firstGroupCol = null;
+    public $lastGroupCol = null;
     public $firstScheduleRow = null;
+    public $lastScheduleRow = null;
 
     public $classHourLessonColumn = null;
+
+    private Sheet $sheet;
+
+    public function __construct(Sheet $sheet)
+    {
+        $this->sheet = $sheet;
+    }
 
     /**
      * @return bool

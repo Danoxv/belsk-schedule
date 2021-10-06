@@ -1,6 +1,7 @@
 <?php
 
 use Src\Config\Config;
+use Src\Config\SheetProcessingConfig;
 use Src\Models\Sheet;
 use Src\Support\Security;
 use Src\Support\Str;
@@ -83,35 +84,23 @@ if ($debug) {
     echo '<pre>';
 }
 
-$sheets = [];
+$sheetWithGroup = null;
 foreach ($spreadsheet->getAllSheets() as $worksheet) {
-    $sheet = new Sheet($worksheet);
+    $sheet = new Sheet($worksheet, new SheetProcessingConfig([
+        'studentsGroup' => $inputGroup,
+        'forceMendeleeva4' => $forceMendeleeva
+    ]));
 
-    if (!$sheet->isProcessable()) {
-        continue;
+    $sheet->process();
+
+    if ($sheet->isGroupColumnFound()) {
+        $sheetWithGroup = $sheet;
     }
-
-    $excelConfig = $sheet->getExcelConfig();
-
-    $columns = $sheet->getColumnsRange();
-    $rows = $sheet->getRowsRange();
-
-    foreach ($columns as $column) {
-        $group = $sheet->getCellValue($column.$excelConfig->groupNamesRow);
-
-        if ($group !== $inputGroup) {
-            continue;
-        }
-
-        foreach ($rows as $row) {
-            $sheet->addCell($column.$row);
-        }
-    }
-
-    $sheets[] = $sheet;
 }
 
-foreach ($sheets as $sheet) {
+dd($sheetWithGroup);
+
+foreach ($sheetWithGroup->getCells() as $cell) {
     foreach ($sheet->getCells() as $cell) {
         dump($cell);
     }

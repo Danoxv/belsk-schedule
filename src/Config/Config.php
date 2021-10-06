@@ -2,8 +2,12 @@
 
 namespace Src\Config;
 
+use Src\Traits\PropertiesApplier;
+
 class Config
 {
+    use PropertiesApplier;
+
     public array $version;
     public bool $debug;
     public int $maxFileSize;
@@ -143,16 +147,6 @@ class Config
             65 => 'ЭМ-31',
             66 => 'ЭМД-11',
         ];
-    }
-
-    /**
-     * @param array $config
-     */
-    private function applyFromArray(array $config)
-    {
-        foreach ($config as $key => $value) {
-            $this->$key = $value;
-        }
     }
 
     /*
