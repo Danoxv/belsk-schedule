@@ -1,5 +1,6 @@
 <?php
 
+use Src\Config\Config;
 use Src\Exceptions\TerminateException;
 use Src\Support\Security;
 
@@ -8,9 +9,9 @@ $fileName = Security::safeFilterInput(INPUT_GET, 'f');
 if (empty($fileName)) {
     throw new TerminateException('Please pass "f" param with filename for opening. Ex: [...]/download-sample?f=1.xls');
 }
-$config = require ROOT . '/src/config/config.php';
+$config = Config::getInstance();
 
-$allowedFiles = $config['samples'] ?? [];
+$allowedFiles = $config->samples ?? [];
 
 if (!in_array($fileName, $allowedFiles, true)) {
     throw new TerminateException('Hack attempt', TerminateException::TYPE_DANGER);

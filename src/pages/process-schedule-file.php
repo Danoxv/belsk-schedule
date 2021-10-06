@@ -1,16 +1,18 @@
 <?php
 
+use Src\Config\Config;
+use Src\Models\Sheet;
 use Src\Support\Security;
 use Src\Support\Str;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use Src\Exceptions\TerminateException;
 
-$config = require ROOT . '/src/config/config.php';
+$config = Config::getInstance();
 
-$debug          = $config['debug'];
-$maxFileSize    = $config['maxFileSize'];
-$minFileSize    = $config['minFileSize'];
-$allowedMimes   = $config['allowedMimes'];
+$debug          = $config->debug;
+$maxFileSize    = $config->maxFileSize;
+$minFileSize    = $config->minFileSize;
+$allowedMimes   = $config->allowedMimes;
 
 $inputGroup = Security::safeFilterInput(INPUT_POST, 'group');
 
@@ -18,12 +20,12 @@ if (empty($inputGroup)) {
     throw new TerminateException('Группа обязательна');
 }
 
-if (!in_array($inputGroup, $config['groupsList'], true)) {
+if (!in_array($inputGroup, $config->groupsList, true)) {
     throw new TerminateException('Hack attempt', TerminateException::TYPE_DANGER);
 }
 
 $scheduleLink = Security::safeFilterInput(INPUT_POST, 'scheduleLink');
-if ($scheduleLink && !isScheduleLinkValid($scheduleLink, $config['pageWithScheduleFiles'], $config['allowedExtensions'])) {
+if ($scheduleLink && !isScheduleLinkValid($scheduleLink, $config->pageWithScheduleFiles, $config->allowedExtensions)) {
     throw new TerminateException('Hack attempt', TerminateException::TYPE_DANGER);
 }
 
@@ -77,7 +79,43 @@ try {
     throw new TerminateException('Ошибка чтения файла: ' . $e->getMessage());
 }
 
-$worksheets = $spreadsheet->getAllSheets();
+$sheets = [];
+foreach ($spreadsheet->getAllSheets() as $worksheet) {
+    $sheet = new Sheet($worksheet);
+
+    var_dump($sheet->isProcessable());
+
+    if (!$sheet->isProcessable()) {
+        continue;
+    }
+
+    $excelConfig = $sheet->getExcelConfig();
+
+    $columns = $sheet->getColumnsRange();
+    $rows = $sheet->getRowsRange();
+
+    foreach ($columns as $column) {
+        $group = $sheet->getCellValue($column.$excelConfig->groupNamesRow);
+
+        if ($group !== $inputGroup) {
+            continue;
+        }
+
+        foreach ($rows as $row) {
+            $sheet->addCell($column.$row);
+        }
+    }
+
+    $sheets[] = $sheet;
+}
+
+foreach ($sheets as $sheet) {
+    foreach ($sheet->getCells() as $cell) {
+        var_dump($cell);
+    }
+}
+
+die;
 
 $scheduleData = [];
 
@@ -86,22 +124,17 @@ if ($debug) {
 }
 
 foreach ($worksheets as $sheet) {
-    if(Str::startsWith($sheet->getTitle(), 'МЕХАНИКИ,')) {
-//        $a = $sheet->getCell('C46');
-//        var_dump(getCellValue($a));
-//        die;
-    }
 
-    $excelConfig = resolveExcelConfig($sheet, $config);
+    //$excelConfig = resolveExcelConfig($sheet, $config);
 
-    if (!isExcelConfigProcessable($excelConfig)) {
-        continue;
-    }
+//    if (!isExcelConfigProcessable($excelConfig)) {
+//        continue;
+//    }
 
     $sheetTitle = trim($sheet->getTitle());
 
-    $firstColumn = $excelConfig['firstGroupCol'];
-    $firstRow = $excelConfig['firstScheduleRow'];
+    $firstColumn = $excelConfig->firstGroupCol;
+    $firstRow = $excelConfig->firstScheduleRow;
 
     $highestColRow = $sheet->getHighestRowAndColumn();
     $lastColumn = $highestColRow['column'];
@@ -119,7 +152,7 @@ foreach ($worksheets as $sheet) {
             break(2);
         }
 
-        $group = getCellValue($sheet->getCell($column.$excelConfig['groupNamesRow']));
+        $group = getCellValue($sheet->getCell($column.$excelConfig->groupNamesRow));
 
         if (empty($group) || $group !== $inputGroup) {
             continue;
@@ -135,9 +168,9 @@ foreach ($worksheets as $sheet) {
 
             $isInvisibleCell = isCellInvisible($cellCoordinate, $sheet);
 
-            if (empty($cellValue) && !empty($excelConfig['classHourLessonColumn'])) {
+            if (empty($cellValue) && !empty($excelConfig->classHourLessonColumn)) {
                 // Hack: try to find any class hour lesson
-                $cellValue = getCellValue($sheet->getCell($excelConfig['classHourLessonColumn'].$row));
+                $cellValue = getCellValue($sheet->getCell($excelConfig->classHourLessonColumn.$row));
             }
 
             $isClassHour = isClassHourLesson($cellValue);
@@ -145,13 +178,13 @@ foreach ($worksheets as $sheet) {
                 $cellValue = formatClassHourLesson($cellValue);
             }
 
-            if (Str::startsWith(trim($cellValue), $config['skipCellsThatStartsWith'])) {
+            if (Str::startsWith(trim($cellValue), $config->skipCellsThatStartsWith)) {
                 $cellValue = '';
             }
 
             $timeRow = $row;
             do {
-                $time = getCellValue($sheet->getCell($excelConfig['timeCol'].$timeRow));
+                $time = getCellValue($sheet->getCell($excelConfig->timeCol.$timeRow));
 
                 if ((empty($time) && empty($cellValue) && $isInvisibleCell)) {
                     continue(2);
@@ -172,7 +205,7 @@ foreach ($worksheets as $sheet) {
 
             list('time' => $time, 'number' => $number) = parseTimeCellValue($time, $cellCoordinate);
 
-            $day = resolveDay($excelConfig['dayCol'], $sheet, $row);
+            $day = resolveDay($excelConfig->dayCol, $sheet, $row);
 
             list('subject' => $subject, 'teacher' => $teacher, 'auditory' => $auditory) = parseLessonCellValue($cellValue);
 
@@ -182,7 +215,7 @@ foreach ($worksheets as $sheet) {
                     $mendeleeva4House = true;
                 } else {
                     $cellColor = $sheet->getCell($cellCoordinate)->getStyle()->getFill()->getEndColor()->getRGB();
-                    if (in_array($cellColor, $config['mendeleeva4HouseCellColors'], true)) {
+                    if (in_array($cellColor, $config->mendeleeva4HouseCellColors, true)) {
                         $mendeleeva4House = true;
                     }
                 }
@@ -259,7 +292,7 @@ echo '
     </div>
 ';
 
-foreach ($config['messagesOnSchedule'] as $message) {
+foreach ($config->messagesOnSchedule as $message) {
     $type = $message['type'] ?? 'primary';
     $content = trim($message['content'] ?? '');
     echo "

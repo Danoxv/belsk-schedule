@@ -1,11 +1,12 @@
 <?php
 
+use Src\Config\Config;
 use Src\Support\Security;
 use Src\Support\Str;
 
-$config = require ROOT . '/src/config/config.php';
+$config = Config::getInstance();
 
-$pageWithFiles = $config['pageWithScheduleFiles'];
+$pageWithFiles = $config->pageWithScheduleFiles;
 $html = @file_get_contents($pageWithFiles);
 
 $links = [];
@@ -24,7 +25,7 @@ if ($html !== false) {
     foreach ($entries as $entry) {
         $linkUri = Security::sanitize($entry->getAttribute('href'));
 
-        if (!Str::endsWith($linkUri, $config['allowedExtensions'])) {
+        if (!Str::endsWith($linkUri, $config->allowedExtensions)) {
             continue;
         }
 
@@ -84,12 +85,12 @@ if ($html !== false) {
                 <div class="col">
                     <div class="mb-3">
                         <label for="scheduleFile" class="form-label">Либо <b>загрузите свой файл</b> расписания:</label>
-                        <input name="scheduleFile" class="form-control" type="file" accept="<?= implode(',', $config['allowedMimes']) ?>" id="scheduleFile" aria-describedby="scheduleFileHelp">
+                        <input name="scheduleFile" class="form-control" type="file" accept="<?= implode(',', $config->allowedMimes) ?>" id="scheduleFile" aria-describedby="scheduleFileHelp">
                         <div id="scheduleFileHelp" class="form-text">
                             Выберите Excel-файл (XLS/XLSX).
-                            <?php if (!empty($config['samples'])): ?>
+                            <?php if (!empty($config->samples)): ?>
                                 Скачать примеры:<br />
-                                <?php foreach ($config['samples'] as $sample): ?>
+                                <?php foreach ($config->samples as $sample): ?>
                                     <a href="download-sample?f=<?= $sample ?>"><?= $sample ?></a>
                                 <?php endforeach; ?>
                             <?php endif; ?>
@@ -103,7 +104,7 @@ if ($html !== false) {
                     <label for="group" class="form-label"><b>Группа:</b></label>
                     <select name="group" class="form-select" aria-label="Выберите группу" id="group" aria-describedby="groupHelp">
                         <!-- <option value="" selected disabled>Выберите...</option> -->
-                        <?php foreach ($config['groupsList'] as $group): ?>
+                        <?php foreach ($config->groupsList as $group): ?>
                             <option value="<?= $group ?>"><?= $group ?></option>
                         <?php endforeach; ?>
                     </select>
