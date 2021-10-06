@@ -8,5 +8,8 @@
         "psr-4": {
             "Src\\": "src/"
         }
+    },
+    "require-dev": {
+        "symfony/var-dumper": "^5.3"
     }
 }

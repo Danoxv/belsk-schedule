@@ -113,7 +113,7 @@ foreach ($spreadsheet->getAllSheets() as $worksheet) {
 
 foreach ($sheets as $sheet) {
     foreach ($sheet->getCells() as $cell) {
-        var_dump($cell);
+        dump($cell);
     }
 }
 
