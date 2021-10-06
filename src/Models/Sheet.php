@@ -5,13 +5,14 @@ namespace Src\Models;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use Src\Config\Config;
 use Src\Config\ExcelConfig;
+use Src\Support\Collection;
 use Src\Support\Str;
 
 class Sheet
 {
     private Worksheet $worksheet;
     private ExcelConfig $excelConfig;
-    private array $cells = [];
+    private Collection $cells;
 
     private int $firstRow = 1;
     private int $lastRow;
@@ -25,6 +26,7 @@ class Sheet
     public function __construct(Worksheet $worksheet)
     {
         $this->worksheet = clone $worksheet;
+        $this->cells = new Collection();
         $this->resolveLastRowAndColumn();
         $this->resolveExcelConfig();
     }
@@ -45,13 +47,13 @@ class Sheet
 
         $cellModel->setLesson(new Lesson($cellModel));
 
-        $this->cells[] = $cellModel;
+        $this->cells->put($coordinate, $cellModel);
     }
 
     /**
-     * @return Cell[]
+     * @return Collection
      */
-    public function getCells(): array
+    public function getCells(): Collection
     {
         return $this->cells;
     }
@@ -63,7 +65,7 @@ class Sheet
      */
     public function getCellValue(string $coordinate, bool $rawValue = false): string
     {
-        $cell = $this->cells[$coordinate] ?? $this->worksheet->getCell($coordinate);
+        $cell = $this->cells->get($coordinate) ?? $this->worksheet->getCell($coordinate);
 
         $cellValue = (string) $cell;
 
@@ -135,7 +137,7 @@ class Sheet
 
                 $rawCellValue = $this->getCellValue($column.$row, true);
 
-                $cellValue = Str::lower(Str::replaceManySpacesWithOne($rawCellValue));
+                $cellValue = trim(Str::lower(Str::replaceManySpacesWithOne($rawCellValue)));
 
                 if (in_array($cellValue, $dayWords)) {
                     $excelConfig->dayCol           = $column;

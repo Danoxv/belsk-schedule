@@ -79,11 +79,13 @@ try {
     throw new TerminateException('Ошибка чтения файла: ' . $e->getMessage());
 }
 
+if ($debug) {
+    echo '<pre>';
+}
+
 $sheets = [];
 foreach ($spreadsheet->getAllSheets() as $worksheet) {
     $sheet = new Sheet($worksheet);
-
-    var_dump($sheet->isProcessable());
 
     if (!$sheet->isProcessable()) {
         continue;
@@ -118,10 +120,6 @@ foreach ($sheets as $sheet) {
 die;
 
 $scheduleData = [];
-
-if ($debug) {
-    echo '<pre>';
-}
 
 foreach ($worksheets as $sheet) {
 
