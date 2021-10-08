@@ -15,13 +15,13 @@ class Sheet
     private Config $config;
     private ExcelConfig $excelConfig;
     private SheetProcessingConfig $sheetProcessingConfig;
-    private Collection $cells;
-    private Collection $lessons;
 
     private bool $isProcessed = false;
 
     private ?string $groupColumn = null;
     private bool $hasMendeleeva4 = false;
+
+    private Collection $groups;
 
     /**
      * @param Worksheet $worksheet
@@ -35,17 +35,17 @@ class Sheet
         $this->sheetProcessingConfig    = $sheetProcessingConfig;
         $this->excelConfig              = new ExcelConfig($this);
 
-        $this->cells                    = new Collection();
-        $this->lessons                  = new Collection();
+        $this->groups                   = new Collection();
 
         $this->init();
+        $this->process();
     }
 
     /**
      * Start Sheet processing:
-     * find and add Cells and Lessons.
+     * recognize and add Groups.
      */
-    public function process()
+    private function process()
     {
         if (!$this->isProcessable()) {
             return;
@@ -63,10 +63,10 @@ class Sheet
                 break;
             }
 
-            $lessonGroup = $this->getLessonGroupByColumn($column);
+            $groupName = $this->getGroupNameByColumn($column);
 
             // Apply filter by student's group
-            if ($hasFilterByGroup && $conf->studentsGroup !== $lessonGroup) {
+            if ($hasFilterByGroup && $conf->studentsGroup !== $groupName) {
                 continue;
             }
 
@@ -74,13 +74,16 @@ class Sheet
                 $this->setGroupColumn($column);
             }
 
-            foreach ($rows as $row) {
-                $this->processCellAdding($column, $row);
-            }
+            $this->addGroup($column, $groupName, $rows);
         }
 
         // All done, mark sheet as processed
         $this->isProcessed = true;
+    }
+
+    public function getGroups()
+    {
+        return $this->groups;
     }
 
     public function getWorksheet(): Worksheet
@@ -94,37 +97,19 @@ class Sheet
     }
 
     /**
-     * @return Collection
-     */
-    public function getCells(): Collection
-    {
-        return $this->cells;
-    }
-
-    /**
      * @param string $coordinate
      * @param bool $rawValue
      * @return string
      */
     public function getCellValue(string $coordinate, bool $rawValue = false): string
     {
-        $cell = $this->cells->get($coordinate) ?? $this->worksheet->getCell($coordinate);
-
-        $cellValue = (string) $cell;
+        $cellValue = (string) $this->worksheet->getCell($coordinate);
 
         if ($rawValue) {
             return $cellValue;
         }
 
         return trim($cellValue);
-    }
-
-    /**
-     * @return ExcelConfig
-     */
-    public function getExcelConfig(): ExcelConfig
-    {
-        return $this->excelConfig;
     }
 
     /**
@@ -141,6 +126,11 @@ class Sheet
     public function isProcessed():bool
     {
         return $this->isProcessed;
+    }
+
+    public function getTimeColumn(): ?string
+    {
+        return $this->excelConfig->timeCol;
     }
 
     /**
@@ -322,31 +312,37 @@ class Sheet
         return range($start, $end);
     }
 
-    public function getLessonGroupByColumn(string $column)
+    public function getGroupNameByColumn(string $column)
     {
         return $this->getCellValue($column.$this->excelConfig->groupNamesRow);
     }
 
     /**
-     * @param string $column
-     * @param int $row
+     * @param string $groupColumn
+     * @param string $groupName
+     * @param array $rows
      */
-    private function processCellAdding(string $column, int $row)
+    public function addGroup(string $groupColumn, string $groupName, array $rows)
     {
-        $coordinate = $column.$row;
+        $group = new Group($groupColumn, $groupName, $this);
+        $group->process($rows);
 
-        /*
-         * Process Cell
-         */
-        $cell = new Cell($coordinate, $this);
+        $this->groups->put($groupColumn, $group);
+    }
 
-        /*
-         * Process Lesson
-         */
-        $lesson = new Lesson($cell);
+    /**
+     * @return bool
+     */
+    public function hasClassHourLessonColumn(): bool
+    {
+        return !empty($this->excelConfig->classHourLessonColumn);
+    }
 
-        $cell->setLesson($lesson);
-
-        $this->cells->put($coordinate, $cell);
+    /**
+     * @return string|null
+     */
+    public function getClassHourLessonColumn(): ?string
+    {
+        return empty($this->excelConfig->classHourLessonColumn) ? null : $this->excelConfig->classHourLessonColumn;
     }
 }

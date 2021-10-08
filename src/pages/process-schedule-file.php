@@ -2,6 +2,7 @@
 
 use Src\Config\Config;
 use Src\Config\SheetProcessingConfig;
+use Src\Models\Group;
 use Src\Models\Sheet;
 use Src\Support\Security;
 use Src\Support\Str;
@@ -91,19 +92,15 @@ foreach ($spreadsheet->getAllSheets() as $worksheet) {
         'forceMendeleeva4' => $forceMendeleeva
     ]));
 
-    $sheet->process();
-
     if ($sheet->isGroupColumnFound()) {
         $sheetWithGroup = $sheet;
+        break;
     }
 }
 
-dd($sheetWithGroup);
-
-foreach ($sheetWithGroup->getCells() as $cell) {
-    foreach ($sheet->getCells() as $cell) {
-        dump($cell);
-    }
+/** @var Group $group */
+foreach ($sheetWithGroup->getGroups() as $group) {
+    dump($group);
 }
 
 die;

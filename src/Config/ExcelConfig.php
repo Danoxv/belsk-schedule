@@ -6,15 +6,15 @@ use Src\Models\Sheet;
 
 class ExcelConfig
 {
-    public $dayCol = null;
-    public $timeCol = null;
-    public $groupNamesRow = null;
+    public ?string $dayCol = null;
+    public ?string $timeCol = null;
+    public ?int $groupNamesRow = null;
 
-    public $firstGroupCol = null;
-    public $lastGroupCol = null;
-    public $firstScheduleRow = null;
-    public $lastScheduleRow = null;
-
+    public ?string $firstGroupCol = null;
+    public ?string $lastGroupCol = null;
+    public ?int $firstScheduleRow = null;
+    public ?int $lastScheduleRow = null;
+    /** @var string|bool|null */
     public $classHourLessonColumn = null;
 
     private Sheet $sheet;

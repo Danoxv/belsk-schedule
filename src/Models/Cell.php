@@ -12,6 +12,7 @@ class Cell
     private int $row;
 
     private string $rawValue;
+    private bool $isEmpty;
 
     private PhpSpreadsheetCell $cell;
     private Sheet $sheet;
@@ -25,12 +26,18 @@ class Cell
      */
     public function __construct(string $coordinate, $sheet)
     {
-        $this->setCoordinate($coordinate);
         $this->sheet = $sheet;
 
+        $this->init($coordinate);
+    }
+
+    private function init(string $coordinate)
+    {
+        $this->setCoordinate($coordinate);
         $this->cell = $this->sheet->getWorksheet()->getCell($this->coordinate);
         $this->rawValue = (string) $this->cell;
         $this->resolveIsInvisible();
+        $this->isEmpty = empty($this->getValue());
     }
 
     /**
@@ -132,6 +139,11 @@ class Cell
     public function getMergeRange()
     {
         return $this->cell->getMergeRange();
+    }
+
+    public function isEmpty(): bool
+    {
+        return $this->isEmpty;
     }
 
     private function setCoordinate(string $coordinate)

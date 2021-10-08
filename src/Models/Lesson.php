@@ -4,25 +4,13 @@ namespace Src\Models;
 
 class Lesson
 {
-    private Cell $cell;
+    private Pair $pair;
+    private int $row;
 
-    /**
-     * @var string
-     */
-    public string $group;
-
-    public function __construct(Cell $cell)
+    public function __construct(Pair $pair, int $row)
     {
-        $this->cell = $cell;
-
-        $this->group = $this->cell->getSheet()->getLessonGroupByColumn(
-            $this->cell->getColumn()
-        );
-    }
-
-    public function getCell()
-    {
-        return $this->cell;
+        $this->pair = $pair;
+        $this->row = $row;
     }
 
     public function isFirstWeek(): bool
@@ -40,7 +28,7 @@ class Lesson
         return true;
     }
 
-    public function isCommon(): bool
+    public function isClassHour(): bool
     {
         return false;
     }
