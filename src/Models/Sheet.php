@@ -18,7 +18,6 @@ class Sheet
 
     private bool $isProcessed = false;
 
-    private ?string $groupColumn = null;
     private bool $hasMendeleeva4 = false;
 
     private Collection $groups;
@@ -39,111 +38,6 @@ class Sheet
 
         $this->init();
         $this->process();
-    }
-
-    /**
-     * Start Sheet processing:
-     * recognize and add Groups.
-     */
-    private function process()
-    {
-        if (!$this->isProcessable()) {
-            return;
-        }
-
-        $columns = $this->getColumnsRange();
-        $rows = $this->getRowsRange();
-
-        $conf = &$this->sheetProcessingConfig;
-        $hasFilterByGroup = $conf->studentsGroup !== null;
-
-        foreach ($columns as $column) {
-            // Optimization: we are already found and processed selected group.
-            if ($hasFilterByGroup && $this->isGroupColumnFound()) {
-                break;
-            }
-
-            $groupName = $this->getGroupNameByColumn($column);
-
-            // Apply filter by student's group
-            if ($hasFilterByGroup && $conf->studentsGroup !== $groupName) {
-                continue;
-            }
-
-            if ($hasFilterByGroup) {
-                $this->setGroupColumn($column);
-            }
-
-            $this->addGroup($column, $groupName, $rows);
-        }
-
-        // All done, mark sheet as processed
-        $this->isProcessed = true;
-    }
-
-    public function getGroups()
-    {
-        return $this->groups;
-    }
-
-    public function getWorksheet(): Worksheet
-    {
-        return $this->worksheet;
-    }
-
-    public function getTitle()
-    {
-        return trim($this->worksheet->getTitle());
-    }
-
-    /**
-     * @param string $coordinate
-     * @param bool $rawValue
-     * @return string
-     */
-    public function getCellValue(string $coordinate, bool $rawValue = false): string
-    {
-        $cellValue = (string) $this->worksheet->getCell($coordinate);
-
-        if ($rawValue) {
-            return $cellValue;
-        }
-
-        return trim($cellValue);
-    }
-
-    /**
-     * @return bool
-     */
-    private function isProcessable(): bool
-    {
-        return $this->excelConfig->isProcessable();
-    }
-
-    /**
-     * @return bool
-     */
-    public function isProcessed():bool
-    {
-        return $this->isProcessed;
-    }
-
-    public function getTimeColumn(): ?string
-    {
-        return $this->excelConfig->timeCol;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isGroupColumnFound(): bool
-    {
-        return $this->groupColumn !== null;
-    }
-
-    private function setGroupColumn(string $column)
-    {
-        $this->groupColumn = $column;
     }
 
     /**
@@ -215,6 +109,107 @@ class Sheet
         if ($excelConfig->classHourLessonColumn === null) {
             $excelConfig->classHourLessonColumn = false;
         }
+    }
+
+    /**
+     * Start Sheet processing:
+     * recognize and add Groups.
+     */
+    private function process()
+    {
+        if (!$this->isProcessable()) {
+            return;
+        }
+
+        $columns = $this->getColumnsRange();
+        $rows = $this->getRowsRange();
+
+        $conf = &$this->sheetProcessingConfig;
+        $hasFilterByGroup = $conf->studentsGroup !== null;
+
+        foreach ($columns as $column) {
+            // Optimization: we are already found and processed selected group.
+            if ($hasFilterByGroup && $this->hasGroups()) {
+                break;
+            }
+
+            $group = new Group($column, $this);
+
+            // Apply filter by student's group
+            if ($hasFilterByGroup && $conf->studentsGroup !== $group->getName()) {
+                continue;
+            }
+
+            // Add group
+            $group->process($rows);
+            $this->groups->put($column, $group);
+        }
+
+        // All done, mark sheet as processed
+        $this->isProcessed = true;
+    }
+
+    public function getGroups()
+    {
+        return $this->groups;
+    }
+
+    public function getWorksheet(): Worksheet
+    {
+        return $this->worksheet;
+    }
+
+    public function getTitle()
+    {
+        return trim($this->worksheet->getTitle());
+    }
+
+    /**
+     * @param string $coordinate
+     * @param bool $rawValue
+     * @return string
+     */
+    public function getCellValue(string $coordinate, bool $rawValue = false): string
+    {
+        $cellValue = (string) $this->worksheet->getCell($coordinate);
+
+        if ($rawValue) {
+            return $cellValue;
+        }
+
+        return trim($cellValue);
+    }
+
+    /**
+     * @return bool
+     */
+    private function isProcessable(): bool
+    {
+        return $this->excelConfig->isProcessable();
+    }
+
+    /**
+     * @return bool
+     */
+    public function isProcessed():bool
+    {
+        return $this->isProcessed;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getTimeColumn(): ?string
+    {
+        return $this->excelConfig->timeCol;
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasGroups(): bool
+    {
+        return $this->groups->isNotEmpty();
     }
 
     /**
@@ -315,6 +310,22 @@ class Sheet
     public function getGroupNameByColumn(string $column)
     {
         return $this->getCellValue($column.$this->excelConfig->groupNamesRow);
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getDayCol(): ?string
+    {
+        return $this->excelConfig->dayCol;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getGroupNamesRow(): ?int
+    {
+        return $this->excelConfig->groupNamesRow;
     }
 
     /**

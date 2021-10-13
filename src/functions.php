@@ -113,7 +113,7 @@ function explodeTeacherAndAuditory(string $string): array
     return $result;
 }
 
-function parseTimeCellValue(string $value, $coord) {
+function parseTimeCellValue(string $value) {
     $value = Str::replaceManySpacesWithOne($value);
     $value = trim($value);
 
@@ -371,7 +371,7 @@ function isFirstPairTime(string $cellValue)
         return false;
     }
 
-    $parsed = parseTimeCellValue($cellValue, '');
+    $parsed = parseTimeCellValue($cellValue);
 
     $pairNum = $parsed['number'];
 

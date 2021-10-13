@@ -12,12 +12,21 @@ class Group
 
     private Collection $pairs;
 
-    public function __construct(string $column, string $name, Sheet $sheet)
+    public function __construct(string $column, Sheet $sheet)
     {
         $this->column = $column;
-        $this->name = $name;
         $this->sheet = $sheet;
         $this->pairs = new Collection();
+
+        $this->init();
+    }
+
+    private function init()
+    {
+        // Resolve name
+        $this->name = $this->sheet->getCellValue(
+            $this->column . $this->sheet->getGroupNamesRow()
+        );
     }
 
     /**
@@ -31,26 +40,45 @@ class Group
             $timeCol = $this->sheet->getTimeColumn();
 
             $pairCellCoordinate = $timeCol . $row;
-
             $pairCell = new Cell($pairCellCoordinate, $this->getSheet());
-
-            if ($pairCell->isEmpty() /* and it's not "class hour" lesson */) {
-                continue;
-            }
 
             $pair = new Pair($pairCell, $this);
 
-            $this->pairs->put($pairCellCoordinate, $pair);
+            if ($pair->isValid()) {
+                $this->pairs->put($pairCellCoordinate, $pair);
+            }
         }
     }
 
+    /**
+     * @return Collection
+     */
+    public function getPairs(): Collection
+    {
+        return $this->pairs;
+    }
+
+    /**
+     * @return string
+     */
     public function getColumn(): string
     {
         return $this->column;
     }
 
+    /**
+     * @return Sheet
+     */
     public function getSheet(): Sheet
     {
         return $this->sheet;
+    }
+
+    /**
+     * @return string
+     */
+    public function getName(): string
+    {
+        return $this->name;
     }
 }

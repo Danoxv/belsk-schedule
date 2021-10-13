@@ -92,7 +92,7 @@ foreach ($spreadsheet->getAllSheets() as $worksheet) {
         'forceMendeleeva4' => $forceMendeleeva
     ]));
 
-    if ($sheet->isGroupColumnFound()) {
+    if ($sheet->hasGroups()) {
         $sheetWithGroup = $sheet;
         break;
     }
@@ -100,7 +100,9 @@ foreach ($spreadsheet->getAllSheets() as $worksheet) {
 
 /** @var Group $group */
 foreach ($sheetWithGroup->getGroups() as $group) {
-    dump($group);
+    foreach ($group->getPairs() as $pair) {
+        dump($pair);
+    }
 }
 
 die;
@@ -187,7 +189,7 @@ foreach ($worksheets as $sheet) {
                 continue;
             }
 
-            list('time' => $time, 'number' => $number) = parseTimeCellValue($time, $cellCoordinate);
+            list('time' => $time, 'number' => $number) = parseTimeCellValue($time);
 
             $day = resolveDay($excelConfig->dayCol, $sheet, $row);
 

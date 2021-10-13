@@ -17,7 +17,7 @@ if ($_config->debug ?? false) {
 require_once ROOT . '/src/functions.php';
 
 $_requestUri = Src\Support\Security::safeFilterInput(INPUT_SERVER, 'REQUEST_URI');
-$_requestUri = strtok($_requestUri, '?'); // Берём REQUEST_URI без GET-параметров
+$_requestUri = strtok($_requestUri, '?');
 
 $_routes = require ROOT . '/src/Config/routes.php';
 

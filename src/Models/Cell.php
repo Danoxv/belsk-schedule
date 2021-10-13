@@ -41,6 +41,14 @@ class Cell
     }
 
     /**
+     * @return string
+     */
+    public function getCoordinate(): string
+    {
+        return $this->coordinate;
+    }
+
+    /**
      * @return Sheet
      */
     public function getSheet()
@@ -81,14 +89,16 @@ class Cell
     {
         // В ячейке есть значение
         if ($this->getValue(true)) {
-            return false;
+            $this->isInvisible = false;
+            return;
         }
 
         $range = $this->cell->getMergeRange();
 
         // Ячейка не объединена
         if (!$range) {
-            return false;
+            $this->isInvisible = false;
+            return;
         }
 
         $prevRowCell = $this->sheet->getWorksheet()->getCell($this->column.prevRow($this->row));
@@ -96,11 +106,12 @@ class Cell
 
         // Ячейка объединена не с ячейкой на предыдущей строке
         if ($range !== $prevRowRange) {
-            return false;
+            $this->isInvisible = false;
+            return;
         }
 
         // Похоже, что ячейка невидима... Но это неточно.
-        return true;
+        $this->isInvisible = true;
     }
 
     /**
@@ -109,13 +120,11 @@ class Cell
      */
     public function getValue(bool $rawValue = false): string
     {
-        $cellValue = $this->rawValue;
-
         if ($rawValue) {
-            return $cellValue;
+            return $this->rawValue;
         }
 
-        return trim($cellValue);
+        return trim($this->rawValue);
     }
 
     public function __toString()
