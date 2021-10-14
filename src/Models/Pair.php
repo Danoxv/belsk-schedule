@@ -38,62 +38,6 @@ class Pair
         $this->process();
     }
 
-    private function init()
-    {
-        $this->resolveIsValid();
-
-        if (!$this->isValid()) {
-            return;
-        }
-
-        $this->resolveTimeAndNumber();
-        $this->resolveDay();
-    }
-
-    private function resolveIsValid()
-    {
-        $firstLesson = new Lesson($this, $this->timeCell->getRow());
-
-        // If Pair cell is empty (without pair start-end time)
-        // and it's lesson is not "class hour"
-        // then Pair is invalid (because without time).
-        if (! $firstLesson->isValid() || ($this->timeCell->isEmpty() /*&& !$firstLesson->isClassHour()*/)) {
-            $this->isValid = false;
-            return;
-        }
-
-        $this->isValid = true;
-    }
-
-    /**
-     * Find and add Lessons.
-     */
-    private function process()
-    {
-        if (!$this->isValid()) {
-            return;
-        }
-
-        $row1 = $this->timeCell->getRow();
-        $lesson1 = new Lesson($this, $row1);
-
-        if ($lesson1->isValid()) {
-            $this->lessons->put($lesson1->getCoordinate(), $lesson1);
-        }
-
-        $row2 = nextRow($row1);
-        $lesson2 = new Lesson($this, $row2);
-
-        if ($lesson2->isValid()) {
-            $this->lessons->put($lesson2->getCoordinate(), $lesson2);
-        }
-    }
-
-    public function getTimeCell(): Cell
-    {
-        return $this->timeCell;
-    }
-
     /**
      * @return Sheet
      */
@@ -116,6 +60,44 @@ class Pair
     public function getGroup(): Group
     {
         return $this->group;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTime(): string
+    {
+        return $this->time;
+    }
+
+    public function getNumber(): string
+    {
+        return $this->number;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDay(): string
+    {
+        return $this->day;
+    }
+
+    public function getLessons()
+    {
+        return $this->lessons;
+    }
+
+    private function init()
+    {
+        $this->resolveIsValid();
+
+        if (!$this->isValid()) {
+            return;
+        }
+
+        $this->resolveTimeAndNumber();
+        $this->resolveDay();
     }
 
     private function resolveDay()
@@ -171,5 +153,47 @@ class Pair
 
         $this->time = formatTime($parts[1] ?? '');
         $this->number = $parts[0] ?? '';
+    }
+
+    private function resolveIsValid()
+    {
+        $firstLesson = new Lesson($this, $this->timeCell->getRow());
+
+        // If Pair cell is empty (without pair start-end time)
+        // and it's lesson is not "class hour"
+        // then Pair is invalid (because without time).
+        if (! $firstLesson->isValid() || ($this->timeCell->isEmpty() /*&& !$firstLesson->isClassHour()*/)) {
+            $this->isValid = false;
+            return;
+        }
+
+        $this->isValid = true;
+    }
+
+    /**
+     * Find and add Lessons.
+     */
+    private function process()
+    {
+        if (!$this->isValid()) {
+            return;
+        }
+
+        $row1 = $this->timeCell->getRow();
+        $lesson1 = new Lesson($this, $row1);
+
+        $row2 = nextRow($row1);
+        $lesson2 = new Lesson($this, $row2);
+
+        if ($lesson1->isValid() && $lesson2->isValid()) {
+            $lesson1->setWeekPosition(Lesson::FIRST_WEEK);
+            $this->lessons->put($lesson1->getCoordinate(), $lesson1);
+
+            $lesson2->setWeekPosition(Lesson::SECOND_WEEK);
+            $this->lessons->put($lesson2->getCoordinate(), $lesson2);
+        } elseif (!$lesson2->isValid()) {
+            $lesson1->setWeekPosition(Lesson::FIRST_AND_SECOND_WEEK);
+            $this->lessons->put($lesson1->getCoordinate(), $lesson1);
+        }
     }
 }

@@ -41,6 +41,157 @@ class Sheet
     }
 
     /**
+     * @return Worksheet
+     */
+    public function getWorksheet(): Worksheet
+    {
+        return $this->worksheet;
+    }
+
+    /**
+     * @param string $coordinate
+     * @param bool $rawValue
+     * @return string
+     */
+    public function getCellValue(string $coordinate, bool $rawValue = false): string
+    {
+        $cellValue = (string) $this->worksheet->getCell($coordinate);
+
+        if ($rawValue) {
+            return $cellValue;
+        }
+
+        return trim($cellValue);
+    }
+
+    /**
+     * @return bool
+     */
+    private function isProcessable(): bool
+    {
+        return $this->excelConfig->isProcessable();
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getTimeColumn(): ?string
+    {
+        return $this->excelConfig->timeCol;
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasGroups(): bool
+    {
+        return $this->groups->isNotEmpty();
+    }
+
+    /**
+     * @return ?Group
+     */
+    public function getFirstGroup(): ?Group
+    {
+        return $this->groups->first();
+    }
+
+    public function getGroupNameByColumn(string $column)
+    {
+        return $this->getCellValue($column.$this->excelConfig->groupNamesRow);
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getDayCol(): ?string
+    {
+        return $this->excelConfig->dayCol;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getGroupNamesRow(): ?int
+    {
+        return $this->excelConfig->groupNamesRow;
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasClassHourLessonColumn(): bool
+    {
+        return !empty($this->excelConfig->classHourLessonColumn);
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getClassHourLessonColumn(): ?string
+    {
+        return empty($this->excelConfig->classHourLessonColumn) ? null : $this->excelConfig->classHourLessonColumn;
+    }
+
+    /**
+     * Get processable (potentially with lessons)
+     * columns range.
+     *
+     * @return array
+     */
+    private function getColumnsRange(): array
+    {
+        $start = $this->excelConfig->firstGroupCol;
+        $end = $this->excelConfig->lastGroupCol;
+
+        return $this->generateColumnsRange($start, $end);
+    }
+
+    /**
+     * Get processable (potentially with lessons)
+     * rows range.
+     *
+     * @return array
+     */
+    private function getRowsRange(): array
+    {
+        $start = $this->excelConfig->firstScheduleRow;
+        $end = $this->excelConfig->lastScheduleRow;
+
+        return $this->generateRowsRange($start, $end);
+    }
+
+    private function isClassHourLesson(string $rawCellValue): bool
+    {
+        return Lesson::isClassHourLesson($rawCellValue);
+    }
+
+    /**
+     * @param string $start
+     * @param string $end
+     * @return array
+     */
+    private function generateColumnsRange(string $start, string $end): array
+    {
+        $end++;
+        $letters = [];
+        while ($start !== $end) {
+            $letters[] = $start++;
+        }
+        return $letters;
+    }
+
+    /**
+     * @param int $start
+     * @param int $end
+     * @return array
+     */
+    private function generateRowsRange(int $start, int $end): array
+    {
+        return range($start, $end);
+    }
+
+    /**
      * Resolve Excel config, detect "Has Mendeleeva 4 house".
      */
     private function init()
@@ -80,7 +231,7 @@ class Sheet
                         $excelConfig->firstGroupCol    = nextColumn($excelConfig->timeCol);
                         $excelConfig->groupNamesRow    = $row;
                         $excelConfig->firstScheduleRow = nextRow($excelConfig->groupNamesRow);
-                    } else if (isClassHourLesson($rawCellValue)) {
+                    } else if ($this->isClassHourLesson($rawCellValue)) {
                         $excelConfig->classHourLessonColumn = $column;
                     }
                 }
@@ -147,213 +298,5 @@ class Sheet
 
         // All done, mark sheet as processed
         $this->isProcessed = true;
-    }
-
-    public function getGroups()
-    {
-        return $this->groups;
-    }
-
-    public function getWorksheet(): Worksheet
-    {
-        return $this->worksheet;
-    }
-
-    public function getTitle()
-    {
-        return trim($this->worksheet->getTitle());
-    }
-
-    /**
-     * @param string $coordinate
-     * @param bool $rawValue
-     * @return string
-     */
-    public function getCellValue(string $coordinate, bool $rawValue = false): string
-    {
-        $cellValue = (string) $this->worksheet->getCell($coordinate);
-
-        if ($rawValue) {
-            return $cellValue;
-        }
-
-        return trim($cellValue);
-    }
-
-    /**
-     * @return bool
-     */
-    private function isProcessable(): bool
-    {
-        return $this->excelConfig->isProcessable();
-    }
-
-    /**
-     * @return bool
-     */
-    public function isProcessed():bool
-    {
-        return $this->isProcessed;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getTimeColumn(): ?string
-    {
-        return $this->excelConfig->timeCol;
-    }
-
-    /**
-     * @return bool
-     */
-    public function hasGroups(): bool
-    {
-        return $this->groups->isNotEmpty();
-    }
-
-    /**
-     * Get processable (potentially with lessons)
-     * columns range.
-     *
-     * @return array
-     */
-    private function getColumnsRange(): array
-    {
-        $start = $this->excelConfig->firstGroupCol;
-        $end = $this->excelConfig->lastGroupCol;
-
-        return $this->generateColumnsRange($start, $end);
-    }
-
-    /**
-     * Get processable (potentially with lessons)
-     * rows range.
-     *
-     * @return array
-     */
-    private function getRowsRange(): array
-    {
-        $start = $this->excelConfig->firstScheduleRow;
-        $end = $this->excelConfig->lastScheduleRow;
-
-        return $this->generateRowsRange($start, $end);
-    }
-
-    private function containsClassHourLesson(string $rawCellValue): bool
-    {
-        if (empty($rawCellValue)) {
-            return false;
-        }
-
-        return $this->formatClassHourLesson($rawCellValue) === 'Классный час';
-    }
-
-    private function formatClassHourLesson(string $rawCellValue): string
-    {
-        $lesson = trim($rawCellValue);
-
-        if (empty($lesson)) {
-            return '';
-        }
-
-        $space = ' ';
-        $uniqueChar = '|';
-
-        $spacesCount = 10;
-        $replacementPerformed = false;
-        do {
-            $lesson = str_replace(str_repeat($space, $spacesCount), $uniqueChar, $lesson, $count);
-
-            if ($count > 0) {
-                $replacementPerformed = true;
-            }
-
-            $spacesCount--;
-        } while($count === 0 && $spacesCount > 0);
-
-        $lesson = Str::removeSpaces($lesson);
-
-        if ($replacementPerformed) {
-            $lesson = str_replace($uniqueChar, $space, $lesson);
-        }
-
-        $lesson = Str::lower($lesson);
-        return Str::ucfirst($lesson);
-    }
-
-    /**
-     * @param string $start
-     * @param string $end
-     * @return array
-     */
-    private function generateColumnsRange(string $start, string $end): array
-    {
-        $end++;
-        $letters = [];
-        while ($start !== $end) {
-            $letters[] = $start++;
-        }
-        return $letters;
-    }
-
-    /**
-     * @param int $start
-     * @param int $end
-     * @return array
-     */
-    private function generateRowsRange(int $start, int $end): array
-    {
-        return range($start, $end);
-    }
-
-    public function getGroupNameByColumn(string $column)
-    {
-        return $this->getCellValue($column.$this->excelConfig->groupNamesRow);
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getDayCol(): ?string
-    {
-        return $this->excelConfig->dayCol;
-    }
-
-    /**
-     * @return int|null
-     */
-    public function getGroupNamesRow(): ?int
-    {
-        return $this->excelConfig->groupNamesRow;
-    }
-
-    /**
-     * @param string $groupColumn
-     * @param string $groupName
-     * @param array $rows
-     */
-    public function addGroup(string $groupColumn, string $groupName, array $rows)
-    {
-        $group = new Group($groupColumn, $groupName, $this);
-        $group->process($rows);
-
-        $this->groups->put($groupColumn, $group);
-    }
-
-    /**
-     * @return bool
-     */
-    public function hasClassHourLessonColumn(): bool
-    {
-        return !empty($this->excelConfig->classHourLessonColumn);
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getClassHourLessonColumn(): ?string
-    {
-        return empty($this->excelConfig->classHourLessonColumn) ? null : $this->excelConfig->classHourLessonColumn;
     }
 }

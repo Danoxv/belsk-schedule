@@ -2,7 +2,10 @@
 
 use Src\Config\Config;
 use Src\Config\SheetProcessingConfig;
+use Src\Enums\Day;
 use Src\Models\Group;
+use Src\Models\Lesson;
+use Src\Models\Pair;
 use Src\Models\Sheet;
 use Src\Support\Security;
 use Src\Support\Str;
@@ -85,7 +88,12 @@ if ($debug) {
     echo '<pre>';
 }
 
-$sheetWithGroup = null;
+/*
+ * Parsing
+ */
+
+/** @var ?Group $group */
+$group = null;
 foreach ($spreadsheet->getAllSheets() as $worksheet) {
     $sheet = new Sheet($worksheet, new SheetProcessingConfig([
         'studentsGroup' => $inputGroup,
@@ -93,17 +101,96 @@ foreach ($spreadsheet->getAllSheets() as $worksheet) {
     ]));
 
     if ($sheet->hasGroups()) {
-        $sheetWithGroup = $sheet;
+        $group = $sheet->getFirstGroup();
         break;
     }
 }
 
-/** @var Group $group */
-foreach ($sheetWithGroup->getGroups() as $group) {
-    foreach ($group->getPairs() as $pair) {
-        dump($pair);
-    }
+if ($group === null) {
+    throw new TerminateException("Группа $inputGroup не найдена в документе", TerminateException::TYPE_INFO);
 }
+
+/*
+ * Rendering
+ */
+
+echo '
+<!doctype html>
+<html lang="ru">
+<head>
+    <title>Расписание</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-U1DAWAznBHeqEIlVSCgzq+c9gqGAJn5c/t99JyeKa9xxaYpSvHU5awsuZVVFIhvj" crossorigin="anonymous"></script>
+    <style>
+        td {
+            vertical-align: middle;
+        }
+    </style>
+</head>
+<body>
+<div class="container-fluid">
+    <div class="sticky-sm-top clearfix">
+        <a class="btn btn-sm btn-success float-end" href="/" role="button">Выбрать другой файл</a>
+    </div>
+';
+
+foreach ($config->messagesOnSchedulePage as $message) {
+    $type = $message['type'] ?? 'primary';
+    $content = trim($message['content'] ?? '');
+    echo "
+    <div class='alert alert-{$type} alert-dismissible fade show' role='alert'>
+        {$content}
+        <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Закрыть'></button>
+    </div>
+    ";
+}
+
+echo "<h3>$inputGroup</h3><hr />";
+
+foreach (Day::getAll() as $day) {
+    $dayPairs = $group->getPairsByDay($day);
+
+    if ($dayPairs->isEmpty()) {
+        continue;
+    }
+
+    echo '<h4>' . Day::format($day) . '</h4>';
+
+    echo '<table class="table table-bordered table-sm table-hover">';
+    echo '
+<thead class="table-light">
+<tr>
+    <td><b>#</b></td>
+    <td><b>Время</b></td>
+    <td><b>Предмет</b></td>
+    <td><b>Учитель</b></td>
+    <td><b>Аудитория</b></td>
+</tr>
+</thead>';
+
+    echo '<tbody>';
+
+    /** @var Pair $pair */
+    foreach ($dayPairs as $pair) {
+        /** @var Lesson $lesson */
+        foreach ($pair->getLessons() as $lesson) {
+            echo '<td>' . $lesson->getNumber()           . '</td>';
+            echo '<td>' . $lesson->getTime()           . '</td>';
+            echo '<td>' . nl2br($lesson->getSubject())        . '</td>';
+            echo '<td>' . nl2br($lesson->getTeacher()) . '</td>';
+            echo '<td>' . nl2br($lesson->getAuditory()). '</td>';
+            echo '</tr>';
+        }
+    }
+
+    echo '</tbody>';
+    echo '</table>';
+}
+
+echo '</div> <!-- /container-fluid -->
+</body>
+</html>';
 
 die;
 
@@ -241,95 +328,3 @@ foreach ($worksheets as $sheet) {
         }
     }
 }
-
-$lessons = $scheduleData[$inputGroup] ?? [];
-
-if (empty($lessons)) {
-    throw new TerminateException("Не найдено занятий для группы $inputGroup", TerminateException::TYPE_INFO);
-}
-
-$days = [
-    'Понедельник',
-    'Вторник',
-    'Среда',
-    'Четверг',
-    'Пятница',
-    'Суббота',
-];
-
-echo '
-<!doctype html>
-<html lang="ru">
-<head>
-    <title>Расписание</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-U1DAWAznBHeqEIlVSCgzq+c9gqGAJn5c/t99JyeKa9xxaYpSvHU5awsuZVVFIhvj" crossorigin="anonymous"></script>
-    <style>
-        td {
-            vertical-align: middle;
-        }
-    </style>
-</head>
-<body>
-<div class="container-fluid">
-    <div class="sticky-sm-top clearfix">
-        <a class="btn btn-sm btn-success float-end" href="/" role="button">Выбрать другой файл</a>
-    </div>
-';
-
-foreach ($config->messagesOnSchedule as $message) {
-    $type = $message['type'] ?? 'primary';
-    $content = trim($message['content'] ?? '');
-    echo "
-    <div class='alert alert-{$type} alert-dismissible fade show' role='alert'>
-        {$content}
-        <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Закрыть'></button>
-    </div>
-    ";
-}
-
-echo "<h3>$inputGroup</h3><hr />";
-
-foreach ($days as $day) {
-    $dayLessons = findAllWhere($lessons, ['day' => $day]);
-
-    echo '<h4>' . $day . '</h4>';
-
-    if (empty($dayLessons)) {
-        continue;
-    }
-
-    echo '<table class="table table-bordered table-sm table-hover">';
-    echo '
-<thead class="table-light">
-<tr>
-    <td><b>#</b></td>
-    <td><b>Время</b></td>
-    <td><b>Предмет</b></td>
-    <td><b>Учитель</b></td>
-    <td><b>Аудитория</b></td>
-</tr>
-</thead>';
-
-    echo '<tbody>';
-    foreach ($dayLessons as $lesson) {
-        $technicalTitle = sprintf('%s [%s]', $lesson['cell'], $lesson['sheetTitle']);
-        echo sprintf(
-            '<tr title="%s" class="%s">',
-            $lesson['mendeleeva4House'] ? 'Занятие на Менделеева, д. 4' : '',
-            $lesson['mendeleeva4House'] ? 'table-success' : ''
-        );
-        echo "<td title='$technicalTitle'>" . Security::sanitize($lesson['number']) . '</td>';
-        echo "<td>" . $lesson['time']           . '</td>';
-        echo "<td>" . nl2br($lesson['subject'])        . '</td>';
-        echo "<td>" . nl2br($lesson['teacher']) . '</td>';
-        echo "<td>" . nl2br($lesson['auditory']). '</td>';
-        echo '</tr>';
-    }
-    echo '</tbody>';
-    echo '</table>';
-}
-
-echo '</div> <!-- /container-fluid -->
-</body></html>';

@@ -20,7 +20,7 @@ class Config
     public array $samples;
     public array $groupsList;
     public array $days;
-    public array $messagesOnSchedule;
+    public array $messagesOnSchedulePage;
 
     public array $dayWords;
     public array $timeWords;
@@ -34,7 +34,7 @@ class Config
                 'number' => '0.8',
                 'stability' => 'beta'
             ],
-            'debug' => true,
+            'debug' => false,
             'maxFileSize' => 512, // in kilobytes
             'minFileSize' => 25, // in kilobytes
             'allowedMimes' => [
@@ -59,7 +59,7 @@ class Config
                 'Пятница',
                 'Суббота',
             ],
-            'messagesOnSchedule' => [
+            'messagesOnSchedulePage' => [
                 [
                     'type' => 'warning',
                     'content' => 'Сервис в тестовом режиме - могут быть ошибки.',

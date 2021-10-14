@@ -21,14 +21,6 @@ class Group
         $this->init();
     }
 
-    private function init()
-    {
-        // Resolve name
-        $this->name = $this->sheet->getCellValue(
-            $this->column . $this->sheet->getGroupNamesRow()
-        );
-    }
-
     /**
      * Recognize and add Pairs
      *
@@ -51,11 +43,14 @@ class Group
     }
 
     /**
+     * @param string $day
      * @return Collection
      */
-    public function getPairs(): Collection
+    public function getPairsByDay(string $day): Collection
     {
-        return $this->pairs;
+        return $this->pairs->filter(function (Pair $pair) use ($day) {
+           return $pair->getDay() === $day;
+        });
     }
 
     /**
@@ -80,5 +75,13 @@ class Group
     public function getName(): string
     {
         return $this->name;
+    }
+
+    private function init()
+    {
+        // Resolve name
+        $this->name = $this->sheet->getCellValue(
+            $this->column . $this->sheet->getGroupNamesRow()
+        );
     }
 }
