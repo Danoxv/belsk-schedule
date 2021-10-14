@@ -23,6 +23,9 @@ class Sheet
 
     private Collection $groups;
 
+    /** @var string[] */
+    private array $coordinatesForSkip = [];
+
     /**
      * @param Worksheet $worksheet
      * @param SheetProcessingConfig $sheetProcessingConfig
@@ -199,6 +202,10 @@ class Sheet
                 $rawCellValue = $this->getCellValue($coordinate, true);
                 $cellValue = trim($rawCellValue);
 
+                if (Str::startsWith($cellValue, $this->config->skipCellsThatStartsWith)) {
+                    $this->coordinatesForSkip[] = $coordinate;
+                }
+
                 /*
                  * Resolve Excel config
                  */
@@ -275,12 +282,37 @@ class Sheet
                 continue;
             }
 
+            $processableRows = $this->getProcessableRows($rows, $column);
+
             // Add group
-            $group->process($rows);
+            $group->process($processableRows);
             $this->groups->put($column, $group);
         }
 
         // All done, mark sheet as processed
         $this->isProcessed = true;
+    }
+
+    /**
+     * @param array $rows
+     * @param string $currentColumn
+     * @return array
+     */
+    private function getProcessableRows(array $rows, string $currentColumn): array
+    {
+        $rowsWasRemoved = false;
+
+        foreach ($this->coordinatesForSkip as $coordinate) {
+            [$column, $row] = Coordinate::explodeCoordinate($coordinate);
+
+            if ($column !== $currentColumn) {
+                continue;
+            }
+
+            $rows = array_diff($rows, [$row]);
+            $rowsWasRemoved = true;
+        }
+
+        return $rowsWasRemoved ? array_values($rows) : $rows;
     }
 }

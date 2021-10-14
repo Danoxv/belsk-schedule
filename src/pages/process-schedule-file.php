@@ -179,6 +179,11 @@ foreach (Day::getAll() as $day) {
                 dump($lesson);
             }
 
+            echo sprintf(
+                '<tr title="%s" class="%s">',
+                $lesson->isMendeleeva4() ? 'Занятие на Менделеева, д. 4' : '',
+                $lesson->isMendeleeva4() ? 'table-success' : ''
+            );
             echo '<td>' . $lesson->getNumber()          .'</td>';
             echo '<td>' . $lesson->getTime()            .'</td>';
             echo '<td>' . nl2br($lesson->getSubject())  .'</td>';

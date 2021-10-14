@@ -46,30 +46,6 @@ class Lesson
     /**
      * @return bool
      */
-    public function isFirstWeek(): bool
-    {
-        return $this->weekPosition === self::FIRST_WEEK;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isSecondWeek(): bool
-    {
-        return $this->weekPosition === self::SECOND_WEEK;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isFirstAndSecondWeek(): bool
-    {
-        return $this->weekPosition === self::FIRST_AND_SECOND_WEEK;
-    }
-
-    /**
-     * @return bool
-     */
     public function isClassHour(): bool
     {
         return $this->isClassHour;
@@ -91,29 +67,52 @@ class Lesson
         return $this->cell->getCoordinate();
     }
 
-    public function getNumber()
+    /**
+     * @return string
+     */
+    public function getNumber(): string
     {
         return $this->pair->getNumber();
     }
 
-    public function getTime()
+    /**
+     * @return string
+     */
+    public function getTime(): string
     {
         return $this->pair->getTime();
     }
 
-    public function getSubject()
+    /**
+     * @return string
+     */
+    public function getSubject(): string
     {
         return $this->subject;
     }
 
-    public function getTeacher()
+    /**
+     * @return string
+     */
+    public function getTeacher(): string
     {
         return $this->teacher;
     }
 
-    public function getAuditory()
+    /**
+     * @return string
+     */
+    public function getAuditory(): string
     {
         return $this->auditory;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isMendeleeva4(): bool
+    {
+        return $this->isMendeleeva4;
     }
 
     /**
@@ -293,10 +292,13 @@ class Lesson
             return;
         }
 
+        if (empty($this->getSubject())) {
+            return;
+        }
+
         $cellColor = $this->cell->getNativeCell()->getStyle()->getFill()->getEndColor()->getRGB();
 
         $config = Config::getInstance();
-
         if (in_array($cellColor, $config->mendeleeva4HouseCellColors, true)) {
             $this->isMendeleeva4 = true;
         }

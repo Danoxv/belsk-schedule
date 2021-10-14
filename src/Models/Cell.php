@@ -133,6 +133,6 @@ class Cell
     {
         $this->coordinate = $coordinate;
 
-        [$this->column, $this->row] = Coordinate::coordinateFromString($this->coordinate);
+        [$this->column, $this->row] = Coordinate::explodeCoordinate($this->coordinate);
     }
 }
