@@ -76,7 +76,7 @@ if (Str::contains($originalFileName, 'Менделеева')) {
 
 try {
     $reader = IOFactory::createReaderForFile($filePath)
-        //->setReadDataOnly(true) // Не считывать стили, размеры ячеек и т.д. - только их содержимое
+        //->setReadDataOnly(false) // Считывать стили, размеры ячеек и т.д. - для определения Менделеева 4
     ;
 
     $spreadsheet = $reader->load($filePath);
@@ -97,7 +97,7 @@ $group = null;
 foreach ($spreadsheet->getAllSheets() as $worksheet) {
     $sheet = new Sheet($worksheet, new SheetProcessingConfig([
         'studentsGroup' => $inputGroup,
-        'forceMendeleeva4' => $forceMendeleeva
+        'forceApplyMendeleeva4ToLessons' => $forceMendeleeva
     ]));
 
     if ($sheet->hasGroups()) {
@@ -175,11 +175,15 @@ foreach (Day::getAll() as $day) {
     foreach ($dayPairs as $pair) {
         /** @var Lesson $lesson */
         foreach ($pair->getLessons() as $lesson) {
-            echo '<td>' . $lesson->getNumber()           . '</td>';
-            echo '<td>' . $lesson->getTime()           . '</td>';
-            echo '<td>' . nl2br($lesson->getSubject())        . '</td>';
-            echo '<td>' . nl2br($lesson->getTeacher()) . '</td>';
-            echo '<td>' . nl2br($lesson->getAuditory()). '</td>';
+            if ($debug) {
+                dump($lesson);
+            }
+
+            echo '<td>' . $lesson->getNumber()          .'</td>';
+            echo '<td>' . $lesson->getTime()            .'</td>';
+            echo '<td>' . nl2br($lesson->getSubject())  .'</td>';
+            echo '<td>' . nl2br($lesson->getTeacher())  .'</td>';
+            echo '<td>' . nl2br($lesson->getAuditory()) .'</td>';
             echo '</tr>';
         }
     }
@@ -191,140 +195,3 @@ foreach (Day::getAll() as $day) {
 echo '</div> <!-- /container-fluid -->
 </body>
 </html>';
-
-die;
-
-$scheduleData = [];
-
-foreach ($worksheets as $sheet) {
-
-    //$excelConfig = resolveExcelConfig($sheet, $config);
-
-//    if (!isExcelConfigProcessable($excelConfig)) {
-//        continue;
-//    }
-
-    $sheetTitle = trim($sheet->getTitle());
-
-    $firstColumn = $excelConfig->firstGroupCol;
-    $firstRow = $excelConfig->firstScheduleRow;
-
-    $highestColRow = $sheet->getHighestRowAndColumn();
-    $lastColumn = $highestColRow['column'];
-    $lastRow = $highestColRow['row'];
-
-    $columns = columnsRange($firstColumn, $lastColumn);
-    $rows = rowsRange($firstRow, $lastRow);
-
-    $hasMendeleeva4House = $forceMendeleeva || sheetHasMendeleeva4House($sheet);
-
-    $groupColumnIsFound = false;
-    foreach ($columns as $column) {
-        // Optimization: we are already found and processed selected group.
-        if ($groupColumnIsFound === true) {
-            break(2);
-        }
-
-        $group = getCellValue($sheet->getCell($column.$excelConfig->groupNamesRow));
-
-        if (empty($group) || $group !== $inputGroup) {
-            continue;
-        }
-
-        $groupColumnIsFound = true;
-
-        foreach ($rows as $row) {
-            $cellCoordinate = $column.$row;
-            $cell = $sheet->getCell($cellCoordinate);
-
-            $cellValue = getCellValue($cell);
-
-            $isInvisibleCell = isCellInvisible($cellCoordinate, $sheet);
-
-            if (empty($cellValue) && !empty($excelConfig->classHourLessonColumn)) {
-                // Hack: try to find any class hour lesson
-                $cellValue = getCellValue($sheet->getCell($excelConfig->classHourLessonColumn.$row));
-            }
-
-            $isClassHour = isClassHourLesson($cellValue);
-            if ($isClassHour) {
-                $cellValue = formatClassHourLesson($cellValue);
-            }
-
-            if (Str::startsWith(trim($cellValue), $config->skipCellsThatStartsWith)) {
-                $cellValue = '';
-            }
-
-            $timeRow = $row;
-            do {
-                $time = getCellValue($sheet->getCell($excelConfig->timeCol.$timeRow));
-
-                if ((empty($time) && empty($cellValue) && $isInvisibleCell)) {
-                    continue(2);
-                }
-                $timeRow--;
-                if ($timeRow < 0) {
-                    break;
-                }
-            } while (empty($time) || ($row - $timeRow > 2));
-
-            if ($isClassHour) {
-                $time = '';
-            }
-
-            if (!$isClassHour && !$time) {
-                continue;
-            }
-
-            list('time' => $time, 'number' => $number) = parseTimeCellValue($time);
-
-            $day = resolveDay($excelConfig->dayCol, $sheet, $row);
-
-            list('subject' => $subject, 'teacher' => $teacher, 'auditory' => $auditory) = parseLessonCellValue($cellValue);
-
-            $mendeleeva4House = false;
-            if (!$isClassHour && $hasMendeleeva4House && $subject) {
-                if ($forceMendeleeva) {
-                    $mendeleeva4House = true;
-                } else {
-                    $cellColor = $sheet->getCell($cellCoordinate)->getStyle()->getFill()->getEndColor()->getRGB();
-                    if (in_array($cellColor, $config->mendeleeva4HouseCellColors, true)) {
-                        $mendeleeva4House = true;
-                    }
-                }
-            }
-
-            $nextLesson = [
-                'sheetTitle'        => Security::sanitize($sheetTitle),
-                'cell'              => Security::sanitize($cellCoordinate),
-
-                'day'               => Security::sanitize($day),
-                'number'            => Security::sanitize($number),
-                'time'              => Security::sanitize($time),
-                'subject'           => Security::sanitize($subject) . ($debug ? " [$cellCoordinate]" : ''),
-                'teacher'           => Security::sanitize($teacher),
-                'auditory'          => Security::sanitize($auditory),
-                'mendeleeva4House'  => Security::sanitize($mendeleeva4House),
-            ];
-
-            if (!isset($scheduleData[$group])) {
-                $scheduleData[$group] = [];
-            }
-
-            $lastKey = array_key_last($scheduleData[$group]);
-            if ($lastKey !== null) {
-                $prevLesson = &$scheduleData[$group][$lastKey];
-
-                if ($prevLesson['time'] === $nextLesson['time'] && $prevLesson['number'] === $nextLesson['number']) {
-                    $prevLesson['subject'] = Str::empty($prevLesson['subject']) . PHP_EOL . Str::empty($nextLesson['subject']). PHP_EOL . ($debug ? "[{$prevLesson['cell']}]-[$cellCoordinate]" : '');
-                    $prevLesson['teacher'] = Str::empty($prevLesson['teacher']) . PHP_EOL . Str::empty($nextLesson['teacher']). PHP_EOL;
-                    $prevLesson['auditory'] = Str::empty($prevLesson['auditory']) . PHP_EOL . Str::empty($nextLesson['auditory']). PHP_EOL;
-                    $prevLesson['mendeleeva4House'] = $nextLesson['mendeleeva4House'];
-                    continue;
-                }
-            }
-
-            $scheduleData[$group][] = $nextLesson;
-        }
-    }
-}

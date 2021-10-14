@@ -31,4 +31,15 @@ class Str extends \Illuminate\Support\Str
     {
         return empty(trim($value)) ? $placeholder : $value;
     }
+
+    /**
+     * @param string $haystack
+     * @param string $needle
+     * @param int $offset
+     * @return false|int
+     */
+    public static function rpos(string $haystack, string $needle, int $offset = 0)
+    {
+        return mb_strrpos($haystack, $needle, $offset, 'UTF-8');
+    }
 }

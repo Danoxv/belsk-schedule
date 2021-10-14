@@ -7,6 +7,7 @@ use Src\Config\Config;
 use Src\Config\ExcelConfig;
 use Src\Config\SheetProcessingConfig;
 use Src\Support\Collection;
+use Src\Support\Coordinate;
 use Src\Support\Str;
 
 class Sheet
@@ -28,7 +29,7 @@ class Sheet
      */
     public function __construct(Worksheet $worksheet, SheetProcessingConfig $sheetProcessingConfig)
     {
-        $this->worksheet                = clone $worksheet;
+        $this->worksheet                = $worksheet;
 
         $this->config                   = Config::getInstance();
         $this->sheetProcessingConfig    = $sheetProcessingConfig;
@@ -133,6 +134,19 @@ class Sheet
         return empty($this->excelConfig->classHourLessonColumn) ? null : $this->excelConfig->classHourLessonColumn;
     }
 
+    public function hasMendeleeva4(): bool
+    {
+        return $this->hasMendeleeva4;
+    }
+
+    /**
+     * @return bool
+     */
+    public function needForceApplyMendeleeva4(): bool
+    {
+        return !empty($this->sheetProcessingConfig->forceApplyMendeleeva4ToLessons);
+    }
+
     /**
      * Get processable (potentially with lessons)
      * columns range.
@@ -144,7 +158,7 @@ class Sheet
         $start = $this->excelConfig->firstGroupCol;
         $end = $this->excelConfig->lastGroupCol;
 
-        return $this->generateColumnsRange($start, $end);
+        return Coordinate::generateColumnsRange($start, $end);
     }
 
     /**
@@ -158,37 +172,7 @@ class Sheet
         $start = $this->excelConfig->firstScheduleRow;
         $end = $this->excelConfig->lastScheduleRow;
 
-        return $this->generateRowsRange($start, $end);
-    }
-
-    private function isClassHourLesson(string $rawCellValue): bool
-    {
-        return Lesson::isClassHourLesson($rawCellValue);
-    }
-
-    /**
-     * @param string $start
-     * @param string $end
-     * @return array
-     */
-    private function generateColumnsRange(string $start, string $end): array
-    {
-        $end++;
-        $letters = [];
-        while ($start !== $end) {
-            $letters[] = $start++;
-        }
-        return $letters;
-    }
-
-    /**
-     * @param int $start
-     * @param int $end
-     * @return array
-     */
-    private function generateRowsRange(int $start, int $end): array
-    {
-        return range($start, $end);
+        return Coordinate::generateRowsRange($start, $end);
     }
 
     /**
@@ -203,8 +187,8 @@ class Sheet
         $highestColumn = $highestColRow['column'];
         $highestRow = $highestColRow['row'];
 
-        $columns = $this->generateColumnsRange($firstColumn, $highestColumn);
-        $rows = $this->generateRowsRange($firstRow, $highestRow);
+        $columns = Coordinate::generateColumnsRange($firstColumn, $highestColumn);
+        $rows = Coordinate::generateRowsRange($firstRow, $highestRow);
 
         $excelConfig = &$this->excelConfig;
 
@@ -225,13 +209,13 @@ class Sheet
                     if (in_array($cleanCellValue, $this->config->dayWords)) {
                         $excelConfig->dayCol           = $column;
                         $excelConfig->groupNamesRow    = $row;
-                        $excelConfig->firstScheduleRow = nextRow($excelConfig->groupNamesRow);
+                        $excelConfig->firstScheduleRow = Coordinate::nextRow($excelConfig->groupNamesRow);
                     } elseif (in_array($cleanCellValue, $this->config->timeWords)) {
                         $excelConfig->timeCol          = $column;
-                        $excelConfig->firstGroupCol    = nextColumn($excelConfig->timeCol);
+                        $excelConfig->firstGroupCol    = Coordinate::nextColumn($excelConfig->timeCol);
                         $excelConfig->groupNamesRow    = $row;
-                        $excelConfig->firstScheduleRow = nextRow($excelConfig->groupNamesRow);
-                    } else if ($this->isClassHourLesson($rawCellValue)) {
+                        $excelConfig->firstScheduleRow = Coordinate::nextRow($excelConfig->groupNamesRow);
+                    } else if (empty($excelConfig->classHourLessonColumn) && Lesson::isClassHourLesson($rawCellValue)) {
                         $excelConfig->classHourLessonColumn = $column;
                     }
                 }
@@ -240,7 +224,7 @@ class Sheet
                  * Detect "Has Mendeleeva 4 house"
                  */
 
-                if ($this->sheetProcessingConfig->forceMendeleeva4) {
+                if ($this->sheetProcessingConfig->forceApplyMendeleeva4ToLessons) {
                     $this->hasMendeleeva4 = true;
                 }
 

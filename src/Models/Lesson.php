@@ -2,6 +2,7 @@
 
 namespace Src\Models;
 
+use Src\Config\Config;
 use Src\Support\Str;
 
 class Lesson
@@ -17,6 +18,9 @@ class Lesson
     /** @var int */
     private int $weekPosition;
     private bool $isEmpty;
+    private bool $isClassHour;
+    private bool $isMendeleeva4;
+
     private string $subject;
     private string $teacher;
     private string $auditory;
@@ -31,29 +35,44 @@ class Lesson
         $this->init();
     }
 
+    /**
+     * @param int $weekPosition
+     */
     public function setWeekPosition(int $weekPosition)
     {
         $this->weekPosition = $weekPosition;
     }
 
+    /**
+     * @return bool
+     */
     public function isFirstWeek(): bool
     {
         return $this->weekPosition === self::FIRST_WEEK;
     }
 
+    /**
+     * @return bool
+     */
     public function isSecondWeek(): bool
     {
         return $this->weekPosition === self::SECOND_WEEK;
     }
 
+    /**
+     * @return bool
+     */
     public function isFirstAndSecondWeek(): bool
     {
         return $this->weekPosition === self::FIRST_AND_SECOND_WEEK;
     }
 
+    /**
+     * @return bool
+     */
     public function isClassHour(): bool
     {
-        return false;
+        return $this->isClassHour;
     }
 
     /**
@@ -111,12 +130,12 @@ class Lesson
     }
 
     /**
-     * @param string $rawCellValue
+     * @param string $cellValue
      * @return string
      */
-    private static function formatClassHourLesson(string $rawCellValue): string
+    private static function formatClassHourLesson(string $cellValue): string
     {
-        $lesson = trim($rawCellValue);
+        $lesson = trim($cellValue);
 
         if (empty($lesson)) {
             return '';
@@ -149,14 +168,9 @@ class Lesson
 
     private function init()
     {
-        // Resolve cell
-        $this->cell = new Cell(
-            $this->pair->getGroup()->getColumn() . $this->row,
-            $this->pair->getSheet()
-        );
+        $this->resolveCellAndIsClassHour();
 
-        // Resolve "is valid":
-        // lesson with invisible cell can't be a valid lesson.
+        // Lesson with invisible cell can't be a valid lesson.
         if ($this->cell->isInvisible()) {
             $this->isValid = false;
             return;
@@ -166,6 +180,34 @@ class Lesson
         $this->isEmpty = $this->cell->isEmpty();
 
         $this->resolveSubjectTeacherAuditory();
+        $this->resolveIsMendeleeva4();
+    }
+
+    private function resolveCellAndIsClassHour()
+    {
+        $this->isClassHour = false;
+
+        $sheet = $this->pair->getSheet();
+
+        $cell = new Cell(
+            $this->pair->getGroup()->getColumn() . $this->row,
+            $sheet
+        );
+
+        if ($cell->isEmpty() && $sheet->hasClassHourLessonColumn()) {
+            $possibleClassHourCell = new Cell(
+                $sheet->getClassHourLessonColumn() . $this->row,
+                $sheet
+            );
+
+            if (self::isClassHourLesson($possibleClassHourCell->getValue(true))) {
+                $cell = $possibleClassHourCell;
+            }
+        }
+
+        $this->cell = $cell;
+
+        $this->isClassHour = self::isClassHourLesson($this->cell->getValue(true));
     }
 
     private function resolveSubjectTeacherAuditory()
@@ -175,6 +217,10 @@ class Lesson
         $this->auditory = '';
 
         $value = $this->cell->getValue();
+
+        if ($this->isClassHour()) {
+            $value = self::formatClassHourLesson($value);
+        }
 
         $parts = explode("\n", $value);
 
@@ -189,8 +235,6 @@ class Lesson
         $this->subject = trim($firstPart ?? '');
 
         if (count($parts) >= 3) {
-            $this->teacher = '';
-
             foreach ($parts as $k => $part) {
                 if ($k === 0) continue; // was already processed (as 'subject')
 
@@ -220,12 +264,41 @@ class Lesson
             'auditory' => ''
         ];
 
-        $lastSpace = mb_strrpos($string, ' ');
+        $string = trim($string);
+
+        if (empty($string)) {
+            return $result;
+        }
+
+        $lastSpace = Str::rpos($string, ' ');
         if ($lastSpace !== false) {
             $result['teacher'] = trim(Str::substr($string, 0, $lastSpace));
             $result['auditory'] = trim(Str::substr($string, $lastSpace));
         }
 
         return $result;
+    }
+
+    private function resolveIsMendeleeva4()
+    {
+        $this->isMendeleeva4 = false;
+
+        if (!$this->cell->getSheet()->hasMendeleeva4()) {
+            return;
+        }
+
+        $sheet = $this->cell->getSheet();
+        if ($sheet->needForceApplyMendeleeva4() && !$this->isClassHour()) {
+            $this->isMendeleeva4 = true;
+            return;
+        }
+
+        $cellColor = $this->cell->getNativeCell()->getStyle()->getFill()->getEndColor()->getRGB();
+
+        $config = Config::getInstance();
+
+        if (in_array($cellColor, $config->mendeleeva4HouseCellColors, true)) {
+            $this->isMendeleeva4 = true;
+        }
     }
 }

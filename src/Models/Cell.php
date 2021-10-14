@@ -2,7 +2,7 @@
 
 namespace Src\Models;
 
-use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
+use Src\Support\Coordinate;
 use PhpOffice\PhpSpreadsheet\Cell\Cell as PhpSpreadsheetCell;
 
 class Cell
@@ -12,11 +12,11 @@ class Cell
     private int $row;
 
     private string $rawValue;
+    private string $value;
     private bool $isEmpty;
 
     private PhpSpreadsheetCell $cell;
     private Sheet $sheet;
-    private ?Lesson $lesson = null;
 
     private bool $isInvisible;
 
@@ -34,10 +34,11 @@ class Cell
     private function init(string $coordinate)
     {
         $this->setCoordinate($coordinate);
-        $this->cell = $this->sheet->getWorksheet()->getCell($this->coordinate);
+        $this->cell     = $this->sheet->getWorksheet()->getCell($this->coordinate);
         $this->rawValue = (string) $this->cell;
+        $this->value    = trim($this->rawValue);
+        $this->isEmpty  = empty($this->getValue());
         $this->resolveIsInvisible();
-        $this->isEmpty = empty($this->getValue());
     }
 
     /**
@@ -54,30 +55,6 @@ class Cell
     public function getSheet()
     {
         return $this->sheet;
-    }
-
-    /**
-     * @param Lesson $lesson
-     */
-    public function setLesson(Lesson $lesson)
-    {
-        $this->lesson = $lesson;
-    }
-
-    /**
-     * @return Lesson|null
-     */
-    public function getLesson(): ?Lesson
-    {
-        return $this->lesson;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isLesson(): bool
-    {
-        return $this->lesson !== null;
     }
 
     public function isInvisible(): bool
@@ -101,7 +78,7 @@ class Cell
             return;
         }
 
-        $prevRowCell = $this->sheet->getWorksheet()->getCell($this->column.prevRow($this->row));
+        $prevRowCell = $this->sheet->getWorksheet()->getCell($this->column.Coordinate::prevRow($this->row));
         $prevRowRange = $prevRowCell->getMergeRange();
 
         // Ячейка объединена не с ячейкой на предыдущей строке
@@ -124,7 +101,7 @@ class Cell
             return $this->rawValue;
         }
 
-        return trim($this->rawValue);
+        return $this->value;
     }
 
     public function __toString()
@@ -142,17 +119,14 @@ class Cell
         return $this->row;
     }
 
-    /**
-     * @return false|string
-     */
-    public function getMergeRange()
-    {
-        return $this->cell->getMergeRange();
-    }
-
     public function isEmpty(): bool
     {
         return $this->isEmpty;
+    }
+
+    public function getNativeCell(): PhpSpreadsheetCell
+    {
+        return $this->cell;
     }
 
     private function setCoordinate(string $coordinate)

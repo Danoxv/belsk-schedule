@@ -3,6 +3,7 @@
 namespace Src\Models;
 
 use Src\Support\Collection;
+use Src\Support\Coordinate;
 use Src\Support\Str;
 
 class Pair
@@ -34,7 +35,6 @@ class Pair
         $this->group = $group;
         $this->lessons = new Collection();
 
-        $this->init();
         $this->process();
     }
 
@@ -70,6 +70,9 @@ class Pair
         return $this->time;
     }
 
+    /**
+     * @return string
+     */
     public function getNumber(): string
     {
         return $this->number;
@@ -83,21 +86,53 @@ class Pair
         return $this->day;
     }
 
-    public function getLessons()
+    /**
+     * @return Collection
+     */
+    public function getLessons(): Collection
     {
         return $this->lessons;
     }
 
-    private function init()
+    /**
+     * Find and add Lessons.
+     */
+    private function process()
     {
-        $this->resolveIsValid();
+        $row1 = $this->timeCell->getRow();
+        $lesson1 = new Lesson($this, $row1);
+
+        $this->isValid = true;
+        // If Pair cell is empty (without pair start-end time)
+        // and it's lesson is not "class hour"
+        // then Pair is invalid (because without time).
+        if (!$lesson1->isValid() || ($this->timeCell->isEmpty() && !$lesson1->isClassHour())) {
+            $this->isValid = false;
+            return;
+        }
+
+        $this->isValid = true;
+
+        $this->resolveTimeAndNumber();
+        $this->resolveDay();
 
         if (!$this->isValid()) {
             return;
         }
 
-        $this->resolveTimeAndNumber();
-        $this->resolveDay();
+        $row2 = Coordinate::nextRow($row1);
+        $lesson2 = new Lesson($this, $row2);
+
+        if ($lesson2->isValid()) {
+            $lesson1->setWeekPosition(Lesson::FIRST_WEEK);
+            $this->lessons->put($lesson1->getCoordinate(), $lesson1);
+
+            $lesson2->setWeekPosition(Lesson::SECOND_WEEK);
+            $this->lessons->put($lesson2->getCoordinate(), $lesson2);
+        } else {
+            $lesson1->setWeekPosition(Lesson::FIRST_AND_SECOND_WEEK);
+            $this->lessons->put($lesson1->getCoordinate(), $lesson1);
+        }
     }
 
     private function resolveDay()
@@ -112,7 +147,7 @@ class Pair
 
             // Hack: try to find day on the previous column also
             if ($dayCol !== 'A') {
-                $dayPrevCol = $sheet->getCellValue(prevColumn($dayCol).$dayRow);
+                $dayPrevCol = $sheet->getCellValue(Coordinate::prevColumn($dayCol).$dayRow);
                 if (!empty($dayPrevCol)) {
                     $day = $dayPrevCol;
                 }
@@ -146,54 +181,27 @@ class Pair
         }
 
         if (!isset($parts[1])) {
-            $this->time = formatTime($parts[0] ?? '');
+            $this->time = $this->formatTime($parts[0] ?? '');
             $this->number = '';
             return;
         }
 
-        $this->time = formatTime($parts[1] ?? '');
+        $this->time = $this->formatTime($parts[1] ?? '');
         $this->number = $parts[0] ?? '';
     }
 
-    private function resolveIsValid()
+    private function formatTime(string $time): string
     {
-        $firstLesson = new Lesson($this, $this->timeCell->getRow());
+        $time = str_replace([
+            '.',
+            '-'
+        ], [
+            ':',
+            ' - '
+        ], $time);
 
-        // If Pair cell is empty (without pair start-end time)
-        // and it's lesson is not "class hour"
-        // then Pair is invalid (because without time).
-        if (! $firstLesson->isValid() || ($this->timeCell->isEmpty() /*&& !$firstLesson->isClassHour()*/)) {
-            $this->isValid = false;
-            return;
-        }
+        $time = Str::replaceManySpacesWithOne($time);
 
-        $this->isValid = true;
-    }
-
-    /**
-     * Find and add Lessons.
-     */
-    private function process()
-    {
-        if (!$this->isValid()) {
-            return;
-        }
-
-        $row1 = $this->timeCell->getRow();
-        $lesson1 = new Lesson($this, $row1);
-
-        $row2 = nextRow($row1);
-        $lesson2 = new Lesson($this, $row2);
-
-        if ($lesson1->isValid() && $lesson2->isValid()) {
-            $lesson1->setWeekPosition(Lesson::FIRST_WEEK);
-            $this->lessons->put($lesson1->getCoordinate(), $lesson1);
-
-            $lesson2->setWeekPosition(Lesson::SECOND_WEEK);
-            $this->lessons->put($lesson2->getCoordinate(), $lesson2);
-        } elseif (!$lesson2->isValid()) {
-            $lesson1->setWeekPosition(Lesson::FIRST_AND_SECOND_WEEK);
-            $this->lessons->put($lesson1->getCoordinate(), $lesson1);
-        }
+        return trim($time);
     }
 }

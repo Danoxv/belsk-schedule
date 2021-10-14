@@ -9,7 +9,7 @@ class SheetProcessingConfig
     use PropertiesApplier;
 
     public ?string $studentsGroup = null;
-    public bool $forceMendeleeva4 = false;
+    public bool $forceApplyMendeleeva4ToLessons = false;
 
     public function __construct(array $config)
     {
