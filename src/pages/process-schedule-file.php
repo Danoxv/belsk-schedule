@@ -160,6 +160,7 @@ echo "
     </div>
     <div class='col-11'>
         <button class='btn btn-sm btn-info' onclick='saveSchedulePageAsPdf(\"{$group->getName()}\")'>Сохранить PDF</button>
+        <span class='form-text' id='orientation-info'></span>
     </div>
 </div>
 <div class='row'>
