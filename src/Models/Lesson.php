@@ -129,6 +129,18 @@ class Lesson
     }
 
     /**
+     * @return string
+     */
+    public function getTechnicalTitle(): string
+    {
+        return sprintf(
+            '%s [%s]',
+            $this->cell->getCoordinate(),
+            $this->pair->getSheet()->getTitle()
+        );
+    }
+
+    /**
      * @param string $cellValue
      * @return string
      */
@@ -204,6 +216,7 @@ class Lesson
             }
         }
 
+        $cell->process();
         $this->cell = $cell;
 
         $this->isClassHour = self::isClassHourLesson($this->cell->getValue(true));
@@ -296,7 +309,7 @@ class Lesson
             return;
         }
 
-        $cellColor = $this->cell->getNativeCell()->getStyle()->getFill()->getEndColor()->getRGB();
+        $cellColor = $this->cell->getEndColorRgb();
 
         $config = Config::getInstance();
         if (in_array($cellColor, $config->mendeleeva4HouseCellColors, true)) {

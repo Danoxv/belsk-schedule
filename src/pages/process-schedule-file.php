@@ -76,7 +76,7 @@ if (Str::contains($originalFileName, 'Менделеева')) {
 
 try {
     $reader = IOFactory::createReaderForFile($filePath)
-        //->setReadDataOnly(false) // Считывать стили, размеры ячеек и т.д. - для определения Менделеева 4
+        ->setReadDataOnly(false) // Считывать стили, размеры ячеек и т.д. - для определения Менделеева 4
     ;
 
     $spreadsheet = $reader->load($filePath);
@@ -146,7 +146,7 @@ foreach ($config->messagesOnSchedulePage as $message) {
     ";
 }
 
-echo "<h3>$inputGroup</h3><hr />";
+echo "<h3>{$group->getName()}</h3><hr />";
 
 foreach (Day::getAll() as $day) {
     $dayPairs = $group->getPairsByDay($day);
@@ -173,23 +173,43 @@ foreach (Day::getAll() as $day) {
 
     /** @var Pair $pair */
     foreach ($dayPairs as $pair) {
+        $lessonsCount = $pair->getLessons()->count();
+
+        $lessonNum = 0;
+
         /** @var Lesson $lesson */
         foreach ($pair->getLessons() as $lesson) {
             if ($debug) {
                 dump($lesson);
             }
 
-            echo sprintf(
-                '<tr title="%s" class="%s">',
+            $mendeleevaHint = sprintf(
+                ' title="%s" class="%s" ',
                 $lesson->isMendeleeva4() ? 'Занятие на Менделеева, д. 4' : '',
                 $lesson->isMendeleeva4() ? 'table-success' : ''
             );
-            echo '<td>' . $lesson->getNumber()          .'</td>';
-            echo '<td>' . $lesson->getTime()            .'</td>';
-            echo '<td>' . nl2br($lesson->getSubject())  .'</td>';
+
+            echo '<tr>';
+
+            if ($lessonsCount === 1 || ($lessonsCount >= 2 && $lessonNum === 0)) {
+                echo "<td rowspan='$lessonsCount'>" . $lesson->getNumber()          .'</td>';
+                echo "<td rowspan='$lessonsCount'>" . $lesson->getTime()            .'</td>';
+            }
+
+            echo "<td $mendeleevaHint>" . $lesson->getSubject() .'</td>';
             echo '<td>' . nl2br($lesson->getTeacher())  .'</td>';
-            echo '<td>' . nl2br($lesson->getAuditory()) .'</td>';
+
+            $technicalTitle = sprintf(' title="%s" ', $lesson->getTechnicalTitle());
+
+            if (empty($lesson->getAuditory())) {
+                echo "<td $technicalTitle style='color: white'>.</td>";
+            } else {
+                echo "<td $technicalTitle>" . nl2br($lesson->getAuditory()) . '</td>';
+            }
+
             echo '</tr>';
+
+            $lessonNum++;
         }
     }
 

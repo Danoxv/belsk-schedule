@@ -32,9 +32,9 @@ class Group
             $timeCol = $this->sheet->getTimeColumn();
 
             $pairCellCoordinate = $timeCol . $row;
-            $pairCell = new Cell($pairCellCoordinate, $this->getSheet());
+            $pairTimeCell = new Cell($pairCellCoordinate, $this->getSheet());
 
-            $pair = new Pair($pairCell, $this);
+            $pair = new Pair($pairTimeCell, $this);
 
             if ($pair->isValid()) {
                 $this->pairs->put($pairCellCoordinate, $pair);

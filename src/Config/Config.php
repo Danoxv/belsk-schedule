@@ -31,7 +31,7 @@ class Config
     {
         $this->applyFromArray([
             'version' => [
-                'number' => '0.8',
+                'number' => '0.9',
                 'stability' => 'beta'
             ],
             'debug' => false,
@@ -63,6 +63,10 @@ class Config
                 [
                     'type' => 'warning',
                     'content' => 'Сервис в тестовом режиме - могут быть ошибки.',
+                ],
+                [
+                    'type' => 'warning',
+                    'content' => 'Занятия на Менделеева, 4 могут быть показаны неверно.',
                 ],
             ],
 

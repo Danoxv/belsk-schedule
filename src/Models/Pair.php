@@ -146,7 +146,7 @@ class Pair
             $day = $sheet->getCellValue($dayCol.$dayRow);
 
             // Hack: try to find day on the previous column also
-            if ($dayCol !== 'A') {
+            if (empty($day) && $dayCol !== 'A') {
                 $dayPrevCol = $sheet->getCellValue(Coordinate::prevColumn($dayCol).$dayRow);
                 if (!empty($dayPrevCol)) {
                     $day = $dayPrevCol;

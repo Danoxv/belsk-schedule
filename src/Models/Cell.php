@@ -4,6 +4,7 @@ namespace Src\Models;
 
 use Src\Support\Coordinate;
 use PhpOffice\PhpSpreadsheet\Cell\Cell as PhpSpreadsheetCell;
+use Src\Support\Security;
 
 class Cell
 {
@@ -14,6 +15,8 @@ class Cell
     private string $rawValue;
     private string $value;
     private bool $isEmpty;
+
+    private bool $isProcessed = false;
 
     private PhpSpreadsheetCell $cell;
     private Sheet $sheet;
@@ -35,10 +38,16 @@ class Cell
     {
         $this->setCoordinate($coordinate);
         $this->cell     = $this->sheet->getWorksheet()->getCell($this->coordinate);
-        $this->rawValue = (string) $this->cell;
+        $this->rawValue = Security::sanitize((string) $this->cell);
         $this->value    = trim($this->rawValue);
-        $this->isEmpty  = empty($this->getValue());
+        $this->isEmpty  = empty($this->value);
+    }
+
+    public function process()
+    {
         $this->resolveIsInvisible();
+
+        $this->isProcessed = true;
     }
 
     /**
@@ -124,9 +133,9 @@ class Cell
         return $this->isEmpty;
     }
 
-    public function getNativeCell(): PhpSpreadsheetCell
+    public function getEndColorRgb(): string
     {
-        return $this->cell;
+        return $this->cell->getStyle()->getFill()->getEndColor()->getRGB();
     }
 
     private function setCoordinate(string $coordinate)

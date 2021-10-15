@@ -8,6 +8,7 @@ use Src\Config\ExcelConfig;
 use Src\Config\SheetProcessingConfig;
 use Src\Support\Collection;
 use Src\Support\Coordinate;
+use Src\Support\Security;
 use Src\Support\Str;
 
 class Sheet
@@ -20,6 +21,8 @@ class Sheet
     private bool $isProcessed = false;
 
     private bool $hasMendeleeva4 = false;
+
+    private string $title;
 
     private Collection $groups;
 
@@ -59,13 +62,7 @@ class Sheet
      */
     public function getCellValue(string $coordinate, bool $rawValue = false): string
     {
-        $cellValue = (string) $this->worksheet->getCell($coordinate);
-
-        if ($rawValue) {
-            return $cellValue;
-        }
-
-        return trim($cellValue);
+        return (new Cell($coordinate, $this))->getValue($rawValue);
     }
 
     /**
@@ -151,6 +148,14 @@ class Sheet
     }
 
     /**
+     * @return string
+     */
+    public function getTitle(): string
+    {
+       return $this->title;
+    }
+
+    /**
      * Get processable (potentially with lessons)
      * columns range.
      *
@@ -183,6 +188,8 @@ class Sheet
      */
     private function init()
     {
+        $this->title = trim(Security::sanitize($this->worksheet->getTitle()));
+
         $firstColumn = 'A';
         $firstRow = 1;
 
