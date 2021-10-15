@@ -127,6 +127,8 @@ echo '
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-U1DAWAznBHeqEIlVSCgzq+c9gqGAJn5c/t99JyeKa9xxaYpSvHU5awsuZVVFIhvj" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js" integrity="sha512-YcsIPGdhPK4P/uRW6/sruonlYj+Q7UHWeKfTAkBW+g83NKM+jMJFJ4iAPfSnVp7BKD4dKMHmVSvICUbE/V1sSw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="/js/save-schedule-page-as-pdf.js"></script>
     <style>
         td {
             vertical-align: middle;
@@ -134,7 +136,7 @@ echo '
     </style>
 </head>
 <body>
-<div class="container-fluid">
+<div class="container-fluid" id="schedule-page-content">
     <div class="sticky-sm-top clearfix">
         <a class="btn btn-sm btn-success float-end" href="/" role="button">Выбрать другой файл</a>
     </div>
@@ -151,7 +153,19 @@ foreach ($config->messagesOnSchedulePage as $message) {
     ";
 }
 
-echo "<h3>{$group->getName()}</h3><hr />";
+echo "
+<div class='row'>
+    <div class='col-1'>
+        <h3>{$group->getName()}</h3>
+    </div>
+    <div class='col-11'>
+        <button class='btn btn-sm btn-info' onclick='saveSchedulePageAsPdf(\"{$group->getName()}\")'>Сохранить PDF</button>
+    </div>
+</div>
+<div class='row'>
+<hr />
+</div>
+";
 
 foreach (Day::getAll() as $day) {
     $dayPairs = $group->getPairsByDay($day);
