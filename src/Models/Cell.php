@@ -71,11 +71,22 @@ class Cell
         return $this->isInvisible;
     }
 
+    private function setIsInvisible(bool $value)
+    {
+        $this->isInvisible = $value;
+        Sheet::setToInvisibleCellsCache($this->coordinate, $value);
+    }
+
     private function resolveIsInvisible()
     {
+        if (Sheet::existsInInvisibleCellsCache($this->coordinate)) {
+            $this->isInvisible = Sheet::getFromInvisibleCellsCache($this->coordinate);
+            return;
+        }
+
         // В ячейке есть значение
         if ($this->getValue(true)) {
-            $this->isInvisible = false;
+            $this->setIsInvisible(false);
             return;
         }
 
@@ -83,7 +94,7 @@ class Cell
 
         // Ячейка не объединена
         if (!$range) {
-            $this->isInvisible = false;
+            $this->setIsInvisible(false);
             return;
         }
 
@@ -92,12 +103,12 @@ class Cell
 
         // Ячейка объединена не с ячейкой на предыдущей строке
         if ($range !== $prevRowRange) {
-            $this->isInvisible = false;
+            $this->setIsInvisible(false);
             return;
         }
 
         // Похоже, что ячейка невидима... Но это неточно.
-        $this->isInvisible = true;
+        $this->setIsInvisible(true);
     }
 
     /**
@@ -118,16 +129,25 @@ class Cell
         return $this->getValue();
     }
 
+    /**
+     * @return string
+     */
     public function getColumn()
     {
         return $this->column;
     }
 
+    /**
+     * @return int
+     */
     public function getRow()
     {
         return $this->row;
     }
 
+    /**
+     * @return bool
+     */
     public function isEmpty(): bool
     {
         return $this->isEmpty;

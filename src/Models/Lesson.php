@@ -204,6 +204,7 @@ class Lesson
             $this->pair->getGroup()->getColumn() . $this->row,
             $sheet
         );
+        $cell->process();
 
         if ($cell->isEmpty() && $sheet->hasClassHourLessonColumn()) {
             $possibleClassHourCell = new Cell(
@@ -212,11 +213,11 @@ class Lesson
             );
 
             if (self::isClassHourLesson($possibleClassHourCell->getValue(true))) {
+                $possibleClassHourCell->process();
                 $cell = $possibleClassHourCell;
             }
         }
 
-        $cell->process();
         $this->cell = $cell;
 
         $this->isClassHour = self::isClassHourLesson($this->cell->getValue(true));
