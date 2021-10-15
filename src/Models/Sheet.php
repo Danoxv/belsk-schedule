@@ -218,7 +218,7 @@ class Sheet
      */
     private function init()
     {
-        $this->title = trim(Security::sanitize($this->worksheet->getTitle()));
+        $this->title = trim(Security::sanitizeString($this->worksheet->getTitle()));
 
         $firstColumn = 'A';
         $firstRow = 1;

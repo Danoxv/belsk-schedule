@@ -38,7 +38,7 @@ class Cell
     {
         $this->setCoordinate($coordinate);
         $this->cell     = $this->sheet->getWorksheet()->getCell($this->coordinate);
-        $this->rawValue = Security::sanitize((string) $this->cell);
+        $this->rawValue = Security::sanitizeString((string) $this->cell);
         $this->value    = trim($this->rawValue);
         $this->isEmpty  = empty($this->value);
     }

@@ -14,10 +14,9 @@ if ($_config->debug ?? false) {
     ini_set('error_reporting', E_ALL);
     error_reporting(E_ALL);
 }
-require_once ROOT . '/src/functions.php';
 
-$_requestUri = Src\Support\Security::safeFilterInput(INPUT_SERVER, 'REQUEST_URI');
-$_requestUri = strtok($_requestUri, '?');
+$_requestUri = Src\Support\Security::filterInputString(INPUT_SERVER, 'REQUEST_URI');
+$_requestUri = \Src\Support\Helpers::uriWithoutGetPart($_requestUri);
 
 $_routes = require ROOT . '/src/Config/routes.php';
 

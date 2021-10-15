@@ -7,6 +7,7 @@ use Src\Models\Group;
 use Src\Models\Lesson;
 use Src\Models\Pair;
 use Src\Models\Sheet;
+use Src\Support\Helpers;
 use Src\Support\Security;
 use Src\Support\Str;
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -19,38 +20,42 @@ $maxFileSize    = $config->maxFileSize;
 $minFileSize    = $config->minFileSize;
 $allowedMimes   = $config->allowedMimes;
 
-$inputGroup = Security::safeFilterInput(INPUT_POST, 'group');
+$inputGroup = Security::filterInputString(INPUT_POST, 'group');
 
 if (empty($inputGroup)) {
     throw new TerminateException('Группа обязательна');
 }
 
 if (!in_array($inputGroup, $config->groupsList, true)) {
-    throw new TerminateException('Hack attempt', TerminateException::TYPE_DANGER);
+    throw new TerminateException('Hack attempt (2)', TerminateException::TYPE_DANGER);
 }
 
-$scheduleLink = Security::safeFilterInput(INPUT_POST, 'scheduleLink');
-if ($scheduleLink && !isScheduleLinkValid($scheduleLink, $config->pageWithScheduleFiles, $config->allowedExtensions)) {
-    throw new TerminateException('Hack attempt', TerminateException::TYPE_DANGER);
+$scheduleLink = Security::filterInputString(INPUT_POST, 'scheduleLink');
+$scheduleLink = Helpers::sanitizeScheduleLink($scheduleLink);
+
+if ($scheduleLink && !Helpers::isScheduleLinkValid($scheduleLink)) {
+    throw new TerminateException('Hack attempt (1)', TerminateException::TYPE_DANGER);
 }
 
 $inputScheduleFile = $_FILES['scheduleFile'] ?? [];
+
+if ($scheduleLink && !empty($inputScheduleFile['tmp_name'])) {
+    throw new TerminateException('Выберите либо файл с сервера техникума, либо с компьютера, но не оба сразу');
+}
 
 $originalFileName = '';
 if ($scheduleLink) {
     $originalFileName = $scheduleLink;
 
-    $scheduleLink = str_replace(' ', '%20', $scheduleLink); // TODO простой хак, нужен нормальный urlencode
+    // Скачать файл и сохранить во временную папку
+    $data = Helpers::httpGet($scheduleLink);
 
-    // Скачать файл во временную папку
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, $scheduleLink);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-    $st = curl_exec($ch);
-    curl_close($ch);
+    if ($data === null) {
+        throw new TerminateException('Ошибка при получении файла с сервера');
+    }
 
     $temp = tmpfile();
-    fwrite($temp, $st);
+    fwrite($temp, $data);
 
     $filePath = stream_get_meta_data($temp)['uri'];
 } elseif (!empty($inputScheduleFile['tmp_name'])) {
