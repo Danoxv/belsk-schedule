@@ -172,4 +172,13 @@ class Helpers
     {
         return PHP_SAPI === 'cli';
     }
+
+    /**
+     * @param string $str
+     * @return bool
+     */
+    public static function isExternalLink(string $str): bool
+    {
+        return !empty(self::getHost($str));
+    }
 }

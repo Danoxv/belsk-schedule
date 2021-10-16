@@ -26,7 +26,7 @@ foreach ($config->samples as $sample) {
 
 $groupNames = [];
 foreach ($links as $link) {
-    if (Helpers::getHost($link['uri'])) {
+    if (Helpers::isExternalLink($link['uri'])) {
         $scheduleLink = Security::sanitizeString($link['uri'], true);
         $scheduleLink = Helpers::sanitizeScheduleLink($scheduleLink);
 
