@@ -10,21 +10,23 @@ require_once ROOT . '/vendor/autoload.php';
 
 $_config = Src\Config\Config::getInstance();
 
-if ($_config->debug ?? false) {
+$isCli = Helpers::isCli();
+
+if ($_config->debug || $isCli) {
     ini_set('display_errors', 1);
     ini_set('display_startup_errors', 1);
     ini_set('error_reporting', E_ALL);
     error_reporting(E_ALL);
 }
 
-$_requestUri = Src\Support\Security::filterInputString(INPUT_SERVER, 'REQUEST_URI');
-$_requestUri = Src\Support\Helpers::uriWithoutGetPart($_requestUri);
-
-if (Helpers::isCli()) {
+if ($isCli) {
     // Is console request.
     require ROOT . '/public/index-console.php';
     die(0);
 }
+
+$_requestUri = Src\Support\Security::filterInputString(INPUT_SERVER, 'REQUEST_URI');
+$_requestUri = Src\Support\Helpers::uriWithoutGetPart($_requestUri);
 
 $_routes = require ROOT . '/src/Config/routes.php';
 
