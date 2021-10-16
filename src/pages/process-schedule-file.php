@@ -155,10 +155,10 @@ foreach ($config->messagesOnSchedulePage as $message) {
 
 echo "
 <div class='row'>
-    <div class='col-1'>
+    <div class='col-2'>
         <h3>{$group->getName()}</h3>
     </div>
-    <div class='col-11'>
+    <div class='col-10'>
         <button class='btn btn-sm btn-secondary' onclick='saveSchedulePageAsPdf(\"{$group->getName()}\")'>Сохранить PDF</button>
         <span class='form-text' id='orientation-info'></span>
     </div>
