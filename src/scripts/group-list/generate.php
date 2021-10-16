@@ -8,10 +8,10 @@ use Src\Models\Sheet;
 use Src\Support\Helpers;
 use Src\Support\Security;
 
-$contentTemplate = '
-<?php
+$contentTemplate =
+'<?php
 
-return {{groups}};
+return {{groupNames}};
 ';
 
 $links = Helpers::getScheduleFilesLinks();
@@ -83,15 +83,11 @@ $groupNames = array_values($groupNames);
 
 $written = file_put_contents(
     $groupListFile,
-    str_replace([
-        '{{groups}}',
-    ], [
-        var_export($groupNames, true)
-    ], $contentTemplate)
+    str_replace('{{groupNames}}', var_export($groupNames, true), $contentTemplate)
 );
 
 if ($written) {
     var_dump('File successfully generated.');
 } else {
-    var_dump('GENERATION FILE ERROR!');
+    var_dump('FILE GENERATION ERROR!');
 }
