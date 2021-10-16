@@ -1,6 +1,7 @@
 <?php
 
 use PhpOffice\PhpSpreadsheet\IOFactory;
+use Src\Config\Config;
 use Src\Config\SheetProcessingConfig;
 use Src\Models\Group;
 use Src\Models\Sheet;
@@ -15,21 +16,33 @@ return {{groups}};
 
 $links = Helpers::getScheduleFilesLinks();
 
+$config = Config::getInstance();
+foreach ($config->samples as $sample) {
+    $samplePath = ROOT . '/src/samples/' . $sample;
+    $links[] = [
+        'uri' => $samplePath,
+    ];
+}
+
 $groupNames = [];
 foreach ($links as $link) {
-    $scheduleLink = Security::sanitizeString($link['uri'], true);
-    $scheduleLink = Helpers::sanitizeScheduleLink($scheduleLink);
+    if (Helpers::getHost($link['uri'])) {
+        $scheduleLink = Security::sanitizeString($link['uri'], true);
+        $scheduleLink = Helpers::sanitizeScheduleLink($scheduleLink);
 
-    $data = Helpers::httpGet($scheduleLink);
+        $data = Helpers::httpGet($scheduleLink);
 
-    if (empty($data)) {
-        continue;
+        if (empty($data)) {
+            continue;
+        }
+
+        $temp = tmpfile();
+        fwrite($temp, $data);
+
+        $filePath = stream_get_meta_data($temp)['uri'];
+    } else {
+        $filePath = $link['uri'];
     }
-
-    $temp = tmpfile();
-    fwrite($temp, $data);
-
-    $filePath = stream_get_meta_data($temp)['uri'];
 
     try {
         $reader = IOFactory::createReaderForFile($filePath)
@@ -41,6 +54,8 @@ foreach ($links as $link) {
         continue;
     }
 
+    var_dump("Process [{$link['uri']}]...");
+
     foreach ($spreadsheet->getAllSheets() as $worksheet) {
         $sheet = new Sheet($worksheet, new SheetProcessingConfig([
             'processGroups' => false,
@@ -51,7 +66,11 @@ foreach ($links as $link) {
             $groupNames[] = $group->getName();
         }
     }
+
+    var_dump('...done');
 }
+
+var_dump('All links and files processed');
 
 $groupListFile = ROOT . '/src/Config/group-list.php';
 
@@ -62,7 +81,7 @@ $groupNames = array_unique($groupNames);
 sort($groupNames);
 $groupNames = array_values($groupNames);
 
-file_put_contents(
+$written = file_put_contents(
     $groupListFile,
     str_replace([
         '{{groups}}',
@@ -70,3 +89,9 @@ file_put_contents(
         var_export($groupNames, true)
     ], $contentTemplate)
 );
+
+if ($written) {
+    var_dump('File successfully generated.');
+} else {
+    var_dump('GENERATION FILE ERROR!');
+}

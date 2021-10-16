@@ -29,6 +29,11 @@ class Helpers
     public static function getHost(string $link): string
     {
         $urlParts = parse_url($link);
+
+        if (empty($urlParts['host'])) {
+            return '';
+        }
+
         return $urlParts['scheme'] . '://' . $urlParts['host'];
     }
 
