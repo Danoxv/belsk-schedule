@@ -71,4 +71,45 @@ class Helpers
     {
         return str_replace(' ', '%20', $scheduleLink); // TODO простой хак, нужен нормальный urlencode
     }
+
+    /**
+     * Convert integer to Roman number.
+     *
+     * Source: @link https://stackoverflow.com/a/26298774
+     *
+     * @param int $num Ex.: 4
+     * @return string Ex.: IV
+     */
+    public static function intToRoman(int $num): string
+    {
+        $res = '';
+
+        $romanNumberMap = [
+            'M'  => 1000,
+            'CM' => 900,
+            'D'  => 500,
+            'CD' => 400,
+            'C'  => 100,
+            'XC' => 90,
+            'L'  => 50,
+            'XL' => 40,
+            'X'  => 10,
+            'IX' => 9,
+            'V'  => 5,
+            'IV' => 4,
+            'I'  => 1];
+
+        foreach ($romanNumberMap as $roman => $number){
+            //divide to get  matches
+            $matches = intval($num / $number);
+
+            //assign the roman char * $matches
+            $res .= str_repeat($roman, $matches);
+
+            //substract from the number
+            $num = $num % $number;
+        }
+
+        return $res;
+    }
 }

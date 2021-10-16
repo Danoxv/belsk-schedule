@@ -23,6 +23,8 @@ class Pair
     /** @var Collection */
     private Collection $lessons;
 
+    private bool $isClassHour;
+
     /** @var string */
     private string $day;
 
@@ -78,6 +80,11 @@ class Pair
         return $this->number;
     }
 
+    public function setNumber(string $number)
+    {
+        $this->number = $number;
+    }
+
     /**
      * @return string
      */
@@ -92,6 +99,14 @@ class Pair
     public function getLessons(): Collection
     {
         return $this->lessons;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isClassHour(): bool
+    {
+        return $this->isClassHour;
     }
 
     /**
@@ -111,9 +126,9 @@ class Pair
             return;
         }
 
-        $this->isValid = true;
+        $this->isClassHour = $lesson1->isClassHour();
 
-        $this->resolveTimeAndNumber($lesson1->isClassHour());
+        $this->resolveTimeAndNumber();
         $this->resolveDay();
 
         if (!$this->isValid()) {
@@ -162,11 +177,11 @@ class Pair
         $this->day = Str::lower($day);
     }
 
-    private function resolveTimeAndNumber(bool $isClassHour)
+    private function resolveTimeAndNumber()
     {
         $this->time = $this->number = '';
 
-        if ($isClassHour) {
+        if ($this->isClassHour()) {
             return;
         }
 

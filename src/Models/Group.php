@@ -2,7 +2,9 @@
 
 namespace Src\Models;
 
+use Src\Enums\Day;
 use Src\Support\Collection;
+use Src\Support\Helpers;
 
 class Group
 {
@@ -38,6 +40,25 @@ class Group
 
             if ($pair->isValid()) {
                 $this->pairs->put($pairCellCoordinate, $pair);
+            }
+        }
+
+        // Assign pair number if not parsed from Excel.
+        if ($this->pairs->first()->getNumber()) {
+            // Optimization: if first pair have number,
+            // assume that all pairs have too.
+            return;
+        }
+
+        foreach (Day::getAll() as $day) {
+            $pairNum = 1;
+
+            /** @var Pair $pair */
+            foreach ($this->getPairsByDay($day) as $pair) {
+                if (!$pair->getNumber()) {
+                    $pair->setNumber(Helpers::intToRoman($pairNum));
+                }
+                $pairNum++;
             }
         }
     }
