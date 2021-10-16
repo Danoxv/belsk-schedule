@@ -90,6 +90,14 @@ class Sheet
     }
 
     /**
+     * @return Collection
+     */
+    public function getGroups(): Collection
+    {
+        return $this->groups;
+    }
+
+    /**
      * @return ?Group
      */
     public function getFirstGroup(): ?Group
@@ -270,10 +278,11 @@ class Sheet
             return;
         }
 
-        $columns = $this->getColumnsRange();
-        $rows = $this->getRowsRange();
-
         $conf = &$this->sheetProcessingConfig;
+
+        $columns = $this->getColumnsRange();
+        $rows = $conf->processGroups ? $this->getRowsRange() : [];
+
         $hasFilterByGroup = $conf->studentsGroup !== null;
 
         foreach ($columns as $column) {
@@ -289,10 +298,11 @@ class Sheet
                 continue;
             }
 
-            $processableRows = $this->getProcessableRows($rows, $column);
-
             // Add group
-            $group->process($processableRows);
+            if ($conf->processGroups) {
+                $processableRows = $this->getProcessableRows($rows, $column);
+                $group->process($processableRows);
+            }
             $this->groups->put($column, $group);
         }
 

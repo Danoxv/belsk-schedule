@@ -2,6 +2,9 @@
 
 namespace Src\Support;
 
+use DOMDocument;
+use DOMElement;
+use DOMXPath;
 use Src\Config\Config;
 
 class Helpers
@@ -111,5 +114,57 @@ class Helpers
         }
 
         return $res;
+    }
+
+    /**
+     * @return array
+     */
+    public static function getScheduleFilesLinks(): array
+    {
+        $config = Config::getInstance();
+
+        $pageWithFiles = $config->pageWithScheduleFiles;
+        $html = self::httpGet($pageWithFiles);
+
+        $links = [];
+
+        if (!empty($html)) {
+            $doc = new DOMDocument;
+
+            @$doc->loadHTML($html);
+
+            $xpath = new DOMXPath($doc);
+
+            $entries = $xpath->query('//body//a');
+            $host = Helpers::getHost($pageWithFiles);
+
+            /** @var DOMElement[] $entries */
+            foreach ($entries as $entry) {
+                $linkUri = Security::sanitizeString($entry->getAttribute('href'));
+
+                if (!Str::endsWith($linkUri, $config->allowedExtensions)) {
+                    continue;
+                }
+
+                $linkUri = "$host/$linkUri";
+
+                $linkText = Security::sanitizeString($entry->textContent);
+
+                $links[] = [
+                    'uri' => $linkUri,
+                    'text' => $linkText,
+                ];
+            }
+        }
+
+        return $links;
+    }
+
+    /**
+     * @return bool
+     */
+    public static function isCli(): bool
+    {
+        return PHP_SAPI === 'cli';
     }
 }

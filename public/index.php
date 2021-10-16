@@ -1,12 +1,14 @@
 <?php
 
+use Src\Support\Helpers;
+
 $_start = microtime(true);
 
 define('ROOT', dirname(__FILE__, 2));
 
 require_once ROOT . '/vendor/autoload.php';
 
-$_config = \Src\Config\Config::getInstance();
+$_config = Src\Config\Config::getInstance();
 
 if ($_config->debug ?? false) {
     ini_set('display_errors', 1);
@@ -16,7 +18,13 @@ if ($_config->debug ?? false) {
 }
 
 $_requestUri = Src\Support\Security::filterInputString(INPUT_SERVER, 'REQUEST_URI');
-$_requestUri = \Src\Support\Helpers::uriWithoutGetPart($_requestUri);
+$_requestUri = Src\Support\Helpers::uriWithoutGetPart($_requestUri);
+
+if (Helpers::isCli()) {
+    // Is console request.
+    require ROOT . '/public/index-console.php';
+    die(0);
+}
 
 $_routes = require ROOT . '/src/Config/routes.php';
 

@@ -10,6 +10,7 @@ class SheetProcessingConfig
 
     public ?string $studentsGroup = null;
     public bool $forceApplyMendeleeva4ToLessons = false;
+    public bool $processGroups = true;
 
     public function __construct(array $config)
     {

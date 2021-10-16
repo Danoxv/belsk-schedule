@@ -2,44 +2,12 @@
 
 use Src\Config\Config;
 use Src\Support\Helpers;
-use Src\Support\Security;
-use Src\Support\Str;
 
 $config = Config::getInstance();
 
 $pageWithFiles = $config->pageWithScheduleFiles;
-$html = Helpers::httpGet($pageWithFiles);
 
-$links = [];
-
-if (!empty($html)) {
-    $doc = new DOMDocument;
-
-    @$doc->loadHTML($html);
-
-    $xpath = new DOMXPath($doc);
-
-    $entries = $xpath->query('//body//a');
-    $host = Helpers::getHost($pageWithFiles);
-
-    /** @var DOMElement[] $entries */
-    foreach ($entries as $entry) {
-        $linkUri = Security::sanitizeString($entry->getAttribute('href'));
-
-        if (!Str::endsWith($linkUri, $config->allowedExtensions)) {
-            continue;
-        }
-
-        $linkUri = "$host/$linkUri";
-
-        $linkText = Security::sanitizeString($entry->textContent);
-
-        $links[] = [
-            'uri' => $linkUri,
-            'text' => $linkText,
-        ];
-    }
-}
+$links = Helpers::getScheduleFilesLinks();
 ?>
 
 <!doctype html>
@@ -67,15 +35,15 @@ if (!empty($html)) {
                 <div class="col">
                     <div class="mb-3">
                         <div><b>Выберите из списка:</b></div>
-                        <div class="form-check">
+                        <!-- <div class="form-check">
                             <input checked name="scheduleLink" value="" class="form-check-input" type="radio" id="scheduleLinkEmpty">
                             <label class="form-check-label" for="scheduleLinkEmpty">
                                 Не выбрано
                             </label>
-                        </div>
+                        </div> -->
                         <?php foreach ($links as $linkIdx => $link): ?>
                             <div class="form-check">
-                                <input name="scheduleLink" value="<?=$link['uri']?>" class="form-check-input" type="radio" id="scheduleLink<?=$linkIdx?>">
+                                <input name="scheduleLink" <?= $linkIdx === 0 ? 'checked' : '' ?> value="<?=$link['uri']?>" class="form-check-input" type="radio" id="scheduleLink<?=$linkIdx?>">
                                 <label class="form-check-label" for="scheduleLink<?=$linkIdx?>">
                                     <?= $link['text'] ?>
                                 </label>

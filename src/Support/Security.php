@@ -11,11 +11,16 @@ class Security
      * Source: @link https://www.oreilly.com/library/view/learning-php-mysql/9781491979075/
      *
      * @param $var
+     * @param bool $applyTrim
      * @return string
      */
-    public static function sanitizeString($var): string
+    public static function sanitizeString($var, bool $applyTrim = false): string
     {
         $var = (string) $var;
+
+        if ($applyTrim) {
+            $var = trim($var);
+        }
 
         return htmlentities(strip_tags($var));
     }
