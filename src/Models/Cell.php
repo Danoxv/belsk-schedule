@@ -75,22 +75,25 @@ class Cell
         return $this->isInvisible;
     }
 
-    private function setIsInvisible(bool $value)
-    {
-        $this->isInvisible = $value;
-        Sheet::setToInvisibleCellsCache($this->coordinate, $value);
-    }
-
     private function resolveIsInvisible()
     {
-        if (Sheet::existsInInvisibleCellsCache($this->coordinate)) {
-            $this->isInvisible = Sheet::getFromInvisibleCellsCache($this->coordinate);
+        // Using a lookup cache adds a slight memory overhead, but boosts speed
+        // caching using a static within the method is faster than a class static,
+        // though it's additional memory overhead
+        /** @var bool[] */
+        static $invisibleCellsCache = [];
+
+        $coord = $this->getCoordinate();
+
+        if (isset($invisibleCellsCache[$coord])) {
+            $this->isInvisible = $invisibleCellsCache[$coord];
             return;
         }
 
         // В ячейке есть значение
         if ($this->getValue(true)) {
-            $this->setIsInvisible(false);
+            $this->isInvisible = false;
+            $invisibleCellsCache[$coord] = $this->isInvisible;
             return;
         }
 
@@ -98,7 +101,8 @@ class Cell
 
         // Ячейка не объединена
         if (!$range) {
-            $this->setIsInvisible(false);
+            $this->isInvisible = false;
+            $invisibleCellsCache[$coord] = $this->isInvisible;
             return;
         }
 
@@ -107,12 +111,14 @@ class Cell
 
         // Ячейка объединена не с ячейкой на предыдущей строке
         if ($range !== $prevRowRange) {
-            $this->setIsInvisible(false);
+            $this->isInvisible = false;
+            $invisibleCellsCache[$coord] = $this->isInvisible;
             return;
         }
 
         // Похоже, что ячейка невидима... Но это неточно.
-        $this->setIsInvisible(true);
+        $this->isInvisible = true;
+        $invisibleCellsCache[$coord] = $this->isInvisible;
     }
 
     /**

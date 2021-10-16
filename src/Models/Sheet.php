@@ -29,9 +29,6 @@ class Sheet
     /** @var string[] */
     private array $coordinatesForSkip = [];
 
-    /** @var bool[] */
-    private static array $invisibleCellsCache = [];
-
     /**
      * @param Worksheet $worksheet
      * @param SheetProcessingConfig $sheetProcessingConfig
@@ -156,33 +153,6 @@ class Sheet
     public function getTitle(): string
     {
        return $this->title;
-    }
-
-    /**
-     * @param string $coordinate
-     * @param bool $isInvisible
-     */
-    public static function setToInvisibleCellsCache(string $coordinate, bool $isInvisible)
-    {
-        self::$invisibleCellsCache[$coordinate] = $isInvisible;
-    }
-
-    /**
-     * @param string $coordinate
-     * @return bool|null
-     */
-    public static function getFromInvisibleCellsCache(string $coordinate): ?bool
-    {
-        return self::$invisibleCellsCache[$coordinate] ?? null;
-    }
-
-    /**
-     * @param string $coordinate
-     * @return bool
-     */
-    public static function existsInInvisibleCellsCache(string $coordinate): bool
-    {
-        return self::getFromInvisibleCellsCache($coordinate) !== null;
     }
 
     /**
