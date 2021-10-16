@@ -23,7 +23,7 @@ $allowedMimes   = $config->allowedMimes;
 $inputGroup = Security::filterInputString(INPUT_POST, 'group');
 
 if (empty($inputGroup)) {
-    throw new TerminateException('Группа обязательна');
+    throw new TerminateException('Выберите группу');
 }
 
 if (!in_array($inputGroup, $config->groupsList, true)) {
@@ -71,7 +71,7 @@ if ($scheduleLink) {
     $originalFileName = $inputScheduleFile['name'];
     $filePath = $inputScheduleFile['tmp_name'];
 } else {
-    throw new TerminateException('Файл обязателен');
+    throw new TerminateException('Выберите файл');
 }
 
 $forceMendeleeva = false;
@@ -159,7 +159,7 @@ echo "
         <h3>{$group->getName()}</h3>
     </div>
     <div class='col-11'>
-        <button class='btn btn-sm btn-info' onclick='saveSchedulePageAsPdf(\"{$group->getName()}\")'>Сохранить PDF</button>
+        <button class='btn btn-sm btn-secondary' onclick='saveSchedulePageAsPdf(\"{$group->getName()}\")'>Сохранить PDF</button>
         <span class='form-text' id='orientation-info'></span>
     </div>
 </div>
@@ -203,11 +203,21 @@ foreach (Day::getAll() as $day) {
                 dump($lesson);
             }
 
-            $mendeleevaHint = sprintf(
-                ' title="%s" class="%s" ',
-                $lesson->isMendeleeva4() ? 'Занятие на Менделеева, д. 4' : '',
-                $lesson->isMendeleeva4() ? 'table-success' : ''
-            );
+            $hint = ' title="%s" class="%s" ';
+
+            if ($lesson->isMendeleeva4()) {
+                $hint = sprintf($hint,
+                    'Занятие на Менделеева, д. 4',
+                    'table-success',
+                );
+            } elseif ($lesson->isClassHour()) {
+                $hint = sprintf($hint,
+                    'Классный час',
+                    'table-warning',
+                );
+            } else {
+                $hint = '';
+            }
 
             echo '<tr>';
 
@@ -216,7 +226,7 @@ foreach (Day::getAll() as $day) {
                 echo "<td rowspan='$lessonsCount'>" . $lesson->getTime()            .'</td>';
             }
 
-            echo "<td $mendeleevaHint>" . $lesson->getSubject() .'</td>';
+            echo "<td $hint>" . $lesson->getSubject() .'</td>';
             echo '<td>' . nl2br($lesson->getTeacher())  .'</td>';
 
             $technicalTitle = sprintf(' title="%s" ', $lesson->getTechnicalTitle());

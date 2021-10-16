@@ -43,6 +43,10 @@ class Cell
         $this->isEmpty  = empty($this->value);
     }
 
+    /**
+     * WARNING: High-cost operations was performed,
+     * call processing only in necessary cases.
+     */
     public function process()
     {
         $this->resolveIsInvisible();

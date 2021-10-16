@@ -113,7 +113,7 @@ class Pair
 
         $this->isValid = true;
 
-        $this->resolveTimeAndNumber();
+        $this->resolveTimeAndNumber($lesson1->isClassHour());
         $this->resolveDay();
 
         if (!$this->isValid()) {
@@ -162,9 +162,13 @@ class Pair
         $this->day = Str::lower($day);
     }
 
-    private function resolveTimeAndNumber()
+    private function resolveTimeAndNumber(bool $isClassHour)
     {
         $this->time = $this->number = '';
+
+        if ($isClassHour) {
+            return;
+        }
 
         $value = $this->timeCell->getValue();
         $value = Str::replaceManySpacesWithOne($value);
