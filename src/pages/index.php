@@ -17,6 +17,7 @@ $links = Helpers::getScheduleFilesLinks();
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-U1DAWAznBHeqEIlVSCgzq+c9gqGAJn5c/t99JyeKa9xxaYpSvHU5awsuZVVFIhvj" crossorigin="anonymous"></script>
+    <script src="/js/functions.js"></script>
     <style>
         a[target="_blank"]::after {
             content: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAQElEQVR42qXKwQkAIAxDUUdxtO6/RBQkQZvSi8I/pL4BoGw/XPkh4XigPmsUgh0626AjRsgxHTkUThsG2T/sIlzdTsp52kSS1wAAAABJRU5ErkJggg==);
@@ -43,7 +44,7 @@ $links = Helpers::getScheduleFilesLinks();
                         </div> -->
                         <?php foreach ($links as $linkIdx => $link): ?>
                             <div class="form-check">
-                                <input name="scheduleLink" <?= $linkIdx === 0 ? 'checked' : '' ?> value="<?=$link['uri']?>" class="form-check-input" type="radio" id="scheduleLink<?=$linkIdx?>">
+                                <input name="scheduleLink" onchange="onScheduleLinkChange()" <?= $linkIdx === 0 ? 'checked' : '' ?> value="<?=$link['uri']?>" class="form-check-input" type="radio" id="scheduleLink<?=$linkIdx?>">
                                 <label class="form-check-label" for="scheduleLink<?=$linkIdx?>">
                                     <?= $link['text'] ?>
                                 </label>
@@ -60,7 +61,7 @@ $links = Helpers::getScheduleFilesLinks();
                 <div class="col">
                     <div class="mb-3">
                         <label for="scheduleFile" class="form-label">Либо <b>загрузите свой файл</b> расписания:</label>
-                        <input name="scheduleFile" class="form-control" type="file" accept="<?= implode(',', $config->allowedMimes) ?>" id="scheduleFile" aria-describedby="scheduleFileHelp">
+                        <input name="scheduleFile" onchange="onScheduleFileChange()" class="form-control" type="file" accept="<?= implode(',', $config->allowedMimes) ?>" id="scheduleFile" aria-describedby="scheduleFileHelp">
                         <div id="scheduleFileHelp" class="form-text">
                             Выберите Excel-файл (XLS/XLSX).
                             <?php if (!empty($config->samples)): ?>
