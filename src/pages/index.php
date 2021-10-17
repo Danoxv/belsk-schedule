@@ -67,7 +67,7 @@ $links = Helpers::getScheduleFilesLinks();
                             <?php if (!empty($config->samples)): ?>
                                 Скачать примеры:<br />
                                 <?php foreach ($config->samples as $sample): ?>
-                                    <a href="download-sample?f=<?= $sample ?>"><?= $sample ?></a>
+                                    <a href="/samples/<?= $sample ?>"><?= $sample ?></a>
                                 <?php endforeach; ?>
                             <?php endif; ?>
                         </div>

@@ -18,7 +18,7 @@ $links = Helpers::getScheduleFilesLinks();
 
 $config = Config::getInstance();
 foreach ($config->samples as $sample) {
-    $samplePath = ROOT . '/src/samples/' . $sample;
+    $samplePath = ROOT . '/public/samples/' . $sample;
     $links[] = [
         'uri' => $samplePath,
     ];
