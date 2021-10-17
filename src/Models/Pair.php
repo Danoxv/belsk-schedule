@@ -138,34 +138,9 @@ class Pair
         $row2 = Coordinate::nextRow($row1);
         $lesson2 = new Lesson($this, $row2);
 
-        if (
-            $lesson2->isValid() && $lesson2->hasSubject() &&
-            $lesson1->isWithoutTeacherAuditory() && $lesson2->isWithoutTeacherAuditory()
-        ) {
-            Lesson::normalizeSubjectTeacherAuditory($lesson1, $lesson2);
-
-            $teacherAndAuditory = Lesson::explodeTeacherAndAuditory($lesson2->getSubject());
-
-            $lesson1
-                ->setWeekPosition(Lesson::FIRST_AND_SECOND_WEEK)
-                ->setTeacher($teacherAndAuditory['teacher'])
-                ->setAuditory($teacherAndAuditory['auditory']);
-            $this->lessons->put($lesson1->getCoordinate(), $lesson1);
-
-            return;
-        }
+        Lesson::processResolving($lesson1, $lesson2);
 
         if ($lesson2->isValid()) {
-            // TODO move logic to Lesson class
-            // TODO apply logic to second lesson also
-            if ($lesson1->hasSubject() && $lesson1->isWithoutTeacherAuditory() && Str::containsOne($lesson1->getSubject(), '*')) {
-                $subject = $lesson1->getSubject();
-
-                $lesson1->setSubject(trim(Str::before($subject, '*')));
-                $lesson1->setAuditory(trim(Str::after($subject, '*')));
-                $lesson1->setTeacher('*');
-            }
-
             $lesson1->setWeekPosition(Lesson::FIRST_WEEK);
             $this->lessons->put($lesson1->getCoordinate(), $lesson1);
 

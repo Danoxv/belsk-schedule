@@ -237,7 +237,7 @@ class Sheet
                         $excelConfig->firstGroupCol    = Coordinate::nextColumn($excelConfig->timeCol);
                         $excelConfig->groupNamesRow    = $row;
                         $excelConfig->firstScheduleRow = Coordinate::nextRow($excelConfig->groupNamesRow);
-                    } else if (empty($excelConfig->classHourLessonColumn) && Lesson::isClassHourLesson($rawCellValue)) {
+                    } else if (empty($excelConfig->classHourLessonColumn) && Lesson::isClassHourLesson($cellValue)) {
                         $excelConfig->classHourLessonColumn = $column;
                     }
                 }

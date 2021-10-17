@@ -3,10 +3,17 @@
 namespace Src\Models;
 
 use Src\Config\Config;
+use Src\Support\Collection;
 use Src\Support\Str;
 
 class Lesson
 {
+    /**
+     * See @link https://regex101.com/r/0CjJYj/1
+     */
+    private const PARSE_TEACHERS_AUDITORIES_REGEX =
+        '#((?<teachersSurnames>\p{Lu}\p{Ll}+)\s+(?<teachersInitials>\p{Lu}\.\s*\p{Lu}\.)\s+(?<auditory>\S+))|((?<teacher>\*+)\s*(?<auditory2>\S+))#u';
+
     public const FIRST_WEEK = 1;
     public const SECOND_WEEK = 2;
     public const FIRST_AND_SECOND_WEEK = 12;
@@ -21,9 +28,8 @@ class Lesson
     private bool $isClassHour;
     private bool $isMendeleeva4;
 
-    private string $subject;
-    private string $teacher;
-    private string $auditory;
+    private string $subject = '';
+    private Collection $teachersAuditories;
 
     private bool $isValid = true;
 
@@ -31,6 +37,7 @@ class Lesson
     {
         $this->pair = $pair;
         $this->row = $row;
+        $this->teachersAuditories = new Collection();
 
         $this->init();
     }
@@ -57,24 +64,20 @@ class Lesson
         return $this;
     }
 
-    /**
-     * @param string $teacher
-     * @return Lesson
-     */
-    public function setTeacher(string $teacher): self
+    private function setTeachersAuditories(Collection $teachersAuditories)
     {
-        $this->teacher = $teacher;
+        $this->teachersAuditories = $teachersAuditories;
 
         return $this;
     }
 
     /**
-     * @param string $auditory
-     * @return Lesson
+     * @param bool $isValid
+     * @return $this
      */
-    public function setAuditory(string $auditory): self
+    public function setIsValid(bool $isValid)
     {
-        $this->auditory = $auditory;
+        $this->isValid = $isValid;
 
         return $this;
     }
@@ -128,19 +131,38 @@ class Lesson
     }
 
     /**
+     * @param string $separator
      * @return string
      */
-    public function getTeacher(): string
+    public function getTeachersAsString(string $separator = ''): string
     {
-        return $this->teacher;
+        return $this->teachersAuditories->keys()->implode($separator);
     }
 
     /**
+     * @return bool
+     */
+    public function hasAuditories(): bool
+    {
+        return !empty($this->getAuditoriesAsString(''));
+    }
+
+    /**
+     * @param bool $rawValue
      * @return string
      */
-    public function getAuditory(): string
+    public function getCellValue(bool $rawValue = false)
     {
-        return $this->auditory;
+        return $this->cell->getValue($rawValue);
+    }
+
+    /**
+     * @param string $separator
+     * @return string
+     */
+    public function getAuditoriesAsString(string $separator = ''): string
+    {
+        return $this->teachersAuditories->values()->implode($separator);
     }
 
     /**
@@ -152,16 +174,18 @@ class Lesson
     }
 
     /**
-     * @param string $rawCellValue
+     * @param string $cellValue
      * @return bool
      */
-    public static function isClassHourLesson(string $rawCellValue): bool
+    public static function isClassHourLesson(string $cellValue): bool
     {
-        if (empty($rawCellValue)) {
+        $cellValue = trim($cellValue);
+
+        if (empty($cellValue)) {
             return false;
         }
 
-        return self::formatClassHourLesson($rawCellValue) === 'Классный час';
+        return self::formatClassHourLesson($cellValue) === 'Классный час';
     }
 
     /**
@@ -177,33 +201,129 @@ class Lesson
     }
 
     /**
-     * @return bool
+     * Resolve subject, teacher and auditory in lessons
+     *
+     * @param Lesson $lesson1
+     * @param Lesson $lesson2
      */
-    public function isWithoutTeacherAuditory(): bool
+    public static function processResolving(Lesson $lesson1, Lesson $lesson2)
     {
-        return empty($this->getTeacher()) && empty($this->getAuditory());
+        if (!$lesson1->isValid() && !$lesson2->isValid()) {
+            return;
+        }
+
+        if ($lesson1->isValid()) {
+            /*
+             * Resolve first lesson
+             */
+
+            $value = $lesson1->getCellValue();
+
+            if ($lesson1->isClassHour()) {
+                $value = self::formatClassHourLesson($value);
+            }
+
+            $parsed = self::parse($value);
+
+            // Not parsed, seems like was intersected with second lesson
+            if ($value && !$parsed) {
+                $lesson2->setIsValid(false);
+
+                $value = "$value " . $lesson2->getCellValue();
+
+                $parsed = self::parse($value);
+            }
+
+            if ($parsed) {
+                $lesson1->setSubject($parsed['subject']);
+                $lesson1->setTeachersAuditories($parsed['teachersAuditories']);
+            } else {
+                $lesson1->setSubject($value);
+            }
+        }
+
+        if ($lesson2->isValid()) {
+            /*
+             * Resolve second lesson
+             */
+
+            $value = $lesson2->getCellValue();
+
+            if ($lesson2->isClassHour()) {
+                $value = self::formatClassHourLesson($value);
+            }
+
+            $parsed = self::parse($value);
+
+            if ($parsed) {
+                $lesson2->setSubject($parsed['subject']);
+                $lesson2->setTeachersAuditories($parsed['teachersAuditories']);
+            } else {
+                $lesson2->setSubject($value);
+            }
+        }
     }
 
     /**
-     * @return bool
+     * @param string $value
+     * @return array|false Array with parsed or FALSE on failure
      */
-    public function hasSubject(): bool
+    private static function parse(string $value)
     {
-        return !empty($this->getSubject());
-    }
+        $parsed = [
+            'subject' => '',
+            'teachersAuditories' => new Collection(),
+        ];
 
-    public static function normalizeSubjectTeacherAuditory(Lesson $lesson1, Lesson $lesson2)
-    {
-        $lesson1Subj = $lesson1->getSubject();
-        $lesson2Subj = $lesson2->getSubject();
+        $value = trim($value);
 
-        if (Str::containsOne($lesson1Subj, '*')) {
-            $lesson1Subj = trim(Str::before($lesson1Subj, '*'));
-            $lesson2Subj = '* ' . $lesson2Subj;
+        if (empty($value)) {
+            return false;
         }
 
-        $lesson1->setSubject($lesson1Subj);
-        $lesson2->setSubject($lesson2Subj);
+        $value = Str::replaceManySpacesWithOne($value);
+
+        $matched = preg_match_all(self::PARSE_TEACHERS_AUDITORIES_REGEX, $value, $matches);
+
+        if (empty($matched)) {
+            return false;
+        }
+
+        /*
+         * Resolve subject
+         */
+
+        $firstTeacher = $matches['teachersSurnames'][0] ?? '';
+        if (empty($firstTeacher)) {
+            $firstTeacher = $matches['teacher'][0] ?? '';
+        }
+        $parsed['subject'] = trim(Str::before($value, $firstTeacher));
+
+        /*
+         * Resolve teachers and auditories
+         */
+
+        $teacherWasFound = false;
+        foreach ($matches['teachersSurnames'] as $k => $surname) {
+            $initials = $matches['teachersInitials'][$k] ?? '';
+            $auditory = $matches['auditory'][$k] ?? '';
+
+            $teacher = trim("$surname $initials");
+
+            if ($teacher) {
+                $teacherWasFound = true;
+                $parsed['teachersAuditories']->put($teacher, $auditory);
+            }
+        }
+
+        if (!$teacherWasFound) {
+            $teacher = $matches['teacher'][0] ?? '';
+            if ($teacher) {
+                $parsed['teachersAuditories']->put($teacher, $matches['auditory2'][0] ?? '');
+            }
+        }
+
+        return $parsed;
     }
 
     /**
@@ -247,7 +367,7 @@ class Lesson
     {
         $this->resolveCellAndIsClassHour();
 
-        // Lesson with invisible cell can't be a valid lesson.
+        // Lesson with invisible cell can't be a valid one.
         if ($this->cell->isInvisible()) {
             $this->isValid = false;
             return;
@@ -256,10 +376,13 @@ class Lesson
         // Resolve "is empty"
         $this->isEmpty = $this->cell->isEmpty();
 
-        $this->resolveSubjectTeacherAuditory();
         $this->resolveIsMendeleeva4();
     }
 
+    /**
+     * TODO Possible optimization:
+     * execute $cell->process() only once
+     */
     private function resolveCellAndIsClassHour()
     {
         $this->isClassHour = false;
@@ -278,7 +401,7 @@ class Lesson
                 $sheet
             );
 
-            if (self::isClassHourLesson($possibleClassHourCell->getValue(true))) {
+            if (self::isClassHourLesson($possibleClassHourCell->getValue())) {
                 $possibleClassHourCell->process();
                 $cell = $possibleClassHourCell;
             }
@@ -286,118 +409,29 @@ class Lesson
 
         $this->cell = $cell;
 
-        $this->isClassHour = self::isClassHourLesson($this->cell->getValue(true));
-    }
-
-    private function resolveSubjectTeacherAuditory()
-    {
-        $this->subject = '';
-        $this->teacher = '';
-        $this->auditory = '';
-
-        $value = $this->cell->getValue();
-
-        if ($this->isClassHour()) {
-            $value = self::formatClassHourLesson($value);
-        }
-
-        if (Str::containsOne($value, '*')) {
-            if (!Str::isWhitespace(Str::lastChar(Str::before($value, '*')))) {
-                $value = Str::insertBefore('*', ' ', $value);
-            }
-        }
-
-        $parts = explode("\n", $value);
-
-        foreach ($parts as &$part) {
-            $part = trim($part);
-            $part = Str::replaceManySpacesWithOne($part);
-        }
-        unset($part); // prevent side-effects
-
-        $firstPart = $parts[0];
-
-        $this->subject = trim($firstPart ?? '');
-
-        $partsCount = count($parts);
-        if ($partsCount >= 3) {
-            foreach ($parts as $k => $part) {
-                if ($k === 0) continue; // was already processed (as 'subject')
-
-                $teacherAndAuditory = self::explodeTeacherAndAuditory($part);
-
-                $this->auditory .= ($teacherAndAuditory['auditory'] . PHP_EOL);
-                $this->teacher .= ($teacherAndAuditory['teacher'] . PHP_EOL);
-            }
-
-            return;
-        }
-
-        $teacherAndAuditory = self::explodeTeacherAndAuditory($parts[1] ?? '');
-
-        $this->teacher = $teacherAndAuditory['teacher'];
-        $this->auditory = $teacherAndAuditory['auditory'];
-
-        // Can't resolve teacher and auditory,
-        // maybe value separated by 2 or more spaces, not new-line symbol?
-        if ($this->isWithoutTeacherAuditory() && $partsCount === 1) {
-            $subjectTeacherAuditory = preg_split('/[\s]{2,}/u', $value);
-            if (is_array($subjectTeacherAuditory) && count($subjectTeacherAuditory) === 3) {
-                [$this->subject, $this->teacher, $this->auditory] = $subjectTeacherAuditory;
-            }
-        }
-
-        if ($this->isWithoutTeacherAuditory() && Str::containsOne($this->subject, '*')) {
-            $subjectTeacherAuditory = preg_split('/[\s]+/u', $value);
-            if (is_array($subjectTeacherAuditory) && count($subjectTeacherAuditory) === 3) {
-                [$this->subject, $this->teacher, $this->auditory] = $subjectTeacherAuditory;
-            }
-        }
-    }
-
-    /**
-     * @param string $string
-     * @return string[]
-     */
-    public static function explodeTeacherAndAuditory(string $string): array
-    {
-        $result = [
-            'teacher' => '',
-            'auditory' => ''
-        ];
-
-        $string = trim($string);
-
-        if (empty($string)) {
-            return $result;
-        }
-
-        $lastSpace = Str::rpos($string, ' ');
-        if ($lastSpace !== false) {
-            $result['teacher'] = trim(Str::substr($string, 0, $lastSpace));
-            $result['auditory'] = trim(Str::substr($string, $lastSpace));
-        } else {
-            $result['auditory'] = $string;
-        }
-
-        return $result;
+        $this->isClassHour = self::isClassHourLesson($this->cell->getValue());
     }
 
     private function resolveIsMendeleeva4()
     {
         $this->isMendeleeva4 = false;
-
-        if (!$this->cell->getSheet()->hasMendeleeva4()) {
+        if ($this->isClassHour()) {
+            $this->isMendeleeva4 = false;
             return;
         }
 
         $sheet = $this->cell->getSheet();
-        if ($sheet->needForceApplyMendeleeva4() && !$this->isClassHour()) {
+
+        if (!$sheet->hasMendeleeva4()) {
+            return;
+        }
+
+        if ($sheet->needForceApplyMendeleeva4()) {
             $this->isMendeleeva4 = true;
             return;
         }
 
-        if (empty($this->getSubject())) {
+        if ($this->cell->isEmpty()) {
             return;
         }
 

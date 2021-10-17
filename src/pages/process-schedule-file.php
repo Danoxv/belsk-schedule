@@ -229,14 +229,14 @@ foreach (Day::getAll() as $day) {
             }
 
             echo "<td $hint>" . $lesson->getSubject() .'</td>';
-            echo '<td>' . nl2br($lesson->getTeacher())  .'</td>';
+            echo '<td>' . $lesson->getTeachersAsString('<br />')  .'</td>';
 
             $technicalTitle = sprintf(' title="%s" ', $lesson->getTechnicalTitle());
 
-            if (empty($lesson->getAuditory())) {
+            if (!$lesson->hasAuditories()) {
                 echo "<td $technicalTitle style='color: white'>.</td>";
             } else {
-                echo "<td $technicalTitle>" . nl2br($lesson->getAuditory()) . '</td>';
+                echo "<td $technicalTitle>" . $lesson->getAuditoriesAsString('<br />') . '</td>';
             }
 
             echo '</tr>';
