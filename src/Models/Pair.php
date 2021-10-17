@@ -138,6 +138,23 @@ class Pair
         $row2 = Coordinate::nextRow($row1);
         $lesson2 = new Lesson($this, $row2);
 
+        if (
+            $lesson2->isValid() && $lesson2->hasSubject() &&
+            $lesson1->isWithoutTeacherAuditory() && $lesson2->isWithoutTeacherAuditory()
+        ) {
+            Lesson::normalizeSubjectTeacherAuditory($lesson1, $lesson2);
+
+            $teacherAndAuditory = Lesson::explodeTeacherAndAuditory($lesson2->getSubject());
+
+            $lesson1
+                ->setWeekPosition(Lesson::FIRST_AND_SECOND_WEEK)
+                ->setTeacher($teacherAndAuditory['teacher'])
+                ->setAuditory($teacherAndAuditory['auditory']);
+            $this->lessons->put($lesson1->getCoordinate(), $lesson1);
+
+            return;
+        }
+
         if ($lesson2->isValid()) {
             $lesson1->setWeekPosition(Lesson::FIRST_WEEK);
             $this->lessons->put($lesson1->getCoordinate(), $lesson1);

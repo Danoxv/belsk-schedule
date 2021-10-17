@@ -37,10 +37,46 @@ class Lesson
 
     /**
      * @param int $weekPosition
+     * @return Lesson
      */
-    public function setWeekPosition(int $weekPosition)
+    public function setWeekPosition(int $weekPosition): self
     {
         $this->weekPosition = $weekPosition;
+
+        return $this;
+    }
+
+    /**
+     * @param string $subject
+     * @return Lesson
+     */
+    public function setSubject(string $subject): self
+    {
+        $this->subject = $subject;
+
+        return $this;
+    }
+
+    /**
+     * @param string $teacher
+     * @return Lesson
+     */
+    public function setTeacher(string $teacher): self
+    {
+        $this->teacher = $teacher;
+
+        return $this;
+    }
+
+    /**
+     * @param string $auditory
+     * @return Lesson
+     */
+    public function setAuditory(string $auditory): self
+    {
+        $this->auditory = $auditory;
+
+        return $this;
     }
 
     /**
@@ -141,6 +177,36 @@ class Lesson
     }
 
     /**
+     * @return bool
+     */
+    public function isWithoutTeacherAuditory(): bool
+    {
+        return empty($this->getTeacher()) && empty($this->getAuditory());
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasSubject(): bool
+    {
+        return !empty($this->getSubject());
+    }
+
+    public static function normalizeSubjectTeacherAuditory(Lesson $lesson1, Lesson $lesson2)
+    {
+        $lesson1Subj = $lesson1->getSubject();
+        $lesson2Subj = $lesson2->getSubject();
+
+        if (Str::containsOne($lesson1Subj, '*')) {
+            $lesson1Subj = trim(Str::before($lesson1Subj, '*'));
+            $lesson2Subj = '* ' . $lesson2Subj;
+        }
+
+        $lesson1->setSubject($lesson1Subj);
+        $lesson2->setSubject($lesson2Subj);
+    }
+
+    /**
      * @param string $cellValue
      * @return string
      */
@@ -230,10 +296,15 @@ class Lesson
         $this->auditory = '';
 
         $value = $this->cell->getValue();
-        $originalValue = $value;
 
         if ($this->isClassHour()) {
             $value = self::formatClassHourLesson($value);
+        }
+
+        if (Str::containsOne($value, '*')) {
+            if (!Str::isWhitespace(Str::lastChar(Str::before($value, '*')))) {
+                $value = Str::insertBefore('*', ' ', $value);
+            }
         }
 
         $parts = explode("\n", $value);
@@ -253,7 +324,7 @@ class Lesson
             foreach ($parts as $k => $part) {
                 if ($k === 0) continue; // was already processed (as 'subject')
 
-                $teacherAndAuditory = $this->explodeTeacherAndAuditory($part);
+                $teacherAndAuditory = self::explodeTeacherAndAuditory($part);
 
                 $this->auditory .= ($teacherAndAuditory['auditory'] . PHP_EOL);
                 $this->teacher .= ($teacherAndAuditory['teacher'] . PHP_EOL);
@@ -262,7 +333,7 @@ class Lesson
             return;
         }
 
-        $teacherAndAuditory = $this->explodeTeacherAndAuditory($parts[1] ?? '');
+        $teacherAndAuditory = self::explodeTeacherAndAuditory($parts[1] ?? '');
 
         $this->teacher = $teacherAndAuditory['teacher'];
         $this->auditory = $teacherAndAuditory['auditory'];
@@ -270,7 +341,14 @@ class Lesson
         // Can't resolve teacher and auditory,
         // maybe value separated by 2 or more spaces, not new-line symbol?
         if (empty($this->teacher) && empty($this->auditory) && $partsCount === 1) {
-            $subjectTeacherAuditory = preg_split('/[\s]{2,}/u', $originalValue);
+            $subjectTeacherAuditory = preg_split('/[\s]{2,}/u', $value);
+            if (is_array($subjectTeacherAuditory) && count($subjectTeacherAuditory) === 3) {
+                [$this->subject, $this->teacher, $this->auditory] = $subjectTeacherAuditory;
+            }
+        }
+
+        if (empty($this->teacher) && empty($this->auditory) && Str::containsOne($this->subject, '*')) {
+            $subjectTeacherAuditory = preg_split('/[\s]+/u', $value);
             if (is_array($subjectTeacherAuditory) && count($subjectTeacherAuditory) === 3) {
                 [$this->subject, $this->teacher, $this->auditory] = $subjectTeacherAuditory;
             }
@@ -281,7 +359,7 @@ class Lesson
      * @param string $string
      * @return string[]
      */
-    private function explodeTeacherAndAuditory(string $string): array
+    public static function explodeTeacherAndAuditory(string $string): array
     {
         $result = [
             'teacher' => '',
@@ -298,6 +376,8 @@ class Lesson
         if ($lastSpace !== false) {
             $result['teacher'] = trim(Str::substr($string, 0, $lastSpace));
             $result['auditory'] = trim(Str::substr($string, $lastSpace));
+        } else {
+            $result['auditory'] = $string;
         }
 
         return $result;
