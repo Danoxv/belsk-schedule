@@ -40,10 +40,12 @@ try {
     require ROOT . '/src/pages/show-error.php';
 }
 
+$_memoryUsage = Helpers::formatBytes(memory_get_usage());
+
 $_finish = round(microtime(true) - $_start, 2);
 
 echo "<div class='card'>
   <div class='card-body'>
-    <code>v{$_config->version['number']} {$_config->version['stability']} / Сгенерировано за $_finish сек.</code>
+    <code>v{$_config->version['number']} {$_config->version['stability']} / $_finish sec / $_memoryUsage</code>
   </div>
 </div>";

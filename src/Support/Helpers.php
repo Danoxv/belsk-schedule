@@ -181,4 +181,17 @@ class Helpers
     {
         return !empty(self::getHost($str));
     }
+
+    /**
+     * Source: @link https://www.php.net/manual/ru/function.memory-get-usage.php#96280
+     *
+     * @param int $size
+     * @return string
+     */
+    public static function formatBytes(int $size)
+    {
+        $unit=array('b','kb','mb','gb','tb','pb');
+
+        return @round($size/pow(1024,($i=floor(log($size,1024)))),2).' '.$unit[$i];
+    }
 }
