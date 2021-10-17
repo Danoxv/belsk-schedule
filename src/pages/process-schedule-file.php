@@ -142,15 +142,17 @@ echo '
     </div>
 ';
 
-foreach ($config->messagesOnSchedulePage as $message) {
-    $type = $message['type'] ?? 'primary';
-    $content = trim($message['content'] ?? '');
-    echo "
-    <div class='alert alert-{$type} alert-dismissible fade show' role='alert'>
-        {$content}
-        <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Закрыть'></button>
-    </div>
-    ";
+if (!$debug) {
+    foreach ($config->messagesOnSchedulePage as $message) {
+        $type = $message['type'] ?? 'primary';
+        $content = trim($message['content'] ?? '');
+        echo "
+        <div class='alert alert-{$type} alert-dismissible fade show' role='alert'>
+            {$content}
+            <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Закрыть'></button>
+        </div>
+        ";
+    }
 }
 
 echo "

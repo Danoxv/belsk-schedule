@@ -230,6 +230,7 @@ class Lesson
         $this->auditory = '';
 
         $value = $this->cell->getValue();
+        $originalValue = $value;
 
         if ($this->isClassHour()) {
             $value = self::formatClassHourLesson($value);
@@ -247,7 +248,8 @@ class Lesson
 
         $this->subject = trim($firstPart ?? '');
 
-        if (count($parts) >= 3) {
+        $partsCount = count($parts);
+        if ($partsCount >= 3) {
             foreach ($parts as $k => $part) {
                 if ($k === 0) continue; // was already processed (as 'subject')
 
@@ -264,6 +266,15 @@ class Lesson
 
         $this->teacher = $teacherAndAuditory['teacher'];
         $this->auditory = $teacherAndAuditory['auditory'];
+
+        // Can't resolve teacher and auditory,
+        // maybe value separated by 2 or more spaces, not new-line symbol?
+        if (empty($this->teacher) && empty($this->auditory) && $partsCount === 1) {
+            $subjectTeacherAuditory = preg_split('/[\s]{2,}/u', $originalValue);
+            if (is_array($subjectTeacherAuditory) && count($subjectTeacherAuditory) === 3) {
+                [$this->subject, $this->teacher, $this->auditory] = $subjectTeacherAuditory;
+            }
+        }
     }
 
     /**
