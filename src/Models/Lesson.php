@@ -340,14 +340,14 @@ class Lesson
 
         // Can't resolve teacher and auditory,
         // maybe value separated by 2 or more spaces, not new-line symbol?
-        if (empty($this->teacher) && empty($this->auditory) && $partsCount === 1) {
+        if ($this->isWithoutTeacherAuditory() && $partsCount === 1) {
             $subjectTeacherAuditory = preg_split('/[\s]{2,}/u', $value);
             if (is_array($subjectTeacherAuditory) && count($subjectTeacherAuditory) === 3) {
                 [$this->subject, $this->teacher, $this->auditory] = $subjectTeacherAuditory;
             }
         }
 
-        if (empty($this->teacher) && empty($this->auditory) && Str::containsOne($this->subject, '*')) {
+        if ($this->isWithoutTeacherAuditory() && Str::containsOne($this->subject, '*')) {
             $subjectTeacherAuditory = preg_split('/[\s]+/u', $value);
             if (is_array($subjectTeacherAuditory) && count($subjectTeacherAuditory) === 3) {
                 [$this->subject, $this->teacher, $this->auditory] = $subjectTeacherAuditory;

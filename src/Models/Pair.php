@@ -156,6 +156,16 @@ class Pair
         }
 
         if ($lesson2->isValid()) {
+            // TODO move logic to Lesson class
+            // TODO apply logic to second lesson also
+            if ($lesson1->hasSubject() && $lesson1->isWithoutTeacherAuditory() && Str::containsOne($lesson1->getSubject(), '*')) {
+                $subject = $lesson1->getSubject();
+
+                $lesson1->setSubject(trim(Str::before($subject, '*')));
+                $lesson1->setAuditory(trim(Str::after($subject, '*')));
+                $lesson1->setTeacher('*');
+            }
+
             $lesson1->setWeekPosition(Lesson::FIRST_WEEK);
             $this->lessons->put($lesson1->getCoordinate(), $lesson1);
 
