@@ -5,7 +5,7 @@ namespace Src\Support;
 use DOMDocument;
 use DOMElement;
 use DOMXPath;
-use Src\Config\Config;
+use Src\Config\AppConfig;
 
 class Helpers
 {
@@ -15,7 +15,7 @@ class Helpers
      */
     public static function isScheduleLinkValid(string $link): bool
     {
-        $config = Config::getInstance();
+        $config = AppConfig::getInstance();
 
         return
             Str::endsWith($link, $config->allowedExtensions) &&
@@ -126,7 +126,7 @@ class Helpers
      */
     public static function getScheduleFilesLinks(): array
     {
-        $config = Config::getInstance();
+        $config = AppConfig::getInstance();
 
         $pageWithFiles = $config->pageWithScheduleFiles;
         $html = self::httpGet($pageWithFiles);
@@ -140,12 +140,12 @@ class Helpers
 
             $xpath = new DOMXPath($doc);
 
-            $entries = $xpath->query('//body//a');
+            $aTags = $xpath->query('//body//a');
             $host = Helpers::getHost($pageWithFiles);
 
-            /** @var DOMElement[] $entries */
-            foreach ($entries as $entry) {
-                $linkUri = Security::sanitizeString($entry->getAttribute('href'));
+            /** @var DOMElement[] $aTags */
+            foreach ($aTags as $a) {
+                $linkUri = Security::sanitizeString($a->getAttribute('href'));
 
                 if (!Str::endsWith($linkUri, $config->allowedExtensions)) {
                     continue;
@@ -153,7 +153,7 @@ class Helpers
 
                 $linkUri = "$host/$linkUri";
 
-                $linkText = Security::sanitizeString($entry->textContent);
+                $linkText = Security::sanitizeString($a->textContent);
 
                 $links[] = [
                     'uri' => $linkUri,

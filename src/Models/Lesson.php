@@ -2,7 +2,7 @@
 
 namespace Src\Models;
 
-use Src\Config\Config;
+use Src\Config\AppConfig;
 use Src\Support\Collection;
 use Src\Support\Str;
 
@@ -437,7 +437,7 @@ class Lesson
 
         $cellColor = $this->cell->getEndColorRgb();
 
-        $config = Config::getInstance();
+        $config = AppConfig::getInstance();
         if (in_array($cellColor, $config->mendeleeva4HouseCellColors, true)) {
             $this->isMendeleeva4 = true;
         }

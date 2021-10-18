@@ -1,9 +1,9 @@
 <?php
 
-use Src\Config\Config;
+use Src\Config\AppConfig;
 use Src\Support\Helpers;
 
-$config = Config::getInstance();
+$config = AppConfig::getInstance();
 
 $pageWithFiles = $config->pageWithScheduleFiles;
 

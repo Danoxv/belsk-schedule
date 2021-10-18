@@ -3,9 +3,10 @@
 namespace Src\Models;
 
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
-use Src\Config\Config;
+use Src\Config\AppConfig;
 use Src\Config\ExcelConfig;
 use Src\Config\SheetProcessingConfig;
+use Src\Support\Arr;
 use Src\Support\Collection;
 use Src\Support\Coordinate;
 use Src\Support\Security;
@@ -14,7 +15,7 @@ use Src\Support\Str;
 class Sheet
 {
     private Worksheet $worksheet;
-    private Config $config;
+    private AppConfig $config;
     private ExcelConfig $excelConfig;
     private SheetProcessingConfig $sheetProcessingConfig;
 
@@ -37,7 +38,7 @@ class Sheet
     {
         $this->worksheet                = $worksheet;
 
-        $this->config                   = Config::getInstance();
+        $this->config                   = AppConfig::getInstance();
         $this->sheetProcessingConfig    = $sheetProcessingConfig;
         $this->excelConfig              = new ExcelConfig($this);
 
@@ -103,11 +104,6 @@ class Sheet
     public function getFirstGroup(): ?Group
     {
         return $this->groups->first();
-    }
-
-    public function getGroupNameByColumn(string $column)
-    {
-        return $this->getCellValue($column.$this->excelConfig->groupNamesRow);
     }
 
     /**
@@ -181,7 +177,7 @@ class Sheet
      * Get processable (potentially with lessons)
      * rows range.
      *
-     * @return array
+     * @return int[]
      */
     private function getRowsRange(): array
     {
@@ -251,10 +247,7 @@ class Sheet
                 }
 
                 if (!$this->hasMendeleeva4 && $cellValue) {
-                    if (
-                        Str::contains(Str::lower($cellValue), 'менделеева') &&
-                        Str::contains($cellValue, '4')
-                    ) {
+                    if (Str::containsAll(Str::lower($cellValue), $this->config->mendeleeva4KeywordsInSheetCell)) {
                         $this->hasMendeleeva4 = true;
                     }
                 }
@@ -326,7 +319,8 @@ class Sheet
                 continue;
             }
 
-            $rows = array_diff($rows, [$row]);
+            Arr::removeByValue($rows, $row);
+
             $rowsWasRemoved = true;
         }
 

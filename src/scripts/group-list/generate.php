@@ -1,7 +1,7 @@
 <?php
 
 use PhpOffice\PhpSpreadsheet\IOFactory;
-use Src\Config\Config;
+use Src\Config\AppConfig;
 use Src\Config\SheetProcessingConfig;
 use Src\Models\Group;
 use Src\Models\Sheet;
@@ -16,7 +16,7 @@ return {{groupNames}};
 
 $links = Helpers::getScheduleFilesLinks();
 
-$config = Config::getInstance();
+$config = AppConfig::getInstance();
 foreach ($config->samples as $sample) {
     $samplePath = ROOT . '/public/samples/' . $sample;
     $links[] = [
@@ -45,10 +45,7 @@ foreach ($links as $link) {
     }
 
     try {
-        $reader = IOFactory::createReaderForFile($filePath)
-            ->setReadDataOnly(true)
-        ;
-
+        $reader = IOFactory::createReaderForFile($filePath)->setReadDataOnly(true);
         $spreadsheet = $reader->load($filePath);
     } catch(\PhpOffice\PhpSpreadsheet\Reader\Exception $e) {
         continue;

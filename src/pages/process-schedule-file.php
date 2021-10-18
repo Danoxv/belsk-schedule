@@ -1,6 +1,6 @@
 <?php
 
-use Src\Config\Config;
+use Src\Config\AppConfig;
 use Src\Config\SheetProcessingConfig;
 use Src\Enums\Day;
 use Src\Models\Group;
@@ -13,7 +13,7 @@ use Src\Support\Str;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use Src\Exceptions\TerminateException;
 
-$config = Config::getInstance();
+$config = AppConfig::getInstance();
 
 $debug          = $config->debug;
 $maxFileSize    = $config->maxFileSize;
@@ -75,13 +75,13 @@ if ($scheduleLink) {
 }
 
 $forceMendeleeva = false;
-if (Str::contains($originalFileName, 'Менделеева')) {
+if (Str::contains(Str::lower($originalFileName), $config->mendeleeva4KeywordInFilename)) {
     $forceMendeleeva = true;
 }
 
 try {
     $reader = IOFactory::createReaderForFile($filePath)
-        ->setReadDataOnly(false) // Считывать стили, размеры ячеек и т.д. - для определения Менделеева 4
+        ->setReadDataOnly(false) // For Mendeleeva 4 detection by cell's color
     ;
 
     $spreadsheet = $reader->load($filePath);
@@ -161,7 +161,7 @@ echo "
         <h3>{$group->getName()}</h3>
     </div>
     <div class='col-10'>
-        <button class='btn btn-sm btn-secondary' onclick='saveSchedulePageAsPdf(\"{$group->getName()}\")'>Сохранить PDF</button>
+        <button class='btn btn-sm btn-secondary' onclick='saveSchedulePageAsPdf(\"{$group->getName()}\")'>Скачать PDF</button>
         <span class='form-text' id='orientation-info'></span>
     </div>
 </div>

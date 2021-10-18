@@ -60,7 +60,7 @@ class Coordinate extends \PhpOffice\PhpSpreadsheet\Cell\Coordinate
     /**
      * @param int $start
      * @param int $end
-     * @return array
+     * @return int[]
      */
     public static function generateRowsRange(int $start, int $end): array
     {
@@ -69,14 +69,16 @@ class Coordinate extends \PhpOffice\PhpSpreadsheet\Cell\Coordinate
 
     /**
      * @param string $coordinate 'A1'
-     * @return string[] ['A', '1']
+     * @return array ['A', 1]
      */
     public static function explodeCoordinate(string $coordinate): array
     {
         try {
-            return parent::coordinateFromString($coordinate);
+            [$col, $row] = parent::coordinateFromString($coordinate);
+            $row = (int) $row;
+            return [$col, $row];
         } catch (Exception $e) {
-            return ['', ''];
+            return ['', 0];
         }
     }
 }

@@ -8,7 +8,7 @@ define('ROOT', dirname(__FILE__, 2));
 
 require_once ROOT . '/vendor/autoload.php';
 
-$_config = Src\Config\Config::getInstance();
+$_config = Src\Config\AppConfig::getInstance();
 
 $isCli = Helpers::isCli();
 
