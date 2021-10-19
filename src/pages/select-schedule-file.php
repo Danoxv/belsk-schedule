@@ -5,9 +5,11 @@ use Src\Support\Helpers;
 
 $config = AppConfig::getInstance();
 
+$allowedExtensionsAsString = implode(', ', $config->allowedExtensions);
+
 $pageWithFiles = $config->pageWithScheduleFiles;
 
-$links = Helpers::getScheduleFilesLinks();
+$links = Helpers::getScheduleFilesLinks($linksGettingCurlError);
 ?>
 
 <!doctype html>
@@ -36,21 +38,29 @@ $links = Helpers::getScheduleFilesLinks();
                 <div class="col">
                     <div class="mb-3">
                         <div><b>Выберите из списка:</b></div>
-                        <!-- <div class="form-check">
-                            <input checked name="scheduleLink" value="" class="form-check-input" type="radio" id="scheduleLinkEmpty">
-                            <label class="form-check-label" for="scheduleLinkEmpty">
-                                Не выбрано
-                            </label>
-                        </div> -->
-                        <?php foreach ($links as $linkIdx => $link): ?>
-                            <div class="form-check">
-                                <input name="scheduleLink" onchange="onScheduleLinkChange()" <?= $linkIdx === 0 ? 'checked' : '' ?> value="<?=$link['uri']?>" class="form-check-input" type="radio" id="scheduleLink<?=$linkIdx?>">
-                                <label class="form-check-label" for="scheduleLink<?=$linkIdx?>">
-                                    <?= $link['text'] ?>
-                                </label>
+                        <?php if (!empty($links)): ?>
+                            <?php foreach ($links as $linkIdx => $link): ?>
+                                <div class="form-check">
+                                    <input name="scheduleLink" onchange="onScheduleLinkChange()" <?= $linkIdx === 0 ? 'checked' : '' ?> value="<?=$link['uri']?>" class="form-check-input" type="radio" id="scheduleLink<?=$linkIdx?>">
+                                    <label class="form-check-label" for="scheduleLink<?=$linkIdx?>">
+                                        <?= $link['text'] ?>
+                                    </label>
+                                </div>
+                            <?php endforeach; ?>
+                            <div class="form-text">(получено с <a target="_blank" href="<?= $pageWithFiles ?>"><?= $pageWithFiles ?></a>)</div>
+                        <?php else: ?>
+                            <div class="form-text">
+                                <p>Не найдено ссылок на странице <a target="_blank" href="<?= $pageWithFiles ?>"><?= $pageWithFiles ?></a>.</p>
+                                <p>
+                                    Причина:
+                                    <?php if ($linksGettingCurlError): ?>
+                                        страница недоступна. <?= $linksGettingCurlError ?>
+                                    <?php else: ?>
+                                        отсутствуют ссылки на поддерживаемые файлы (<?= $allowedExtensionsAsString ?>)
+                                    <?php endif; ?>
+                                </p>
                             </div>
-                        <?php endforeach; ?>
-                        <div class="form-text">(получено с <a target="_blank" href="<?= $pageWithFiles ?>"><?= $pageWithFiles ?></a>)</div>
+                        <?php endif; ?>
                     </div>
                 </div>
                 <div class="col-1">
@@ -60,7 +70,7 @@ $links = Helpers::getScheduleFilesLinks();
                 </div>
                 <div class="col">
                     <div class="mb-3">
-                        <label for="scheduleFile" class="form-label">Либо <b>загрузите свой файл</b> расписания (<?= implode(', ', $config->allowedExtensions) ?>):</label>
+                        <label for="scheduleFile" class="form-label">Либо <b>загрузите свой файл</b> расписания (<?= $allowedExtensionsAsString ?>):</label>
                         <input name="scheduleFile" onchange="onScheduleFileChange()" class="form-control" type="file" accept="<?= implode(',', $config->allowedMimes) ?>" id="scheduleFile" aria-describedby="scheduleFileHelp">
                         <div id="scheduleFileHelp" class="form-text">
                             <?php if (!empty($config->samples)): ?>

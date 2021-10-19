@@ -52,10 +52,10 @@ if ($scheduleLink) {
     $originalFileName = $scheduleLink;
 
     // Get file and save to temp dir
-    $data = Helpers::httpGet($scheduleLink);
+    $data = Helpers::httpGet($scheduleLink, $curlError);
 
     if ($data === null) {
-        throw new TerminateException('Ошибка при получении файла с сервера');
+        throw new TerminateException("Ошибка при получении файла с сервера. Ссылка: '$scheduleLink', ошибка '$curlError'");
     }
 
     $temp = tmpfile();

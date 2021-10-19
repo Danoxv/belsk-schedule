@@ -53,15 +53,21 @@ class Helpers
     /**
      * @param string $link
      * @param int $timeout In seconds
+     * @param string $curlError
      * @return ?string
      */
-    public static function httpGet(string $link, int $timeout = 3): ?string
+    public static function httpGet(string $link, &$curlError = '', int $timeout = 3): ?string
     {
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $link);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $timeout);
         $data = @curl_exec($ch);
+
+        if ($data === false) {
+            $curlError = curl_error($ch);
+        }
+
         curl_close($ch);
 
         if (empty($data)) {
@@ -122,44 +128,47 @@ class Helpers
     }
 
     /**
+     * @param string $curlError
      * @return array
      */
-    public static function getScheduleFilesLinks(): array
+    public static function getScheduleFilesLinks(&$curlError = ''): array
     {
         $config = AppConfig::getInstance();
 
         $pageWithFiles = $config->pageWithScheduleFiles;
-        $html = self::httpGet($pageWithFiles);
+        $html = self::httpGet($pageWithFiles, $curlError);
 
         $links = [];
 
-        if (!empty($html)) {
-            $doc = new DOMDocument;
+        if ($curlError || empty($html)) {
+            return $links;
+        }
 
-            @$doc->loadHTML($html);
+        $doc = new DOMDocument;
 
-            $xpath = new DOMXPath($doc);
+        @$doc->loadHTML($html);
 
-            $aTags = $xpath->query('//body//a');
-            $host = Helpers::getHost($pageWithFiles);
+        $xpath = new DOMXPath($doc);
 
-            /** @var DOMElement[] $aTags */
-            foreach ($aTags as $a) {
-                $linkUri = Security::sanitizeString($a->getAttribute('href'));
+        $aTags = $xpath->query('//body//a');
+        $host = Helpers::getHost($pageWithFiles);
 
-                if (!Str::endsWith($linkUri, $config->allowedExtensions)) {
-                    continue;
-                }
+        /** @var DOMElement[] $aTags */
+        foreach ($aTags as $a) {
+            $linkUri = Security::sanitizeString($a->getAttribute('href'));
 
-                $linkUri = "$host/$linkUri";
-
-                $linkText = Security::sanitizeString($a->textContent);
-
-                $links[] = [
-                    'uri' => $linkUri,
-                    'text' => $linkText,
-                ];
+            if (!Str::endsWith($linkUri, $config->allowedExtensions)) {
+                continue;
             }
+
+            $linkUri = "$host/$linkUri";
+
+            $linkText = Security::sanitizeString($a->textContent);
+
+            $links[] = [
+                'uri' => $linkUri,
+                'text' => $linkText,
+            ];
         }
 
         return $links;
