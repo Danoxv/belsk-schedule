@@ -4,6 +4,9 @@ namespace Src\Support;
 
 class Coordinate extends \PhpOffice\PhpSpreadsheet\Cell\Coordinate
 {
+    public const FIRST_COL = 'A';
+    public const FIRST_ROW = 1;
+
     /**
      * @param string $column
      * @return string

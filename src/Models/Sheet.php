@@ -194,8 +194,8 @@ class Sheet
     {
         $this->title = trim(Security::sanitizeString($this->worksheet->getTitle()));
 
-        $firstColumn = Cell::FIRST_COL;
-        $firstRow = Cell::FIRST_ROW;
+        $firstColumn = Coordinate::FIRST_COL;
+        $firstRow = Coordinate::FIRST_ROW;
 
         $highestColRow = $this->worksheet->getHighestRowAndColumn();
         $highestColumn = $highestColRow['column'];
