@@ -141,6 +141,23 @@ echo '
         td {
             vertical-align: middle;
         }
+        
+        /* Something like table grid layout */
+        .tbl1 {
+            width: 5%;
+            min-width: 5%;
+            max-width: 5%;
+        }
+        .tbl2 {
+            width: 10%;
+            min-width: 10%;
+            max-width: 10%;
+        }
+        .tbl3 {
+            width: 15%;
+            min-width: 15%;
+            max-width: 15%;
+        }
     </style>
 </head>
 <body>
@@ -191,11 +208,11 @@ foreach (Day::getAll() as $day) {
     echo '
 <thead class="table-light">
 <tr>
-    <td><b>#</b></td>
-    <td><b>Время</b></td>
-    <td><b>Предмет</b></td>
-    <td><b>Учитель</b></td>
-    <td><b>Аудитория</b></td>
+    <td class="text-center tbl1"><b>#</b></td>
+    <td class="text-center tbl2"><b>Время</b></td>
+    <td class="text-center"><b>Предмет</b></td>
+    <td class="text-center tbl3"><b>Учитель</b></td>
+    <td class="text-center tbl2"><b>Аудитория</b></td>
 </tr>
 </thead>';
 
@@ -232,12 +249,12 @@ foreach (Day::getAll() as $day) {
             echo '<tr>';
 
             if ($lessonsCount === 1 || ($lessonsCount >= 2 && $lessonNum === 0)) {
-                echo "<td rowspan='$lessonsCount'>" . $lesson->getNumber()          .'</td>';
-                echo "<td rowspan='$lessonsCount'>" . $lesson->getTime()            .'</td>';
+                echo "<td rowspan='$lessonsCount' class='text-center'>" . $lesson->getNumber()          .'</td>';
+                echo "<td rowspan='$lessonsCount' class='text-center'>" . $lesson->getTime()            .'</td>';
             }
 
             echo "<td $hint>" . $lesson->getSubject() .'</td>';
-            echo '<td>' . $lesson->getTeachersAsString('<br />')  .'</td>';
+            echo "<td>" . $lesson->getTeachersAsString('<br />')  .'</td>';
 
             $technicalTitle = sprintf(' title="%s" ', $lesson->getTechnicalTitle());
 
