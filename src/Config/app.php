@@ -22,14 +22,6 @@ return [
         '3.xls',
     ],
     'groupsList' => require ROOT . '/src/Config/group-list.php',
-    'days' => [
-        'Понедельник',
-        'Вторник',
-        'Среда',
-        'Четверг',
-        'Пятница',
-        'Суббота',
-    ],
     'messagesOnSchedulePage' => [
         [
             'type' => 'warning',
@@ -43,4 +35,5 @@ return [
     'mendeleeva4HouseCellColors' => ['000000'],
     'mendeleeva4KeywordInFilename' => 'менделеева',
     'mendeleeva4KeywordsInSheetCell' => ['менделеева', '4'],
+    'classHourCellKeyword' => 'классный час',
 ];

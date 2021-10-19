@@ -185,7 +185,9 @@ class Lesson
             return false;
         }
 
-        return self::formatClassHourLesson($cellValue) === 'Классный час';
+        $config = AppConfig::getInstance();
+
+        return Str::lower(Str::removeSpaces($cellValue)) === Str::lower(Str::removeSpaces($config->classHourCellKeyword));
     }
 
     /**

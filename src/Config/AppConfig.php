@@ -19,7 +19,6 @@ class AppConfig
 
     public array $samples;
     public array $groupsList;
-    public array $days;
     public array $messagesOnSchedulePage;
 
     public array $dayWords;
@@ -28,6 +27,7 @@ class AppConfig
     public array $mendeleeva4HouseCellColors;
     public string $mendeleeva4KeywordInFilename;
     public array $mendeleeva4KeywordsInSheetCell;
+    public string $classHourCellKeyword;
 
     protected function __construct()
     {
