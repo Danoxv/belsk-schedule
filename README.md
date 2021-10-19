@@ -15,7 +15,7 @@
 composer install
 ```
 ## Архитектура
-Архитектура приложения построена с использованием паттерна [Единая точка входа](https://ru.wikipedia.org/wiki/Единая_точка_входа_(шаблон_проектирования)) (Single entry point), на основе каркаса [NewEXE/single-entry-point-php](https://github.com/NewEXE/single-entry-point-php).
+Архитектура приложения построена на основе каркаса [NewEXE/single-entry-point-php](https://github.com/NewEXE/single-entry-point-php).
 
 ### Как создать страницу
 1. Создать PHP-файл страницы в директории `src/pages` (допускается создание в субдиректории)
