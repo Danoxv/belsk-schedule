@@ -35,6 +35,14 @@ php public/index.php sub-dir/script.php
 1. Добавить ключ со значением в `src/Config/app.php`
 2. Добавить свойство в класс `Src\Config\AppConfig`
 
+### Как показать ошибку пользователю
+Чтобы корректно завершить работу приложения, необходимо кинуть исключение:
+```
+use Src\Exceptions\TerminateException;
+
+throw new TerminateException('Пользователь увидит это сообщение об ошибке');
+```
+
 ## Утилиты
 ### Обновить актуальный список всех групп для страницы `select-schedule-file.php`:
 ```
