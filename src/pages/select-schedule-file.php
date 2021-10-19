@@ -63,9 +63,8 @@ $links = Helpers::getScheduleFilesLinks();
                         <label for="scheduleFile" class="form-label">Либо <b>загрузите свой файл</b> расписания:</label>
                         <input name="scheduleFile" onchange="onScheduleFileChange()" class="form-control" type="file" accept="<?= implode(',', $config->allowedMimes) ?>" id="scheduleFile" aria-describedby="scheduleFileHelp">
                         <div id="scheduleFileHelp" class="form-text">
-                            Выберите Excel-файл (XLS/XLSX).
                             <?php if (!empty($config->samples)): ?>
-                                Скачать примеры:<br />
+                                Скачать примеры:
                                 <?php foreach ($config->samples as $sample): ?>
                                     <a href="/samples/<?= $sample ?>"><?= $sample ?></a>
                                 <?php endforeach; ?>
