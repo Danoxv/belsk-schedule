@@ -104,7 +104,7 @@ $links = Helpers::getScheduleFilesLinks($linksGettingCurlError);
                         <label class="form-check-label" for="detectMendeleeva4">
                             Выделять пары, проходящие на Менделеева, 4
                         </label>
-                        <div id="detectMendeleeva4Help" class="form-text">Такие пары будут выделены зелёным цветом. Может работать нестабильно.</div>
+                        <div id="detectMendeleeva4Help" class="form-text">Такие пары будут выделены зелёным цветом. Может работать некорректно.</div>
                     </div>
                 </div>
             </div>
