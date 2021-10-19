@@ -8,6 +8,9 @@ use Src\Support\Security;
 
 class Cell
 {
+    public const FIRST_COL = 'A';
+    public const FIRST_ROW = 1;
+
     private string $coordinate;
     private string $column;
     private int $row;
