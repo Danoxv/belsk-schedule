@@ -2,6 +2,7 @@
 
 namespace Src\Models;
 
+use Src\Enums\Day;
 use Src\Support\Collection;
 use Src\Support\Coordinate;
 use Src\Support\Str;
@@ -176,7 +177,7 @@ class Pair
             }
         } while (empty($day));
 
-        $this->day = Str::lower($day);
+        $this->day = Day::normalize($day);
     }
 
     private function resolveTimeAndNumber()

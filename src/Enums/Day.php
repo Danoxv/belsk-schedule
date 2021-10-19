@@ -34,6 +34,15 @@ class Day
      * @param string $day
      * @return string
      */
+    public static function normalize(string $day)
+    {
+        return Str::lower($day);
+    }
+
+    /**
+     * @param string $day
+     * @return string
+     */
     public static function format(string $day): string
     {
         return Str::ucfirst($day);
