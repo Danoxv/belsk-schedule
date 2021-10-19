@@ -60,7 +60,7 @@ $links = Helpers::getScheduleFilesLinks();
                 </div>
                 <div class="col">
                     <div class="mb-3">
-                        <label for="scheduleFile" class="form-label">Либо <b>загрузите свой файл</b> расписания:</label>
+                        <label for="scheduleFile" class="form-label">Либо <b>загрузите свой файл</b> расписания (<?= implode(', ', $config->allowedExtensions) ?>):</label>
                         <input name="scheduleFile" onchange="onScheduleFileChange()" class="form-control" type="file" accept="<?= implode(',', $config->allowedMimes) ?>" id="scheduleFile" aria-describedby="scheduleFileHelp">
                         <div id="scheduleFileHelp" class="form-text">
                             <?php if (!empty($config->samples)): ?>
