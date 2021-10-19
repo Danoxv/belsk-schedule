@@ -242,13 +242,15 @@ class Sheet
                  * Detect "Has Mendeleeva 4 house"
                  */
 
-                if ($this->sheetProcessingConfig->forceApplyMendeleeva4ToLessons) {
-                    $this->hasMendeleeva4 = true;
-                }
-
-                if (!$this->hasMendeleeva4 && $cellValue) {
-                    if (Str::containsAll(Str::lower($cellValue), $this->config->mendeleeva4KeywordsInSheetCell)) {
+                if ($this->sheetProcessingConfig->detectMendeleeva4) {
+                    if ($this->sheetProcessingConfig->forceApplyMendeleeva4ToLessons) {
                         $this->hasMendeleeva4 = true;
+                    }
+
+                    if (!$this->hasMendeleeva4 && $cellValue) {
+                        if (Str::containsAll(Str::lower($cellValue), $this->config->mendeleeva4KeywordsInSheetCell)) {
+                            $this->hasMendeleeva4 = true;
+                        }
                     }
                 }
             }

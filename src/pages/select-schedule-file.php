@@ -37,7 +37,7 @@ $links = Helpers::getScheduleFilesLinks($linksGettingCurlError);
             <div class="row">
                 <div class="col">
                     <div class="mb-3">
-                        <div><b>Выберите из списка:</b></div>
+                        <div><b>1. Выберите из списка:</b></div>
                         <?php if (!empty($links)): ?>
                             <?php foreach ($links as $linkIdx => $link): ?>
                                 <div class="form-check">
@@ -86,7 +86,7 @@ $links = Helpers::getScheduleFilesLinks($linksGettingCurlError);
             <!-- <div class="row"><hr /></div> -->
             <div class="row">
                 <div class="mb-3">
-                    <label for="group" class="form-label"><b>Группа:</b></label>
+                    <label for="group" class="form-label"><b>2. Группа:</b></label>
                     <select name="group" class="form-select" aria-label="Выберите группу" id="group" aria-describedby="groupHelp">
                         <!-- <option value="" selected disabled>Выберите...</option> -->
                         <?php foreach ($config->groupsList as $group): ?>
@@ -94,6 +94,18 @@ $links = Helpers::getScheduleFilesLinks($linksGettingCurlError);
                         <?php endforeach; ?>
                     </select>
                     <div id="groupHelp" class="form-text">Выберите учебную группу, для которой хотите получить расписание.</div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="mb-3">
+                    <b>3. Настройки:</b>
+                    <div class="form-check">
+                        <input name="detectMendeleeva4" class="form-check-input" type="checkbox" value="1" id="detectMendeleeva4" aria-describedby="detectMendeleeva4Help">
+                        <label class="form-check-label" for="detectMendeleeva4">
+                            Выделять пары, проходящие на Менделеева, 4
+                        </label>
+                        <div id="detectMendeleeva4Help" class="form-text">Такие пары будут выделены зелёным цветом. Может работать нестабильно.</div>
+                    </div>
                 </div>
             </div>
 

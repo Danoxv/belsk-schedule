@@ -47,6 +47,9 @@ if ($scheduleLink && !empty($inputScheduleFile['tmp_name'])) {
     throw new TerminateException('Выберите либо файл с сервера техникума, либо с компьютера, но не оба сразу');
 }
 
+$detectMendeleeva4 = Security::filterInputString(INPUT_POST, 'detectMendeleeva4');
+$detectMendeleeva4 = (bool) $detectMendeleeva4;
+
 $originalFileName = '';
 if ($scheduleLink) {
     $originalFileName = $scheduleLink;
@@ -90,9 +93,11 @@ if (Str::contains(Str::lower($originalFileName), $config->mendeleeva4KeywordInFi
 // Load Excel file into PHPSpreadsheet
 
 try {
-    $reader = IOFactory::createReaderForFile($filePath)
-        ->setReadDataOnly(false) // For Mendeleeva 4 detection by cell's color
-    ;
+    $reader = IOFactory::createReaderForFile($filePath);
+
+    if (!$detectMendeleeva4) {
+        $reader->setReadDataOnly(true); // Disable parsing of cell's color, formatting etc.
+    }
 
     $spreadsheet = $reader->load($filePath);
 } catch(\PhpOffice\PhpSpreadsheet\Reader\Exception $e) {
@@ -110,7 +115,8 @@ $group = null;
 foreach ($spreadsheet->getAllSheets() as $worksheet) {
     $sheet = new Sheet($worksheet, new SheetProcessingConfig([
         'studentsGroup' => $inputGroup,
-        'forceApplyMendeleeva4ToLessons' => $forceMendeleeva
+        'forceApplyMendeleeva4ToLessons' => $forceMendeleeva,
+        'detectMendeleeva4' => $detectMendeleeva4
     ]));
 
     if ($sheet->hasGroups()) {
