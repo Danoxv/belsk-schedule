@@ -9,7 +9,7 @@ use Src\Support\Str;
 class Lesson
 {
     /**
-     * See @link https://regex101.com/r/0CjJYj/1
+     * See @link https://regex101.com/r/S7njgP/1
      */
     private const PARSE_TEACHERS_AUDITORIES_REGEX =
         '#((?<teachersSurnames>\p{Lu}\p{Ll}+)\s+(?<teachersInitials>\p{Lu}\.\s*\p{Lu}\.)\s+(?<auditory>\S+))|((?<teacher>\*+)\s*(?<auditory2>\S+))#u';

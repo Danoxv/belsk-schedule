@@ -2,8 +2,6 @@
 
 namespace Src\Support;
 
-use PhpOffice\PhpSpreadsheet\Exception;
-
 class Coordinate extends \PhpOffice\PhpSpreadsheet\Cell\Coordinate
 {
     /**
@@ -73,12 +71,11 @@ class Coordinate extends \PhpOffice\PhpSpreadsheet\Cell\Coordinate
      */
     public static function explodeCoordinate(string $coordinate): array
     {
-        try {
-            [$col, $row] = parent::coordinateFromString($coordinate);
-            $row = (int) $row;
-            return [$col, $row];
-        } catch (Exception $e) {
-            return ['', 0];
-        }
+        $col = '';
+        $row = 0;
+
+        sscanf($coordinate, '%[A-Z]%d', $col, $row);
+
+        return [$col, (int) $row];
     }
 }

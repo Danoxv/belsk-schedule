@@ -13,6 +13,10 @@ use Src\Support\Str;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use Src\Exceptions\TerminateException;
 
+/*
+ * Take settings from app config and user's input.
+ */
+
 $config = AppConfig::getInstance();
 
 $debug          = $config->debug;
@@ -27,14 +31,14 @@ if (empty($inputGroup)) {
 }
 
 if (!in_array($inputGroup, $config->groupsList, true)) {
-    throw new TerminateException('Hack attempt (2)', TerminateException::TYPE_DANGER);
+    throw new TerminateException('Недопустимая группа', TerminateException::TYPE_DANGER);
 }
 
 $scheduleLink = Security::filterInputString(INPUT_POST, 'scheduleLink');
 $scheduleLink = Helpers::sanitizeScheduleLink($scheduleLink);
 
 if ($scheduleLink && !Helpers::isScheduleLinkValid($scheduleLink)) {
-    throw new TerminateException('Hack attempt (1)', TerminateException::TYPE_DANGER);
+    throw new TerminateException('Недопустимая ссылка на файл расписания', TerminateException::TYPE_DANGER);
 }
 
 $inputScheduleFile = $_FILES['scheduleFile'] ?? [];
@@ -47,7 +51,7 @@ $originalFileName = '';
 if ($scheduleLink) {
     $originalFileName = $scheduleLink;
 
-    // Скачать файл и сохранить во временную папку
+    // Get file and save to temp dir
     $data = Helpers::httpGet($scheduleLink);
 
     if ($data === null) {
@@ -60,10 +64,10 @@ if ($scheduleLink) {
     $filePath = stream_get_meta_data($temp)['uri'];
 } elseif (!empty($inputScheduleFile['tmp_name'])) {
     if (
-        !in_array($inputScheduleFile['type'], $allowedMimes, true)  // файл не эксель
-        || empty($inputScheduleFile['size'])                      // файл с нулевым размером или отсутствующим размером
-        || $inputScheduleFile['size'] > ($maxFileSize * 1024)     // файл с размером больше, чем $maxFileSize килобайт
-        || $inputScheduleFile['size'] < ($minFileSize * 1024)     // файл с размером меньше, чем $minFileSize килобайт
+        !in_array($inputScheduleFile['type'], $allowedMimes, true)  // is not Excel file
+        || empty($inputScheduleFile['size'])                      // empty size
+        || $inputScheduleFile['size'] > ($maxFileSize * 1024)     // file biggest that $maxFileSize kb
+        || $inputScheduleFile['size'] < ($minFileSize * 1024)     // file smallest that $minFileSize kb
     ) {
         throw new TerminateException('Выбран недопустимый файл');
     }
@@ -79,6 +83,12 @@ if (Str::contains(Str::lower($originalFileName), $config->mendeleeva4KeywordInFi
     $forceMendeleeva = true;
 }
 
+/*
+ * Parsing
+ */
+
+// Load Excel file into PHPSpreadsheet
+
 try {
     $reader = IOFactory::createReaderForFile($filePath)
         ->setReadDataOnly(false) // For Mendeleeva 4 detection by cell's color
@@ -93,9 +103,7 @@ if ($debug) {
     echo '<pre>';
 }
 
-/*
- * Parsing
- */
+// Parse Sheets, Groups, Pairs and Lessons
 
 /** @var ?Group $group */
 $group = null;

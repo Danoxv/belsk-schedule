@@ -12,6 +12,11 @@ $_config = Src\Config\AppConfig::getInstance();
 
 $isCli = Helpers::isCli();
 
+if (!$isCli) {
+    // See https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-XSS-Protection
+    header('X-XSS-Protection: 1; mode=block');
+}
+
 if ($_config->debug || $isCli) {
     ini_set('display_errors', 1);
     ini_set('display_startup_errors', 1);
