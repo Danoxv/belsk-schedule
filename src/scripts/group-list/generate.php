@@ -72,6 +72,7 @@ var_dump('All links and files processed');
 $groupListFile = ROOT . '/src/Config/group-list.php';
 
 $existingGroups = require $groupListFile;
+$groupNames = array_merge($groupNames, $existingGroups);
 
 $groupNames = array_filter($groupNames);
 $groupNames = array_unique($groupNames);
