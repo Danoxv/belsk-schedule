@@ -176,7 +176,7 @@ echo '
     </style>
 </head>
 <body>
-<div class="container-fluid main-container" id="schedule-page-content">
+<div class="container main-container" id="schedule-page-content">
 ';
 
 if (!$debug) {
