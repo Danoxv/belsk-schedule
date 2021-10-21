@@ -47,7 +47,7 @@ foreach ($links as $link) {
     try {
         $reader = IOFactory::createReaderForFile($filePath)->setReadDataOnly(true);
         $spreadsheet = $reader->load($filePath);
-    } catch(\PhpOffice\PhpSpreadsheet\Reader\Exception $e) {
+    } catch(Exception $e) {
         continue;
     }
 

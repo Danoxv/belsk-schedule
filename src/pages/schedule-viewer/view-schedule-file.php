@@ -96,7 +96,7 @@ try {
     $reader = IOFactory::createReaderForFile($filePath);
 
     $spreadsheet = $reader->load($filePath);
-} catch(\PhpOffice\PhpSpreadsheet\Reader\Exception $e) {
+} catch(Exception $e) {
     throw new TerminateException('Ошибка чтения файла: ' . $e->getMessage());
 }
 
