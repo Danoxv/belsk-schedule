@@ -198,7 +198,7 @@ echo "
     <div class='col'>
         <h3>{$group->getName()}</h3>
     </div>
-    <div class='col text-end'>
+    <div class='col-md-auto text-end'>
         <span class='form-text' id='orientation-info'></span>
         <button class='btn btn-sm btn-secondary' onclick='saveSchedulePageAsPdf(\"{$group->getName()}\")'>Скачать PDF</button>
         <a class='btn btn-sm btn-primary' href='/' role='button'>Выбрать другой файл</a>
