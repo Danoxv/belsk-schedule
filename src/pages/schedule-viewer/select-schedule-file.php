@@ -22,18 +22,18 @@ $links = Helpers::getScheduleFilesLinks($linksGettingCurlError);
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-U1DAWAznBHeqEIlVSCgzq+c9gqGAJn5c/t99JyeKa9xxaYpSvHU5awsuZVVFIhvj" crossorigin="anonymous"></script>
     <script src="/js/functions.js"></script>
     <style>
+        #main-container {
+            padding-top: 6px;
+            padding-bottom: 6px;
+        }
         a[target="_blank"]::after {
             content: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAQElEQVR42qXKwQkAIAxDUUdxtO6/RBQkQZvSi8I/pL4BoGw/XPkh4XigPmsUgh0626AjRsgxHTkUThsG2T/sIlzdTsp52kSS1wAAAABJRU5ErkJggg==);
             margin: 3px 3px 0 5px;
         }
-        .main-container {
-            padding-top: 6px;
-            padding-bottom: 6px;
-        }
     </style>
 </head>
 <body>
-    <div class="container main-container">
+    <div class="container" id="main-container">
         <?php require ROOT . '/src/pages/components/dark-mode.php' ?>
         <form method="post" action="view-schedule-file" enctype="multipart/form-data">
             <div class="row">

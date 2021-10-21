@@ -145,8 +145,8 @@ echo '
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js" integrity="sha512-YcsIPGdhPK4P/uRW6/sruonlYj+Q7UHWeKfTAkBW+g83NKM+jMJFJ4iAPfSnVp7BKD4dKMHmVSvICUbE/V1sSw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="/js/functions.js"></script>
     <style>
-        .main-container {
-            padding-top: 12px;
+        #main-container {
+            padding-top: 6px;
         }
         
         td {
@@ -176,7 +176,7 @@ echo '
     </style>
 </head>
 <body>
-<div class="container main-container" id="schedule-page-content">
+<div class="container" id="main-container">
 ';
 require ROOT . '/src/pages/components/dark-mode.php';
 

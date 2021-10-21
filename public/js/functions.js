@@ -76,7 +76,7 @@ function saveSchedulePageAsPdf(fileName = 'schedule') {
 
   O('orientation-info').innerHTML = orientationInfo;
 
-  html2pdf(O('schedule-page-content'), {
+  html2pdf(O('main-container'), {
     filename:     fileName + '.pdf',
     jsPDF:        { orientation: orientation }
   });
