@@ -19,9 +19,9 @@ function saveSchedulePageAsPdf(fileName = 'schedule') {
   }
 
   let orientationInfo =
-    'Сохранено в ' +
-    (orientation === 'l' ? 'альбомном' : 'портретном') +
-    ' режиме'
+    'Скачана ' +
+    (orientation === 'l' ? 'альбомная' : 'портретная') +
+    ' версия'
   ;
 
   if (usedDefaultOrientation) {

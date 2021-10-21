@@ -144,6 +144,10 @@ echo '
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js" integrity="sha512-YcsIPGdhPK4P/uRW6/sruonlYj+Q7UHWeKfTAkBW+g83NKM+jMJFJ4iAPfSnVp7BKD4dKMHmVSvICUbE/V1sSw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="/js/functions.js"></script>
     <style>
+        .main-container {
+            padding-top: 12px;
+        }
+        
         td {
             vertical-align: middle;
         }
@@ -164,13 +168,14 @@ echo '
             min-width: 15%;
             max-width: 15%;
         }
+        
+        .debug {
+            border: 1px solid black;       
+        }
     </style>
 </head>
 <body>
-<div class="container-fluid" id="schedule-page-content">
-    <div class="sticky-sm-top clearfix">
-        <a class="btn btn-sm btn-success float-end" href="/" role="button">Выбрать другой файл</a>
-    </div>
+<div class="container-fluid main-container" id="schedule-page-content">
 ';
 
 if (!$debug) {
@@ -188,12 +193,13 @@ if (!$debug) {
 
 echo "
 <div class='row'>
-    <div class='col-2'>
+    <div class='col'>
         <h3>{$group->getName()}</h3>
     </div>
-    <div class='col-10'>
-        <button class='btn btn-sm btn-secondary' onclick='saveSchedulePageAsPdf(\"{$group->getName()}\")'>Скачать PDF</button>
+    <div class='col text-end'>
         <span class='form-text' id='orientation-info'></span>
+        <button class='btn btn-sm btn-secondary' onclick='saveSchedulePageAsPdf(\"{$group->getName()}\")'>Скачать PDF</button>
+        <a class='btn btn-sm btn-success' href='/' role='button'>Выбрать другой файл</a>
     </div>
 </div>
 <div class='row'>

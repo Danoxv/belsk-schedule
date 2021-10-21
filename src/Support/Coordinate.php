@@ -79,6 +79,6 @@ class Coordinate extends \PhpOffice\PhpSpreadsheet\Cell\Coordinate
 
         sscanf($coordinate, '%[A-Z]%d', $col, $row);
 
-        return [$col, (int) $row];
+        return [$col, $row];
     }
 }
