@@ -95,10 +95,6 @@ if (Str::contains(Str::lower($originalFileName), $config->mendeleeva4KeywordInFi
 try {
     $reader = IOFactory::createReaderForFile($filePath);
 
-    if (!$detectMendeleeva4) {
-        $reader->setReadDataOnly(true); // Disable parsing of cell's color, formatting etc.
-    }
-
     $spreadsheet = $reader->load($filePath);
 } catch(\PhpOffice\PhpSpreadsheet\Reader\Exception $e) {
     throw new TerminateException('Ошибка чтения файла: ' . $e->getMessage());
