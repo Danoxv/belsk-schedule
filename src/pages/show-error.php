@@ -1,5 +1,6 @@
 <?php
 
+use Src\Config\AppConfig;
 use Src\Support\Str;
 use Src\Exceptions\TerminateException;
 
@@ -13,6 +14,7 @@ if (!$message) {
 $message = Str::finish($message, '.');
 
 $type = $exception->getType();
+$config = AppConfig::getInstance();
 ?>
 
 <!doctype html>
@@ -22,7 +24,7 @@ $type = $exception->getType();
     <title>Просмотр расписания</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
-    <script src="/js/functions.js"></script>
+    <script src="/js/functions.js?v=<?= $config->version['number'] ?>"></script>
     <style>
         .main-container {
             padding-top: 6px;
