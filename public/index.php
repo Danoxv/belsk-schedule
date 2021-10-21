@@ -15,6 +15,8 @@ $isCli = Helpers::isCli();
 if (!$isCli) {
     // See https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-XSS-Protection
     header('X-XSS-Protection: 1; mode=block');
+    // See https://www.w3.org/International/articles/http-charset/index
+    header('Content-type: text/html; charset=utf-8');
 }
 
 if ($_config->debug || $isCli) {
