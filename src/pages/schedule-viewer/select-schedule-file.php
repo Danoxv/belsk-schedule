@@ -102,7 +102,7 @@ $links = Helpers::getScheduleFilesLinks($linksGettingCurlError);
                 <div class="mb-3">
                     <b>3. Настройки:</b>
                     <div class="form-check">
-                        <input name="detectMendeleeva4" class="form-check-input" type="checkbox" value="1" id="detectMendeleeva4" aria-describedby="detectMendeleeva4Help">
+                        <input name="detectMendeleeva4" class="form-check-input" type="checkbox" value="1" checked="checked" id="detectMendeleeva4" aria-describedby="detectMendeleeva4Help">
                         <label class="form-check-label" for="detectMendeleeva4">
                             Выделять пары, проходящие на Менделеева, 4
                         </label>
