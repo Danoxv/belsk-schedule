@@ -1,10 +1,56 @@
 /*
- * Helpers
+ * Common helpers
  */
 function O(elementId) { return typeof elementId === 'object' ? elementId : document.getElementById(elementId) }
 function S(elementId) { return O(elementId).style }
 function C(className) { return document.getElementsByClassName(className) }
 function byName(name) { return document.getElementsByName(name) }
+function getHtmlTag() { return document.getElementsByTagName('html')[0] }
+
+/*
+ * Dark mode system
+ */
+
+// Auto-switch to dark mode if already switched
+window.addEventListener('load', function() {
+  let darkModeToggle = O('darkModeToggle');
+  if (isDarkModeEnabled()) {
+    enableDarkMode();
+    darkModeToggle.checked = true;
+  } else {
+    darkModeToggle.checked = false;
+  }
+});
+
+function enableDarkMode() {
+  let htmlTag = getHtmlTag();
+
+  htmlTag.style['filter'] = 'invert(100%)';
+  localStorage.setItem('darkModeEnabled', '1');
+}
+
+function disableDarkMode() {
+  let htmlTag = getHtmlTag();
+
+  htmlTag.style['filter'] = '';
+  localStorage.setItem('darkModeEnabled', '');
+}
+
+function isDarkModeEnabled() {
+  return !!localStorage.getItem('darkModeEnabled');
+}
+
+function switchDarkMode() {
+  if (isDarkModeEnabled()) {
+    disableDarkMode();
+  } else {
+    enableDarkMode();
+  }
+}
+
+/*
+ * Schedule select/view page functions
+ */
 
 /**
  * @param fileName

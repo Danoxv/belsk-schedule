@@ -178,6 +178,7 @@ echo '
 <body>
 <div class="container main-container" id="schedule-page-content">
 ';
+require ROOT . '/src/pages/components/dark-mode.php';
 
 if (!$debug) {
     foreach ($config->messagesOnSchedulePage as $message) {

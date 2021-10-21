@@ -34,7 +34,8 @@ $links = Helpers::getScheduleFilesLinks($linksGettingCurlError);
 </head>
 <body>
     <div class="container main-container">
-        <form method="post" action="process-schedule-file" enctype="multipart/form-data">
+        <?php require ROOT . '/src/pages/components/dark-mode.php' ?>
+        <form method="post" action="view-schedule-file" enctype="multipart/form-data">
             <div class="row">
                 <div class="col">
                     <div class="mb-3">

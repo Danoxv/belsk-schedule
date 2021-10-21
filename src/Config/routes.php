@@ -1,6 +1,6 @@
 <?php
 
 return [
-    '/'                             => 'pages/select-schedule-file.php',
-    '/process-schedule-file'        => 'pages/process-schedule-file.php',
+    '/'                             => 'pages/schedule-viewer/select-schedule-file.php',
+    '/view-schedule-file'           => 'pages/schedule-viewer/view-schedule-file.php',
 ];

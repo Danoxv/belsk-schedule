@@ -22,6 +22,7 @@ $type = $exception->getType();
     <title>Просмотр расписания</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
+    <script src="/js/functions.js"></script>
     <style>
         .main-container {
             padding-top: 6px;
@@ -31,6 +32,7 @@ $type = $exception->getType();
 </head>
 <body>
 <div class="container main-container">
+    <?php require ROOT . '/src/pages/components/dark-mode.php' ?>
     <div class='alert alert-<?= $type ?>' role='alert'>
         <?= $message ?>
     </div>
