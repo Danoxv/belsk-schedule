@@ -154,17 +154,17 @@ echo '
         }
         
         /* Something like table grid layout */
-        .tbl1 {
+        .tbl-5 {
             width: 5%;
             min-width: 5%;
             max-width: 5%;
         }
-        .tbl2 {
+        .tbl-10 {
             width: 10%;
             min-width: 10%;
             max-width: 10%;
         }
-        .tbl3 {
+        .tbl-15 {
             width: 15%;
             min-width: 15%;
             max-width: 15%;
@@ -201,7 +201,7 @@ echo "
     <div class='col text-end'>
         <span class='form-text' id='orientation-info'></span>
         <button class='btn btn-sm btn-secondary' onclick='saveSchedulePageAsPdf(\"{$group->getName()}\")'>Скачать PDF</button>
-        <a class='btn btn-sm btn-success' href='/' role='button'>Выбрать другой файл</a>
+        <a class='btn btn-sm btn-primary' href='/' role='button'>Выбрать другой файл</a>
     </div>
 </div>
 <div class='row'>
@@ -222,11 +222,11 @@ foreach (Day::getAll() as $day) {
     echo '
 <thead class="table-light">
 <tr>
-    <td class="text-center tbl1"><b>#</b></td>
-    <td class="text-center tbl2"><b>Время</b></td>
+    <td class="text-center tbl-5"><b>#</b></td>
+    <td class="text-center tbl-10"><b>Время</b></td>
     <td class="text-center"><b>Предмет</b></td>
-    <td class="text-center tbl3"><b>Учитель</b></td>
-    <td class="text-center tbl2"><b>Аудитория</b></td>
+    <td class="text-center tbl-15"><b>Учитель</b></td>
+    <td class="text-center tbl-10"><b>Аудитория</b></td>
 </tr>
 </thead>';
 
