@@ -24,6 +24,10 @@ foreach ($config->samples as $sample) {
     ];
 }
 
+$sheetProcessingConfig = new SheetProcessingConfig([
+    'processGroups' => false,
+]);
+
 $groupNames = [];
 foreach ($links as $link) {
     if (Helpers::isExternalLink($link['uri'])) {
@@ -45,18 +49,15 @@ foreach ($links as $link) {
     }
 
     try {
-        $reader = IOFactory::createReaderForFile($filePath)->setReadDataOnly(true);
-        $spreadsheet = $reader->load($filePath);
-    } catch(Exception $e) {
+        $spreadsheet = Sheet::createSpreadsheet($filePath, $sheetProcessingConfig);
+    } catch (Exception $e) {
         continue;
     }
 
     var_dump("Process [{$link['uri']}]...");
 
     foreach ($spreadsheet->getAllSheets() as $worksheet) {
-        $sheet = new Sheet($worksheet, new SheetProcessingConfig([
-            'processGroups' => false,
-        ]));
+        $sheet = new Sheet($worksheet, $sheetProcessingConfig);
 
         /** @var Group $group */
         foreach ($sheet->getGroups() as $group) {

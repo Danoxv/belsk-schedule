@@ -92,11 +92,15 @@ if (Str::contains(Str::lower($originalFileName), $config->mendeleeva4KeywordInFi
 
 // Load Excel file into PHPSpreadsheet
 
-try {
-    $reader = IOFactory::createReaderForFile($filePath);
+$sheetProcessingConfig = new SheetProcessingConfig([
+    'studentsGroup' => $inputGroup,
+    'forceApplyMendeleeva4ToLessons' => $forceMendeleeva,
+    'detectMendeleeva4' => $detectMendeleeva4
+]);
 
-    $spreadsheet = $reader->load($filePath);
-} catch(Exception $e) {
+try {
+    $spreadsheet = Sheet::createSpreadsheet($filePath, $sheetProcessingConfig);
+} catch (Exception $e) {
     throw new TerminateException('Ошибка чтения файла: ' . $e->getMessage());
 }
 
@@ -109,11 +113,7 @@ if ($debug) {
 /** @var ?Group $group */
 $group = null;
 foreach ($spreadsheet->getAllSheets() as $worksheet) {
-    $sheet = new Sheet($worksheet, new SheetProcessingConfig([
-        'studentsGroup' => $inputGroup,
-        'forceApplyMendeleeva4ToLessons' => $forceMendeleeva,
-        'detectMendeleeva4' => $detectMendeleeva4
-    ]));
+    $sheet = new Sheet($worksheet, $sheetProcessingConfig);
 
     if ($sheet->hasGroups()) {
         $group = $sheet->getFirstGroup();
@@ -129,7 +129,12 @@ if ($group === null) {
  * Rendering
  */
 
-echo '
+echo str_replace(
+    [
+        '{{appVersion}}',
+    ], [
+        $config->version['number'],
+    ], '
 <!doctype html>
 <html lang="ru">
 <head>
@@ -139,7 +144,7 @@ echo '
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-U1DAWAznBHeqEIlVSCgzq+c9gqGAJn5c/t99JyeKa9xxaYpSvHU5awsuZVVFIhvj" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js" integrity="sha512-YcsIPGdhPK4P/uRW6/sruonlYj+Q7UHWeKfTAkBW+g83NKM+jMJFJ4iAPfSnVp7BKD4dKMHmVSvICUbE/V1sSw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script src="/js/functions.js"></script>
+    <script src="/js/functions.js?v={{appVersion}}"></script>
     <style>
         #main-container {
             padding-top: 6px;
@@ -173,7 +178,7 @@ echo '
 </head>
 <body>
 <div class="container" id="main-container">
-';
+');
 require ROOT . '/src/pages/components/dark-mode.php';
 
 if (!$debug) {

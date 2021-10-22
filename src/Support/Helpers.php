@@ -39,8 +39,7 @@ class Helpers
 
     /**
      * Get part before GET-params in URI.
-     * So from "https://site.com/page?p1=v1&p2=v2"
-     * "https://site.com/page" was returned.
+     * Example: return "/page" from "/page?p1=v1&p2=v2"
      *
      * @param string $uri
      * @return string

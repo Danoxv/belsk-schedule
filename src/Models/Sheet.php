@@ -2,6 +2,8 @@
 
 namespace Src\Models;
 
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use Src\Config\AppConfig;
 use Src\Config\ExcelConfig;
@@ -46,6 +48,23 @@ class Sheet
 
         $this->init();
         $this->process();
+    }
+
+    /**
+     * @param string $filePath
+     * @param SheetProcessingConfig $sheetProcessingConfig
+     * @return Spreadsheet
+     * @throws \PhpOffice\PhpSpreadsheet\Reader\Exception
+     */
+    public static function createSpreadsheet(string $filePath, SheetProcessingConfig $sheetProcessingConfig): Spreadsheet
+    {
+        $reader = IOFactory::createReaderForFile($filePath);
+
+        if (!$sheetProcessingConfig->processGroups) {
+            $reader->setReadDataOnly(true);
+        }
+
+        return $reader->load($filePath);
     }
 
     /**

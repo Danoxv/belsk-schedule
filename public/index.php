@@ -28,7 +28,7 @@ if ($_config->debug || $isCli) {
 
 if ($isCli) {
     // Is console request.
-    require ROOT . '/src/scripts/index-console.php';
+    require ROOT . '/src/console/scripts/index-console.php';
     die(0);
 }
 
