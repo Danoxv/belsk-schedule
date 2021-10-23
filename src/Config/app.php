@@ -2,7 +2,7 @@
 
 return [
     'version' => [
-        'number' => '1.0.7',
+        'number' => '1.0.8',
         'stability' => 'beta'
     ],
     'debug' => false,

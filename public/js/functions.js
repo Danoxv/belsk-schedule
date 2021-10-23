@@ -25,7 +25,7 @@ window.addEventListener('DOMContentLoaded', function() {
 function enableDarkMode() {
   let htmlTag = getHtmlTag();
 
-  htmlTag.style['filter'] = 'invert(100%)';
+  htmlTag.style['filter'] = 'invert(90%)';
   localStorage.setItem('darkModeEnabled', '1');
 }
 
