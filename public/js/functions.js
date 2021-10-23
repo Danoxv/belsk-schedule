@@ -12,7 +12,7 @@ function getHtmlTag() { return document.getElementsByTagName('html')[0] }
  */
 
 // Auto-switch to dark mode if already switched
-window.addEventListener('load', function() {
+window.addEventListener('DOMContentLoaded', function() {
   let darkModeToggle = O('darkModeToggle');
   if (isDarkModeEnabled()) {
     enableDarkMode();
