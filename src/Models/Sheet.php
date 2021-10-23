@@ -82,7 +82,13 @@ class Sheet
      */
     public function getCellValue(string $coordinate, bool $rawValue = false): string
     {
-        return (new Cell($coordinate, $this))->getValue($rawValue);
+        static $cellsCache = [];
+
+        if (!isset($cellsCache[$coordinate])) {
+            $cellsCache[$coordinate] = new Cell($coordinate, $this);
+        }
+
+        return $cellsCache[$coordinate]->getValue($rawValue);
     }
 
     /**
