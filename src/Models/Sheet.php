@@ -29,6 +29,8 @@ class Sheet
 
     private Collection $groups;
 
+    private string $id;
+
     /** @var string[] */
     private array $coordinatesForSkip = [];
 
@@ -82,13 +84,7 @@ class Sheet
      */
     public function getCellValue(string $coordinate, bool $rawValue = false): string
     {
-        static $cellsCache = [];
-
-        if (!isset($cellsCache[$coordinate])) {
-            $cellsCache[$coordinate] = new Cell($coordinate, $this);
-        }
-
-        return $cellsCache[$coordinate]->getValue($rawValue);
+        return (new Cell($coordinate, $this))->getValue($rawValue);
     }
 
     /**
@@ -184,6 +180,11 @@ class Sheet
        return $this->title;
     }
 
+    public function getId()
+    {
+        return $this->id;
+    }
+
     /**
      * Get processable (potentially with lessons)
      * columns range.
@@ -218,6 +219,8 @@ class Sheet
     private function init()
     {
         $this->title = trim(Security::sanitizeString($this->worksheet->getTitle()));
+
+        $this->resolveId();
 
         $firstColumn = Coordinate::FIRST_COL;
         $firstRow = Coordinate::FIRST_ROW;
@@ -286,6 +289,17 @@ class Sheet
         if ($excelConfig->classHourLessonColumn === null) {
             $excelConfig->classHourLessonColumn = false;
         }
+    }
+
+    private function resolveId()
+    {
+        $id = Str::slug($this->getTitle());
+
+        if (empty($id)) {
+            $id = $this->worksheet->getHashCode();
+        }
+
+        $this->id = $id . '_' . Str::random(4);
     }
 
     /**

@@ -83,17 +83,17 @@ class Cell
         /** @var bool[] */
         static $invisibleCellsCache = [];
 
-        $coord = $this->getCoordinate();
+        $cacheKey = $this->getCoordinate() . '__' . $this->getSheet()->getId();
 
-        if (isset($invisibleCellsCache[$coord])) {
-            $this->isInvisible = $invisibleCellsCache[$coord];
+        if (isset($invisibleCellsCache[$cacheKey])) {
+            $this->isInvisible = $invisibleCellsCache[$cacheKey];
             return;
         }
 
         // В ячейке есть значение
         if ($this->getValue(true)) {
             $this->isInvisible = false;
-            $invisibleCellsCache[$coord] = $this->isInvisible;
+            $invisibleCellsCache[$cacheKey] = $this->isInvisible;
             return;
         }
 
@@ -102,7 +102,7 @@ class Cell
         // Ячейка не объединена
         if (!$range) {
             $this->isInvisible = false;
-            $invisibleCellsCache[$coord] = $this->isInvisible;
+            $invisibleCellsCache[$cacheKey] = $this->isInvisible;
             return;
         }
 
@@ -112,13 +112,13 @@ class Cell
         // Ячейка объединена не с ячейкой на предыдущей строке
         if ($range !== $prevRowRange) {
             $this->isInvisible = false;
-            $invisibleCellsCache[$coord] = $this->isInvisible;
+            $invisibleCellsCache[$cacheKey] = $this->isInvisible;
             return;
         }
 
         // Похоже, что ячейка невидима... Но это неточно.
         $this->isInvisible = true;
-        $invisibleCellsCache[$coord] = $this->isInvisible;
+        $invisibleCellsCache[$cacheKey] = $this->isInvisible;
     }
 
     /**
