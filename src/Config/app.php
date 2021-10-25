@@ -6,6 +6,8 @@ return [
         'stability' => 'beta'
     ],
     'debug' => false,
+    'forceConsoleMode' => false,
+
     'maxFileSize' => 512, // in kilobytes
     'minFileSize' => 25, // in kilobytes
     'allowedMimes' => [

@@ -178,7 +178,7 @@ class Helpers
      */
     public static function isCli(): bool
     {
-        return IS_CONSOLE;
+        return AppConfig::getInstance()->forceConsoleMode || IS_CONSOLE;
     }
 
     /**

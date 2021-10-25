@@ -10,6 +10,8 @@ class AppConfig
 
     public array $version;
     public bool $debug;
+    public bool $forceConsoleMode;
+
     public int $maxFileSize;
     public int $minFileSize;
     public array $allowedMimes;
