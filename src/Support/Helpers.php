@@ -178,7 +178,7 @@ class Helpers
      */
     public static function isCli(): bool
     {
-        return PHP_SAPI === 'cli';
+        return IS_CONSOLE;
     }
 
     /**

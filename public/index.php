@@ -4,6 +4,8 @@ use Src\Support\Helpers;
 
 $_start = microtime(true);
 
+define('IS_CONSOLE', in_array(PHP_SAPI, ['cli', 'phpdbg'], true));
+
 define('ROOT', dirname(__FILE__, 2));
 
 require_once ROOT . '/vendor/autoload.php';
