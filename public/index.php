@@ -1,5 +1,6 @@
 <?php
 
+use Src\Exceptions\TerminateException;
 use Src\Support\Helpers;
 
 $_start = microtime(true);
@@ -41,7 +42,7 @@ $_routes = require ROOT . '/src/Config/routes.php';
 
 try {
     if (!isset($_routes[$_requestUri])) {
-        throw new Src\Exceptions\TerminateException('Страница не найдена (404)');
+        throw new Src\Exceptions\TerminateException('Страница не найдена (404)', TerminateException::TYPE_WARNING, 404);
     }
 
     require_once ROOT . '/src/' . $_routes[$_requestUri];

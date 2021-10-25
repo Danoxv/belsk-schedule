@@ -15,6 +15,11 @@ $message = Str::finish($message, '.');
 
 $type = $exception->getType();
 $config = AppConfig::getInstance();
+
+$code = $exception->getCode();
+if ($code) {
+    http_response_code($code);
+}
 ?>
 
 <!doctype html>
