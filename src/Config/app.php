@@ -8,6 +8,12 @@ return [
     'debug' => false,
     'forceConsoleMode' => false,
 
+    /*
+     * Status
+     */
+    'enableStatusPages' => false,
+    'hitsStorageFile' => ROOT . '/src/storage/hits.csv',
+
     'maxFileSize' => 512, // in kilobytes
     'minFileSize' => 25, // in kilobytes
     'allowedMimes' => [

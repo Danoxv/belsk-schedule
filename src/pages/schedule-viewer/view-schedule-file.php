@@ -205,7 +205,7 @@ echo "
     </div>
 </div>
 <div class='row'>
-<hr />
+    <hr />
 </div>
 ";
 

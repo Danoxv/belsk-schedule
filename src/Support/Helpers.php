@@ -198,8 +198,14 @@ class Helpers
      */
     public static function formatBytes(int $size)
     {
-        $unit=array('b','kb','mb','gb','tb','pb');
+        $unit=array('b','KB','MB','GB','TB','PB');
 
         return @round($size/pow(1024,($i=floor(log($size,1024)))),2).' '.$unit[$i];
+    }
+
+    public static function goToLocation(string $location)
+    {
+        header('Location: '.$location);
+        die(0);
     }
 }

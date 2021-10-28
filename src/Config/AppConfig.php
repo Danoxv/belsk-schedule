@@ -12,6 +12,9 @@ class AppConfig
     public bool $debug;
     public bool $forceConsoleMode;
 
+    public bool $enableStatusPages;
+    public string $hitsStorageFile;
+
     public int $maxFileSize;
     public int $minFileSize;
     public array $allowedMimes;

@@ -13,23 +13,23 @@ require_once ROOT . '/vendor/autoload.php';
 
 $_config = Src\Config\AppConfig::getInstance();
 
-$isCli = Helpers::isCli();
+$_isCli = Helpers::isCli();
 
-if (!$isCli) {
+if (!$_isCli) {
     // See https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-XSS-Protection
     header('X-XSS-Protection: 1; mode=block');
     // See https://www.w3.org/International/articles/http-charset/index
     header('Content-type: text/html; charset=utf-8');
 }
 
-if ($_config->debug || $isCli) {
+if ($_config->debug || $_isCli) {
     ini_set('display_errors', 1);
     ini_set('display_startup_errors', 1);
     ini_set('error_reporting', E_ALL);
     error_reporting(E_ALL);
 }
 
-if ($isCli) {
+if ($_isCli) {
     // Is console request.
     require ROOT . '/src/console/scripts/index-console.php';
     die(0);
@@ -49,6 +49,8 @@ try {
 } catch (Src\Exceptions\TerminateException $exception) {
     require ROOT . '/src/pages/show-error.php';
 }
+
+require_once ROOT . '/src/pages/components/write-hit.php';
 
 $_memoryUsage = Helpers::formatBytes(memory_get_usage());
 
