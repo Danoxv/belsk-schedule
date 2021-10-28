@@ -41,7 +41,7 @@ if ($handle === false) {
     <table class="table table-bordered table-sm table-hover">
         <thead class="table-light">
         <tr>
-            <td class="text-center tbl-15"><b>Datetime</b></td>
+            <td class="text-center tbl-15"><b>Datetime (UTC)</b></td>
             <td class="text-center tbl-15"><b>IP</b></td>
             <td class="text-center"><b>User agent</b></td>
             <td class="text-center tbl-15"><b>URI</b></td>
