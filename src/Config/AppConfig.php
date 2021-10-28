@@ -12,7 +12,7 @@ class AppConfig
     public bool $debug;
     public bool $forceConsoleMode;
 
-    public bool $enableStatusPages;
+    public bool $enableSystemPages;
     public string $hitsStorageFile;
 
     public int $maxFileSize;

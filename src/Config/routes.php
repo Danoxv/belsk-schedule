@@ -10,14 +10,14 @@ $_routes = [
     '/view-schedule-file'   => 'pages/schedule-viewer/view-schedule-file.php',
 ];
 
-if (AppConfig::getInstance()->enableStatusPages) {
+if (AppConfig::getInstance()->enableSystemPages) {
     $_routes = $_routes + [
         /*
-         * Status pages
+         * System pages
          */
-        '/status/opcache'       => 'pages/status/opcache-gui-3.3.0/index.php',
-        '/status/hits'          => 'pages/status/hits/viewer.php',
-        '/status/hits/clean'    => 'pages/status/hits/cleaner.php',
+        '/system/opcache'       => 'pages/system/opcache-gui-3.3.0/index.php',
+        '/system/hits'          => 'pages/system/hits/viewer.php',
+        '/system/hits/clean'    => 'pages/system/hits/cleaner.php',
     ];
 }
 

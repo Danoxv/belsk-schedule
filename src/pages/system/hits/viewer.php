@@ -59,7 +59,7 @@ if ($handle === false) {
     </table>
 
     <a class="btn btn-primary" href="/" role="button">На главную</a>
-    <a class='btn btn btn-danger' href='/status/hits/clean' role='button'>Очистить</a>
+    <a class='btn btn btn-danger' href='/system/hits/clean' role='button'>Очистить</a>
 </div>
 </body>
 </html>

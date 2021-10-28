@@ -9,9 +9,9 @@ return [
     'forceConsoleMode' => false,
 
     /*
-     * Status
+     * System
      */
-    'enableStatusPages' => false,
+    'enableSystemPages' => true,
     'hitsStorageFile' => ROOT . '/src/storage/hits.csv',
 
     'maxFileSize' => 512, // in kilobytes
