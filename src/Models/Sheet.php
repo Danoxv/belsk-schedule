@@ -5,7 +5,7 @@ namespace Src\Models;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
-use Src\Config\AppConfig;
+use Src\Config\App;
 use Src\Config\ExcelConfig;
 use Src\Config\SheetProcessingConfig;
 use Src\Support\Arr;
@@ -17,7 +17,7 @@ use Src\Support\Str;
 class Sheet
 {
     private Worksheet $worksheet;
-    private AppConfig $config;
+    private App $config;
     private ExcelConfig $excelConfig;
     private SheetProcessingConfig $sheetProcessingConfig;
 
@@ -42,7 +42,7 @@ class Sheet
     {
         $this->worksheet                = $worksheet;
 
-        $this->config                   = AppConfig::getInstance();
+        $this->config                   = App::getInstance();
         $this->sheetProcessingConfig    = $sheetProcessingConfig;
         $this->excelConfig              = new ExcelConfig($this);
 

@@ -1,6 +1,6 @@
 <?php
 
-use Src\Config\AppConfig;
+use Src\Config\App;
 use Src\Config\SheetProcessingConfig;
 use Src\Models\Group;
 use Src\Models\Sheet;
@@ -15,7 +15,7 @@ return {{groupNames}};
 
 $links = Helpers::getScheduleFilesLinks();
 
-$config = AppConfig::getInstance();
+$config = App::getInstance();
 foreach ($config->samples as $sample) {
     $samplePath = ROOT . '/public/samples/' . $sample;
     $links[] = [

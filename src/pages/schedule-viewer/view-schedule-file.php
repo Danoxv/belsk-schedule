@@ -1,6 +1,6 @@
 <?php
 
-use Src\Config\AppConfig;
+use Src\Config\App;
 use Src\Config\SheetProcessingConfig;
 use Src\Enums\Day;
 use Src\Models\Group;
@@ -16,7 +16,7 @@ use Src\Exceptions\TerminateException;
  * Take settings from app config and user's input.
  */
 
-$config = AppConfig::getInstance();
+$config = App::getInstance();
 
 $debug          = $config->debug;
 $maxFileSize    = $config->maxFileSize;

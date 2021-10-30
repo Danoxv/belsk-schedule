@@ -1,6 +1,6 @@
 <?php
 
-$hitsStorage = Src\Config\AppConfig::getInstance()->hitsStorageFile;
+$hitsStorage = Src\Config\App::getInstance()->hitsStorageFile;
 
 @unlink($hitsStorage);
 

@@ -1,6 +1,6 @@
 <?php
 
-use Src\Config\AppConfig;
+use Src\Config\App;
 
 $_routes = [
     /*
@@ -10,7 +10,7 @@ $_routes = [
     '/view-schedule-file'   => 'pages/schedule-viewer/view-schedule-file.php',
 ];
 
-if (AppConfig::getInstance()->enableSystemPages) {
+if (App::getInstance()->enableSystemPages) {
     $_routes = $_routes + [
         /*
          * System pages

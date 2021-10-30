@@ -1,9 +1,9 @@
 <?php
 
-use Src\Config\AppConfig;
+use Src\Config\App;
 use Src\Exceptions\TerminateException;
 
-$config = AppConfig::getInstance();
+$config = App::getInstance();
 
 $hitsStorage = $config->hitsStorageFile;
 

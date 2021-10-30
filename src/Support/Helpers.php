@@ -5,7 +5,7 @@ namespace Src\Support;
 use DOMDocument;
 use DOMElement;
 use DOMXPath;
-use Src\Config\AppConfig;
+use Src\Config\App;
 
 class Helpers
 {
@@ -15,7 +15,7 @@ class Helpers
      */
     public static function isScheduleLinkValid(string $link): bool
     {
-        $config = AppConfig::getInstance();
+        $config = App::getInstance();
 
         return
             Str::endsWith($link, $config->allowedExtensions) &&
@@ -132,7 +132,7 @@ class Helpers
      */
     public static function getScheduleFilesLinks(&$curlError = ''): array
     {
-        $config = AppConfig::getInstance();
+        $config = App::getInstance();
 
         $pageWithFiles = $config->pageWithScheduleFiles;
         $html = self::httpGet($pageWithFiles, $curlError);
@@ -178,7 +178,7 @@ class Helpers
      */
     public static function isCli(): bool
     {
-        return AppConfig::getInstance()->forceConsoleMode || IS_CONSOLE;
+        return App::getInstance()->forceConsoleMode || IS_CONSOLE;
     }
 
     /**

@@ -1,9 +1,9 @@
 <?php
 
-use Src\Config\AppConfig;
+use Src\Config\App;
 use Src\Support\Helpers;
 
-$config = AppConfig::getInstance();
+$config = App::getInstance();
 
 $allowedExtensionsAsString = implode(', ', $config->allowedExtensions);
 
