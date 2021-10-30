@@ -40,8 +40,8 @@ class Security
     public static function filterInputString(int $type, string $varName): string
     {
         $input = filter_input($type, $varName, FILTER_SANITIZE_STRING);
-        $input = self::sanitizeString($input);
+        $input = self::sanitizeString($input, true);
 
-        return trim($input);
+        return $input;
     }
 }
