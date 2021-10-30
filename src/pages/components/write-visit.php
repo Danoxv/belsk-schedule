@@ -9,7 +9,7 @@ if (!$ip) {
     return;
 }
 
-$datetime = date('d-m-Y H:i:s');
+$datetime = gmdate('d-m-Y H:i:s');
 $ua = Security::filterInputString(INPUT_SERVER, 'HTTP_USER_AGENT');
 $uri = Security::filterInputString(INPUT_SERVER, 'REQUEST_URI');
 
