@@ -2,7 +2,7 @@
 
 namespace Src\Models;
 
-use Src\Config\App;
+use Src\Config\AppConfig;
 use Src\Support\Collection;
 use Src\Support\Str;
 
@@ -185,7 +185,7 @@ class Lesson
             return false;
         }
 
-        $config = App::getInstance();
+        $config = AppConfig::getInstance();
 
         return Str::lower(Str::removeSpaces($cellValue)) === Str::lower(Str::removeSpaces($config->classHourCellKeyword));
     }
@@ -439,7 +439,7 @@ class Lesson
 
         $cellColor = $this->cell->getEndColorRgb();
 
-        $config = App::getInstance();
+        $config = AppConfig::getInstance();
         if (in_array($cellColor, $config->mendeleeva4HouseCellColors, true)) {
             $this->isMendeleeva4 = true;
         }

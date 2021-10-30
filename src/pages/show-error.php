@@ -1,6 +1,6 @@
 <?php
 
-use Src\Config\App;
+use Src\Config\AppConfig;
 use Src\Support\Str;
 use Src\Exceptions\TerminateException;
 
@@ -14,7 +14,7 @@ if (!$message) {
 $message = Str::finish($message, '.');
 
 $type = $exception->getType();
-$config = App::getInstance();
+$config = AppConfig::getInstance();
 
 $code = $exception->getCode();
 if ($code) {

@@ -11,7 +11,7 @@ define('ROOT', dirname(__FILE__, 2));
 
 require_once ROOT . '/vendor/autoload.php';
 
-$_config = Src\Config\App::getInstance();
+$_config = Src\Config\AppConfig::getInstance();
 
 $_isCli = Helpers::isCli();
 
@@ -50,7 +50,7 @@ try {
     require ROOT . '/src/pages/show-error.php';
 }
 
-require_once ROOT . '/src/pages/components/write-hit.php';
+require_once ROOT . '/src/pages/components/write-visit.php';
 
 $_memoryUsage = Helpers::formatBytes(memory_get_usage());
 

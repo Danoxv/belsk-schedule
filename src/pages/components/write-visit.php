@@ -1,6 +1,6 @@
 <?php
 
-use Src\Config\App;
+use Src\Config\AppConfig;
 use Src\Support\Security;
 
 $ip = Security::filterInputString(INPUT_SERVER, 'REMOTE_ADDR');
@@ -13,8 +13,8 @@ $datetime = date('d-m-Y H:i:s');
 $ua = Security::filterInputString(INPUT_SERVER, 'HTTP_USER_AGENT');
 $uri = Security::filterInputString(INPUT_SERVER, 'REQUEST_URI');
 
-$hitsStorage = App::getInstance()->hitsStorageFile;
+$visitsStorage = AppConfig::getInstance()->visitsStorageFile;
 
-$fp = fopen($hitsStorage, 'a');
+$fp = fopen($visitsStorage, 'a');
 fputcsv($fp, [$datetime, $ip, $ua, $uri]);
 fclose($fp);

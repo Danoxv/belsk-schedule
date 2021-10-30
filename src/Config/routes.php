@@ -1,6 +1,6 @@
 <?php
 
-use Src\Config\App;
+use Src\Config\AppConfig;
 
 $_routes = [
     /*
@@ -10,14 +10,14 @@ $_routes = [
     '/view-schedule-file'   => 'pages/schedule-viewer/view-schedule-file.php',
 ];
 
-if (App::getInstance()->enableSystemPages) {
+if (AppConfig::getInstance()->enableSystemPages) {
     $_routes = $_routes + [
         /*
          * System pages
          */
         '/system/opcache'       => 'pages/system/opcache-gui-3.3.0/index.php',
-        '/system/hits'          => 'pages/system/hits/viewer.php',
-        '/system/hits/clean'    => 'pages/system/hits/cleaner.php',
+        '/system/visits'        => 'pages/system/visits/viewer.php',
+        '/system/visits/clean'  => 'pages/system/visits/cleaner.php',
     ];
 }
 

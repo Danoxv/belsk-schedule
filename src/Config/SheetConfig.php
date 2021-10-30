@@ -4,7 +4,7 @@ namespace Src\Config;
 
 use Src\Models\Sheet;
 
-class ExcelConfig
+class SheetConfig
 {
     public ?string $dayCol = null;
     public ?string $timeCol = null;
@@ -16,13 +16,6 @@ class ExcelConfig
     public ?int $lastScheduleRow = null;
     /** @var string|bool|null */
     public $classHourLessonColumn = null;
-
-    private Sheet $sheet;
-
-    public function __construct(Sheet $sheet)
-    {
-        $this->sheet = $sheet;
-    }
 
     /**
      * @return bool

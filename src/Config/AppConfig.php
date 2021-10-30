@@ -2,7 +2,7 @@
 
 namespace Src\Config;
 
-class App
+class AppConfig
 {
     public array $version = [
         'number' => '1.0.9',
@@ -15,7 +15,7 @@ class App
      * System
      */
     public bool $enableSystemPages = true;
-    public string $hitsStorageFile = ROOT . '/src/storage/hits.csv';
+    public string $visitsStorageFile = ROOT . '/src/storage/visits.csv';
 
     public int $maxFileSize = 512; // in kilobytes
     public int $minFileSize = 25; // in kilobytes

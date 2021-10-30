@@ -5,8 +5,8 @@ namespace Src\Models;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
-use Src\Config\App;
-use Src\Config\ExcelConfig;
+use Src\Config\AppConfig;
+use Src\Config\SheetConfig;
 use Src\Config\SheetProcessingConfig;
 use Src\Support\Arr;
 use Src\Support\Collection;
@@ -17,8 +17,8 @@ use Src\Support\Str;
 class Sheet
 {
     private Worksheet $worksheet;
-    private App $config;
-    private ExcelConfig $excelConfig;
+    private AppConfig $config;
+    private SheetConfig $sheetConfig;
     private SheetProcessingConfig $sheetProcessingConfig;
 
     private bool $isProcessed = false;
@@ -42,9 +42,9 @@ class Sheet
     {
         $this->worksheet                = $worksheet;
 
-        $this->config                   = App::getInstance();
+        $this->config                   = AppConfig::getInstance();
         $this->sheetProcessingConfig    = $sheetProcessingConfig;
-        $this->excelConfig              = new ExcelConfig($this);
+        $this->sheetConfig              = new SheetConfig();
 
         $this->groups                   = new Collection();
 
@@ -92,7 +92,7 @@ class Sheet
      */
     private function isProcessable(): bool
     {
-        return $this->excelConfig->isProcessable();
+        return $this->sheetConfig->isProcessable();
     }
 
     /**
@@ -100,7 +100,7 @@ class Sheet
      */
     public function getTimeColumn(): ?string
     {
-        return $this->excelConfig->timeCol;
+        return $this->sheetConfig->timeCol;
     }
 
     /**
@@ -132,7 +132,7 @@ class Sheet
      */
     public function getDayCol(): ?string
     {
-        return $this->excelConfig->dayCol;
+        return $this->sheetConfig->dayCol;
     }
 
     /**
@@ -140,7 +140,7 @@ class Sheet
      */
     public function getGroupNamesRow(): ?int
     {
-        return $this->excelConfig->groupNamesRow;
+        return $this->sheetConfig->groupNamesRow;
     }
 
     /**
@@ -148,7 +148,7 @@ class Sheet
      */
     public function hasClassHourLessonColumn(): bool
     {
-        return !empty($this->excelConfig->classHourLessonColumn);
+        return !empty($this->sheetConfig->classHourLessonColumn);
     }
 
     /**
@@ -156,7 +156,7 @@ class Sheet
      */
     public function getClassHourLessonColumn(): ?string
     {
-        return empty($this->excelConfig->classHourLessonColumn) ? null : $this->excelConfig->classHourLessonColumn;
+        return empty($this->sheetConfig->classHourLessonColumn) ? null : $this->sheetConfig->classHourLessonColumn;
     }
 
     public function hasMendeleeva4(): bool
@@ -193,8 +193,8 @@ class Sheet
      */
     private function getColumnsRange(): array
     {
-        $start = $this->excelConfig->firstGroupCol;
-        $end = $this->excelConfig->lastGroupCol;
+        $start = $this->sheetConfig->firstGroupCol;
+        $end = $this->sheetConfig->lastGroupCol;
 
         return Coordinate::generateColumnsRange($start, $end);
     }
@@ -207,8 +207,8 @@ class Sheet
      */
     private function getRowsRange(): array
     {
-        $start = $this->excelConfig->firstScheduleRow;
-        $end = $this->excelConfig->lastScheduleRow;
+        $start = $this->sheetConfig->firstScheduleRow;
+        $end = $this->sheetConfig->lastScheduleRow;
 
         return Coordinate::generateRowsRange($start, $end);
     }
@@ -232,7 +232,7 @@ class Sheet
         $columns = Coordinate::generateColumnsRange($firstColumn, $highestColumn);
         $rows = Coordinate::generateRowsRange($firstRow, $highestRow);
 
-        $excelConfig = &$this->excelConfig;
+        $sheetCfg = &$this->sheetConfig;
 
         foreach ($columns as $column) {
             foreach ($rows as $row) {
@@ -249,20 +249,20 @@ class Sheet
                  * Resolve Excel config
                  */
 
-                if (!$excelConfig->isProcessable()) {
+                if (!$sheetCfg->isProcessable()) {
                     $cleanCellValue = Str::lower(Str::replaceManySpacesWithOne($cellValue));
 
                     if (in_array($cleanCellValue, $this->config->dayWords)) {
-                        $excelConfig->dayCol           = $column;
-                        $excelConfig->groupNamesRow    = $row;
-                        $excelConfig->firstScheduleRow = Coordinate::nextRow($excelConfig->groupNamesRow);
+                        $sheetCfg->dayCol           = $column;
+                        $sheetCfg->groupNamesRow    = $row;
+                        $sheetCfg->firstScheduleRow = Coordinate::nextRow($sheetCfg->groupNamesRow);
                     } elseif (in_array($cleanCellValue, $this->config->timeWords)) {
-                        $excelConfig->timeCol          = $column;
-                        $excelConfig->firstGroupCol    = Coordinate::nextColumn($excelConfig->timeCol);
-                        $excelConfig->groupNamesRow    = $row;
-                        $excelConfig->firstScheduleRow = Coordinate::nextRow($excelConfig->groupNamesRow);
-                    } else if (empty($excelConfig->classHourLessonColumn) && Lesson::isClassHourLesson($cellValue)) {
-                        $excelConfig->classHourLessonColumn = $column;
+                        $sheetCfg->timeCol          = $column;
+                        $sheetCfg->firstGroupCol    = Coordinate::nextColumn($sheetCfg->timeCol);
+                        $sheetCfg->groupNamesRow    = $row;
+                        $sheetCfg->firstScheduleRow = Coordinate::nextRow($sheetCfg->groupNamesRow);
+                    } else if (empty($sheetCfg->classHourLessonColumn) && Lesson::isClassHourLesson($cellValue)) {
+                        $sheetCfg->classHourLessonColumn = $column;
                     }
                 }
 
@@ -284,10 +284,10 @@ class Sheet
             }
         }
 
-        $excelConfig->lastGroupCol = $highestColumn;
-        $excelConfig->lastScheduleRow = $highestRow;
-        if ($excelConfig->classHourLessonColumn === null) {
-            $excelConfig->classHourLessonColumn = false;
+        $sheetCfg->lastGroupCol = $highestColumn;
+        $sheetCfg->lastScheduleRow = $highestRow;
+        if ($sheetCfg->classHourLessonColumn === null) {
+            $sheetCfg->classHourLessonColumn = false;
         }
     }
 

@@ -1,13 +1,13 @@
 <?php
 
-use Src\Config\App;
+use Src\Config\AppConfig;
 use Src\Exceptions\TerminateException;
 
-$config = App::getInstance();
+$config = AppConfig::getInstance();
 
-$hitsStorage = $config->hitsStorageFile;
+$visitsStorage = $config->visitsStorageFile;
 
-@$handle = fopen($hitsStorage, 'r');
+@$handle = fopen($visitsStorage, 'r');
 if ($handle === false) {
     throw new TerminateException('Отсутствует лог файлов', TerminateException::TYPE_INFO);
 }
@@ -59,7 +59,7 @@ if ($handle === false) {
     </table>
 
     <a class="btn btn-primary" href="/" role="button">На главную</a>
-    <a class='btn btn btn-danger' href='/system/hits/clean' role='button'>Очистить</a>
+    <a class='btn btn btn-danger' href='/system/visits/clean' role='button'>Очистить</a>
 </div>
 </body>
 </html>

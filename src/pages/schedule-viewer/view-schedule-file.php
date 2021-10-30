@@ -1,6 +1,6 @@
 <?php
 
-use Src\Config\App;
+use Src\Config\AppConfig;
 use Src\Config\SheetProcessingConfig;
 use Src\Enums\Day;
 use Src\Models\Group;
@@ -16,7 +16,7 @@ use Src\Exceptions\TerminateException;
  * Take settings from app config and user's input.
  */
 
-$config = App::getInstance();
+$config = AppConfig::getInstance();
 
 $debug          = $config->debug;
 $maxFileSize    = $config->maxFileSize;
@@ -89,6 +89,10 @@ if (Str::contains(Str::lower($originalFileName), $config->mendeleeva4KeywordInFi
  * Parsing
  */
 
+if ($debug) {
+    echo '<pre>';
+}
+
 // Load Excel file into PHPSpreadsheet
 
 $sheetProcessingConfig = new SheetProcessingConfig([
@@ -101,10 +105,6 @@ try {
     $spreadsheet = Sheet::createSpreadsheet($filePath, $sheetProcessingConfig);
 } catch (Exception $e) {
     throw new TerminateException('Ошибка чтения файла: ' . $e->getMessage());
-}
-
-if ($debug) {
-    echo '<pre>';
 }
 
 // Parse Sheets, Groups, Pairs and Lessons
