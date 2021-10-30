@@ -2,8 +2,6 @@
 
 namespace Src\Config;
 
-use Src\Models\Sheet;
-
 class SheetConfig
 {
     public ?string $dayCol = null;
@@ -14,7 +12,7 @@ class SheetConfig
     public ?string $lastGroupCol = null;
     public ?int $firstScheduleRow = null;
     public ?int $lastScheduleRow = null;
-    /** @var string|bool|null */
+    /** @var string|false|null */
     public $classHourLessonColumn = null;
 
     /**
