@@ -9,6 +9,7 @@ use Src\Models\Pair;
 use Src\Models\Sheet;
 use Src\Support\Helpers;
 use Src\Support\Security;
+use Src\Support\Session;
 use Src\Support\Str;
 use Src\Exceptions\TerminateException;
 
@@ -84,6 +85,10 @@ $forceMendeleeva = false;
 if (Str::contains(Str::lower($originalFileName), $config->mendeleeva4KeywordInFilename)) {
     $forceMendeleeva = true;
 }
+
+$session = new Session();
+$session->set('group', $inputGroup);
+$session->set('detectMendeleeva4', $detectMendeleeva4);
 
 /*
  * Parsing

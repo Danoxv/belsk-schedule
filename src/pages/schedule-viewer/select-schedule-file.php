@@ -2,6 +2,7 @@
 
 use Src\Config\AppConfig;
 use Src\Support\Helpers;
+use Src\Support\Session;
 
 $config = AppConfig::getInstance();
 
@@ -10,6 +11,8 @@ $allowedExtensionsAsString = implode(', ', $config->allowedExtensions);
 $pageWithFiles = $config->pageWithScheduleFiles;
 
 $links = Helpers::getScheduleFilesLinks($linksGettingCurlError);
+
+$session = new Session();
 ?>
 
 <!doctype html>
@@ -92,7 +95,7 @@ $links = Helpers::getScheduleFilesLinks($linksGettingCurlError);
                     <select name="group" class="form-select" aria-label="Выберите группу" id="group" aria-describedby="groupHelp">
                         <!-- <option value="" selected disabled>Выберите...</option> -->
                         <?php foreach ($config->groupsList as $group): ?>
-                            <option value="<?= $group ?>"><?= $group ?></option>
+                            <option value="<?= $group ?>" <?= $session->get('group') === $group ? ' selected ' : '' ?>><?= $group ?></option>
                         <?php endforeach; ?>
                     </select>
                     <div id="groupHelp" class="form-text">Выберите учебную группу, для которой хотите получить расписание.</div>
@@ -102,7 +105,7 @@ $links = Helpers::getScheduleFilesLinks($linksGettingCurlError);
                 <div class="mb-3">
                     <b>3. Настройки:</b>
                     <div class="form-check">
-                        <input name="detectMendeleeva4" class="form-check-input" type="checkbox" value="1" checked="checked" id="detectMendeleeva4" aria-describedby="detectMendeleeva4Help">
+                        <input name="detectMendeleeva4" class="form-check-input" type="checkbox" value="1" <?= $session->get('detectMendeleeva4', true) === true  ? ' checked ' : '' ?> id="detectMendeleeva4" aria-describedby="detectMendeleeva4Help">
                         <label class="form-check-label" for="detectMendeleeva4">
                             Выделять пары, проходящие на Менделеева, 4
                         </label>
