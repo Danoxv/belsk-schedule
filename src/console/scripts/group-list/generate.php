@@ -31,7 +31,6 @@ $groupNames = [];
 foreach ($links as $link) {
     if (Helpers::isExternalLink($link['uri'])) {
         $scheduleLink = Security::sanitizeString($link['uri'], true);
-        $scheduleLink = Helpers::sanitizeScheduleLink($scheduleLink);
 
         $data = Helpers::httpGet($scheduleLink);
 

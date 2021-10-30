@@ -53,7 +53,7 @@ class Session
     public function destroy()
     {
         $_SESSION = [];
-        setcookie(session_name(), '', time() - 2592000, '/');
+        setcookie(session_name(), '', time() - 2592000, '/'); // subtract 30 days
         session_destroy();
     }
 }

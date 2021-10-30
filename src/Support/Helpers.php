@@ -161,6 +161,7 @@ class Helpers
             }
 
             $linkUri = "$host/$linkUri";
+            $linkUri = Helpers::sanitizeScheduleLink($linkUri);
 
             $linkText = Security::sanitizeString($a->textContent);
 

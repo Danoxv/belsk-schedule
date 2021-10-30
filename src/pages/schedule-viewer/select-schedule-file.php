@@ -46,7 +46,7 @@ $session = new Session();
                         <?php if (!empty($links)): ?>
                             <?php foreach ($links as $linkIdx => $link): ?>
                                 <div class="form-check">
-                                    <input name="scheduleLink" onchange="onScheduleLinkChange()" <?= $linkIdx === 0 ? 'checked' : '' ?> value="<?=$link['uri']?>" class="form-check-input" type="radio" id="scheduleLink<?=$linkIdx?>">
+                                    <input name="scheduleLink" onchange="onScheduleLinkChange()" <?= ($linkIdx === 0 || $session->get('scheduleLink') === $link['uri']) ? 'checked' : '' ?> value="<?=$link['uri']?>" class="form-check-input" type="radio" id="scheduleLink<?=$linkIdx?>">
                                     <label class="form-check-label" for="scheduleLink<?=$linkIdx?>">
                                         <?= $link['text'] ?>
                                     </label>

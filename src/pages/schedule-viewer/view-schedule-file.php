@@ -50,6 +50,8 @@ if ($scheduleLink && !empty($inputScheduleFile['tmp_name'])) {
 $detectMendeleeva4 = Security::filterInputString(INPUT_POST, 'detectMendeleeva4');
 $detectMendeleeva4 = (bool) $detectMendeleeva4;
 
+$session = new Session();
+
 $originalFileName = '';
 if ($scheduleLink) {
     $originalFileName = $scheduleLink;
@@ -65,6 +67,8 @@ if ($scheduleLink) {
     fwrite($temp, $data);
 
     $filePath = stream_get_meta_data($temp)['uri'];
+
+    $session->set('scheduleLink', $scheduleLink);
 } elseif (!empty($inputScheduleFile['tmp_name'])) {
     if (
         !in_array($inputScheduleFile['type'], $allowedMimes, true)  // is not Excel file
@@ -86,7 +90,6 @@ if (Str::contains(Str::lower($originalFileName), $config->mendeleeva4KeywordInFi
     $forceMendeleeva = true;
 }
 
-$session = new Session();
 $session->set('group', $inputGroup);
 $session->set('detectMendeleeva4', $detectMendeleeva4);
 
