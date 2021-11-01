@@ -97,7 +97,7 @@ class Helpers
     {
         $res = '';
 
-        $romanNumberMap = [
+        static $romanNumberMap = [
             'M'  => 1000,
             'CM' => 900,
             'D'  => 500,
@@ -110,7 +110,8 @@ class Helpers
             'IX' => 9,
             'V'  => 5,
             'IV' => 4,
-            'I'  => 1];
+            'I'  => 1
+        ];
 
         foreach ($romanNumberMap as $roman => $number){
             //divide to get  matches
@@ -199,7 +200,7 @@ class Helpers
      */
     public static function formatBytes(int $size)
     {
-        $unit=array('b','KB','MB','GB','TB','PB');
+        static $unit=array('b','KB','MB','GB','TB','PB');
 
         return @round($size/pow(1024,($i=floor(log($size,1024)))),2).' '.$unit[$i];
     }
