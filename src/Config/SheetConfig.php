@@ -20,7 +20,11 @@ class SheetConfig
      */
     public function isProcessable(): bool
     {
-        $configProps = (new \ReflectionObject($this))->getProperties(\ReflectionProperty::IS_PUBLIC);
+        static $configProps = null;
+
+        if ($configProps === null) {
+            $configProps = (new \ReflectionObject($this))->getProperties(\ReflectionProperty::IS_PUBLIC);
+        }
 
         foreach ($configProps as $prop) {
             if ($this->{$prop->getName()} === null) {

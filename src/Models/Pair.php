@@ -164,18 +164,21 @@ class Pair
             $day = $sheet->getCellValue($dayCol.$dayRow);
 
             // Hack: try to find day on the previous column also
-            if (empty($day) && $dayCol !== Coordinate::FIRST_COL) {
-                $dayPrevCol = $sheet->getCellValue(Coordinate::prevColumn($dayCol).$dayRow);
-                if (!empty($dayPrevCol)) {
-                    $day = $dayPrevCol;
+            if ($day === '') {
+                $dayPrevCol = Coordinate::prevColumn($dayCol);
+                if ($dayPrevCol !== null) {
+                    $dayPrevCell = $sheet->getCellValue($dayPrevCol.$dayRow);
+                    if ($dayPrevCell !== '') {
+                        $day = $dayPrevCell;
+                    }
                 }
             }
 
-            $dayRow--;
-            if ($dayRow < 0) {
+            $dayRow = Coordinate::prevRow($dayRow);
+            if ($dayRow === null) {
                 break;
             }
-        } while (empty($day));
+        } while ($day === '');
 
         $this->day = Day::normalize($day);
     }

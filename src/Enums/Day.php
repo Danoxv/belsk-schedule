@@ -45,6 +45,6 @@ class Day
      */
     public static function format(string $day): string
     {
-        return Str::ucfirst($day);
+        return Str::ucfirst(Str::lower($day));
     }
 }

@@ -2,6 +2,8 @@
 
 namespace Src\Support;
 
+use PhpOffice\PhpSpreadsheet\Exception;
+
 class Coordinate extends \PhpOffice\PhpSpreadsheet\Cell\Coordinate
 {
     public const FIRST_COL = 'A';
@@ -10,19 +12,25 @@ class Coordinate extends \PhpOffice\PhpSpreadsheet\Cell\Coordinate
     /**
      * @param string $column
      * @return string
+     * @throws Exception
      */
     public static function nextColumn(string $column): string
     {
-        return ++$column;
+        return self::stringFromColumnIndex(self::columnIndexFromString($column) + 1);
     }
 
     /**
      * @param string $column
-     * @return string
+     * @return string|null
+     * @throws Exception
      */
-    public static function prevColumn(string $column): string
+    public static function prevColumn(string $column): ?string
     {
-        return chr(ord($column)-1);
+        if ($column === self::FIRST_COL) {
+            return null;
+        }
+
+        return self::stringFromColumnIndex(self::columnIndexFromString($column) - 1);
     }
 
     /**
@@ -36,10 +44,14 @@ class Coordinate extends \PhpOffice\PhpSpreadsheet\Cell\Coordinate
 
     /**
      * @param int $row
-     * @return int
+     * @return int|null
      */
-    public static function prevRow(int $row): int
+    public static function prevRow(int $row): ?int
     {
+        if ($row === self::FIRST_ROW) {
+            return null;
+        }
+
         return $row - 1;
     }
 
