@@ -14,8 +14,8 @@
 
 ## Установка
 1. Склонируйте репозиторий и выполните:
-```
-composer install
+```bash
+$ composer install
 ```
 ## Архитектура
 Архитектура приложения построена на основе каркаса [NewEXE/single-entry-point-php](https://github.com/NewEXE/single-entry-point-php).

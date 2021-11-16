@@ -48,10 +48,11 @@ try {
 
     require_once ROOT . '/src/' . $_routes[$_requestUri];
 } catch (Src\Exceptions\TerminateException $exception) {
-    require ROOT . '/src/pages/show-error.php';
+    require ROOT . '/src/pages/service/show-error.php';
 }
 
 require_once ROOT . '/src/pages/components/write-visit.php';
+require_once ROOT . '/src/pages/components/cookie-alert.php';
 
 $_memoryUsage = Helpers::formatBytes(memory_get_usage());
 

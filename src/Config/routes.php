@@ -4,6 +4,11 @@ use Src\Config\AppConfig;
 
 $_routes = [
     /*
+     * Service pages
+     */
+    '/terms-and-conditions' => 'pages/service/terms-and-conditions.php',
+
+    /*
      * Schedule viewer pages
      */
     '/'                     => 'pages/schedule-viewer/select-schedule-file.php',
