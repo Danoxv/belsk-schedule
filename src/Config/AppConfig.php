@@ -5,7 +5,7 @@ namespace Src\Config;
 class AppConfig
 {
     public array $version = [
-        'number' => '1.0.10',
+        'number' => '1.0.11',
         'stability' => 'beta'
     ];
     public bool $debug = false;
