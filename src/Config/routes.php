@@ -16,7 +16,7 @@ $_routes = [
 ];
 
 if (AppConfig::getInstance()->enableSystemPages) {
-    $_routes = $_routes + [
+    $_routes += [
         /*
          * System pages
          */
