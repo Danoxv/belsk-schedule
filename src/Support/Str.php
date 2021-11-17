@@ -100,7 +100,7 @@ class Str extends \Illuminate\Support\Str
      * Replace text within a portion of a string
      * (substr_replace for unicode characters)
      *
-     * Source @link https://github.com/sallaizalan/mb-substr-replace/blob/master/mbsubstrreplace.php
+     * Source: @link https://github.com/sallaizalan/mb-substr-replace/blob/master/mbsubstrreplace.php
      *
      * @param string $string
      * @param string $replacement
@@ -114,5 +114,22 @@ class Str extends \Illuminate\Support\Str
         $endString = Str::substr($string, $start + $length, Str::length($string));
 
         return $startString . $replacement . $endString;
+    }
+
+    /**
+     * Source: @link https://stackoverflow.com/a/4517270
+     *
+     * @param string $string
+     * @param string $prefix
+     * @return string
+     */
+    public static function removePrefix(string $string, string $prefix): string
+    {
+        $prefixLen = Str::length($prefix);
+        if (Str::substr($string, 0, $prefixLen) === $prefix) {
+            $string = Str::substr($string, $prefixLen);
+        }
+
+        return $string;
     }
 }

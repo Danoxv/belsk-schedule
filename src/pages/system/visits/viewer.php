@@ -45,13 +45,14 @@ if ($handle === false) {
             <td class="text-center tbl-15"><b>IP</b></td>
             <td class="text-center"><b>User agent</b></td>
             <td class="text-center tbl-15"><b>URI</b></td>
+            <td class="text-center tbl-15"><b>POST</b></td>
         </tr>
         </thead>
         <tbody>
             <?php while (($row = fgetcsv($handle, 10000)) !== false): ?>
                 <tr>
                 <?php foreach ($row as $col): ?>
-                    <td><?= $col ?></td>
+                    <td><?= nl2br($col); ?></td>
                 <?php endforeach; ?>
                 </tr>
             <?php endwhile; ?>

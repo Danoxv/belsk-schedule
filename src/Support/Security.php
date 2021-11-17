@@ -40,8 +40,27 @@ class Security
     public static function filterInputString(int $type, string $varName): string
     {
         $input = filter_input($type, $varName, FILTER_SANITIZE_STRING);
-        $input = self::sanitizeString($input, true);
+        return self::sanitizeString($input, true);
+    }
 
-        return $input;
+    /**
+     * Walks the array while sanitizing the contents.
+     *
+     * Source: @link https://github.com/WordPress/WordPress/blob/master/wp-includes/functions.php#L1253 (add_magic_quotes())
+     *
+     * @param array $array Array to walk while sanitizing contents.
+     * @return array Sanitized $array.
+     */
+    public static function sanitizeArray(array $array)
+    {
+        foreach ($array as $k => $v) {
+            if (is_array($v)) {
+                $array[$k] = self::sanitizeArray($v);
+            } elseif (is_string($v)) {
+                $array[$k] = self::sanitizeString($v);
+            }
+        }
+
+        return $array;
     }
 }
