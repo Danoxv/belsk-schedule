@@ -14,7 +14,7 @@ class AppConfig
     /*
      * System
      */
-    public bool $enableSystemPages = true;
+    public bool $enableSystemPages = false;
     public string $visitsStorageFile = ROOT . '/src/storage/visits.csv';
 
     public int $maxFileSize = 512; // in kilobytes
