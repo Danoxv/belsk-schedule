@@ -30,17 +30,20 @@ class Group
      */
     public function process(array $rows)
     {
+        $timeCol = $this->sheet->getTimeColumn();
         foreach ($rows as $row) {
-            $timeCol = $this->sheet->getTimeColumn();
-
-            $pairCellCoordinate = $timeCol . $row;
-            $pairTimeCell = new Cell($pairCellCoordinate, $this->getSheet());
+            $pairTimeCellCoord = $timeCol . $row;
+            $pairTimeCell = new Cell($pairTimeCellCoord, $this->getSheet());
 
             $pair = new Pair($pairTimeCell, $this);
 
             if ($pair->isValid()) {
-                $this->pairs->put($pairCellCoordinate, $pair);
+                $this->pairs->put($pairTimeCellCoord, $pair);
             }
+        }
+
+        if($this->pairs->isEmpty()) {
+            return;
         }
 
         // Assign pair number if not parsed from Excel.
