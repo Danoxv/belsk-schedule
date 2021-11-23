@@ -210,10 +210,6 @@ class Lesson
      */
     public static function processResolving(Lesson $lesson1, Lesson $lesson2)
     {
-        if (!$lesson1->isValid() && !$lesson2->isValid()) {
-            return;
-        }
-
         if ($lesson1->isValid()) {
             /*
              * Resolve first lesson
