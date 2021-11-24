@@ -31,7 +31,7 @@ class Sheet
 
     private string $id;
 
-    /** @var string[] */
+    /** @var array */
     private array $coordinatesForSkip = [];
 
     /**
@@ -242,7 +242,7 @@ class Sheet
                 $cellValue = trim($rawCellValue);
 
                 if (Str::startsWith($cellValue, $this->config->skipCellsThatStartsWith)) {
-                    $this->coordinatesForSkip[] = $coordinate;
+                    $this->coordinatesForSkip[] = ['column' => $column, 'row' => $row];
                 }
 
                 /*
@@ -254,11 +254,13 @@ class Sheet
 
                     if (in_array($cleanCellValue, $this->config->dayWords)) {
                         $sheetCfg->dayCol           = $column;
+
                         $sheetCfg->groupNamesRow    = $row;
                         $sheetCfg->firstScheduleRow = Coordinate::nextRow($sheetCfg->groupNamesRow);
                     } elseif (in_array($cleanCellValue, $this->config->timeWords)) {
                         $sheetCfg->timeCol          = $column;
                         $sheetCfg->firstGroupCol    = Coordinate::nextColumn($sheetCfg->timeCol);
+
                         $sheetCfg->groupNamesRow    = $row;
                         $sheetCfg->firstScheduleRow = Coordinate::nextRow($sheetCfg->groupNamesRow);
                     } else if (empty($sheetCfg->classHourLessonColumn) && Lesson::isClassHourLesson($cellValue)) {
@@ -286,6 +288,7 @@ class Sheet
 
         $sheetCfg->lastGroupCol = $highestColumn;
         $sheetCfg->lastScheduleRow = $highestRow;
+
         if ($sheetCfg->classHourLessonColumn === null) {
             $sheetCfg->classHourLessonColumn = false;
         }
@@ -334,7 +337,7 @@ class Sheet
 
             // Add group
             if ($conf->processGroups) {
-                $processableRows = $this->getProcessableRows($rows, $column);
+                $processableRows = $this->removeUnprocessableRows($rows, $column);
                 $group->process($processableRows);
             }
             $this->groups->put($column, $group);
@@ -349,18 +352,16 @@ class Sheet
      * @param string $currentColumn
      * @return array
      */
-    private function getProcessableRows(array $rows, string $currentColumn): array
+    private function removeUnprocessableRows(array $rows, string $currentColumn): array
     {
         $rowsWasRemoved = false;
 
         foreach ($this->coordinatesForSkip as $coordinate) {
-            [$column, $row] = Coordinate::explodeCoordinate($coordinate);
-
-            if ($column !== $currentColumn) {
+            if ($coordinate['column'] !== $currentColumn) {
                 continue;
             }
 
-            Arr::removeByValue($rows, $row);
+            Arr::removeByValue($rows, $coordinate['row']);
 
             $rowsWasRemoved = true;
         }

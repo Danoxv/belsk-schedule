@@ -245,7 +245,7 @@ foreach (Day::getAll() as $day) {
     foreach ($dayPairs as $pair) {
         $lessonsCount = $pair->getLessons()->count();
 
-        $lessonNum = 0;
+        $lessonNum = 1;
 
         /** @var Lesson $lesson */
         foreach ($pair->getLessons() as $lesson) {
@@ -271,9 +271,9 @@ foreach (Day::getAll() as $day) {
 
             echo '<tr>';
 
-            if ($lessonsCount === 1 || ($lessonsCount >= 2 && $lessonNum === 0)) {
-                echo "<td rowspan='$lessonsCount' class='text-center'>" . $lesson->getNumber()          .'</td>';
-                echo "<td rowspan='$lessonsCount' class='text-center'>" . $lesson->getTime()            .'</td>';
+            if ($lessonsCount === 1 || ($lessonsCount >= 2 && $lessonNum === 1)) {
+                echo "<td rowspan='$lessonsCount' class='text-center'>" . $lesson->getNumber() .'</td>';
+                echo "<td rowspan='$lessonsCount' class='text-center'>" . $lesson->getTime() .'</td>';
             }
 
             echo "<td $hint>" . $lesson->getSubject() .'</td>';

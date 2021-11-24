@@ -11,6 +11,7 @@ class Group
     private string $column;
     private string $name;
     private Sheet $sheet;
+    private bool $isProcessed = false;
 
     private Collection $pairs;
 
@@ -41,6 +42,8 @@ class Group
                 $this->pairs->put($pairTimeCellCoord, $pair);
             }
         }
+
+        $this->isProcessed = true;
 
         if($this->pairs->isEmpty()) {
             return;

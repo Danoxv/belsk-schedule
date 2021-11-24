@@ -58,7 +58,7 @@ class Coordinate extends \PhpOffice\PhpSpreadsheet\Cell\Coordinate
     /**
      * @param string $start
      * @param string $end
-     * @return array
+     * @return string[]
      */
     public static function generateColumnsRange(string $start, string $end): array
     {
