@@ -234,6 +234,7 @@ class Sheet
 
         $sheetCfg = &$this->sheetConfig;
 
+        $dayColFound = $timeColFound = $classHourColFound = false;
         foreach ($columns as $column) {
             foreach ($rows as $row) {
                 $coordinate = $column.$row;
@@ -250,21 +251,27 @@ class Sheet
                  */
 
                 if (!$sheetCfg->isProcessable()) {
-                    $cleanCellValue = Str::lower(Str::replaceManySpacesWithOne($cellValue));
+                    $cleanCellValue = '';
+                    if (!$dayColFound || !$timeColFound) {
+                        $cleanCellValue = Str::lower(Str::replaceManySpacesWithOne($cellValue));
+                    }
 
-                    if (in_array($cleanCellValue, $this->config->dayWords)) {
+                    if (!$dayColFound && in_array($cleanCellValue, $this->config->dayWords)) {
+                        $dayColFound                = true;
                         $sheetCfg->dayCol           = $column;
 
                         $sheetCfg->groupNamesRow    = $row;
                         $sheetCfg->firstScheduleRow = Coordinate::nextRow($sheetCfg->groupNamesRow);
-                    } elseif (in_array($cleanCellValue, $this->config->timeWords)) {
+                    } elseif (!$timeColFound && in_array($cleanCellValue, $this->config->timeWords)) {
+                        $timeColFound               = true;
                         $sheetCfg->timeCol          = $column;
                         $sheetCfg->firstGroupCol    = Coordinate::nextColumn($sheetCfg->timeCol);
 
                         $sheetCfg->groupNamesRow    = $row;
                         $sheetCfg->firstScheduleRow = Coordinate::nextRow($sheetCfg->groupNamesRow);
-                    } else if (empty($sheetCfg->classHourLessonColumn) && Lesson::isClassHourLesson($cellValue)) {
-                        $sheetCfg->classHourLessonColumn = $column;
+                    } else if (!$classHourColFound && Lesson::isClassHourLesson($cellValue)) {
+                        $classHourColFound                  = true;
+                        $sheetCfg->classHourLessonColumn    = $column;
                     }
                 }
 

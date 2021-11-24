@@ -325,6 +325,11 @@ class Lesson
     }
 
     /**
+     * Turn this one:
+     * 'К Л А С С Н Ы Й   Ч А С'
+     * Into this one:
+     * 'Классный час'
+     *
      * @param string $cellValue
      * @return string
      */
@@ -337,27 +342,25 @@ class Lesson
         }
 
         $space = ' ';
-        $uniqueChar = '|';
+        $maxSpacesCount = Str::maxConsecutiveCharsCount($cellValue, $space);
 
-        $spacesCount = 10;
-        $replacementPerformed = false;
-        do {
-            $lesson = str_replace(str_repeat($space, $spacesCount), $uniqueChar, $lesson, $count);
+        if ($maxSpacesCount > 0) {
+            $uniqueChar = '|';
 
-            if ($count > 0) {
-                $replacementPerformed = true;
-            }
+            // К Л А С С Н Ы Й   Ч А С -> К Л А С С Н Ы Й|Ч А С
+            $lesson = str_replace(str_repeat($space, $maxSpacesCount), $uniqueChar, $lesson);
 
-            $spacesCount--;
-        } while($count === 0 && $spacesCount > 0);
+            // К Л А С С Н Ы Й|Ч А С -> КЛАССНЫЙ|ЧАС
+            $lesson = Str::removeSpaces($lesson);
 
-        $lesson = Str::removeSpaces($lesson);
-
-        if ($replacementPerformed) {
+            // КЛАССНЫЙ|ЧАС -> КЛАССНЫЙ ЧАС
             $lesson = str_replace($uniqueChar, $space, $lesson);
         }
 
+        // КЛАССНЫЙ ЧАС -> классный час
         $lesson = Str::lower($lesson);
+
+        // классный час -> Классный час
         return Str::ucfirst($lesson);
     }
 

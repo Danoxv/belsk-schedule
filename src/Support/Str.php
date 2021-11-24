@@ -4,6 +4,8 @@ namespace Src\Support;
 
 class Str extends \Illuminate\Support\Str
 {
+    private const UNICODE = 'UTF-8';
+
     /**
      * @param string $string
      * @return string
@@ -40,7 +42,7 @@ class Str extends \Illuminate\Support\Str
      */
     public static function rpos(string $haystack, string $needle, int $offset = 0)
     {
-        return mb_strrpos($haystack, $needle, $offset, 'UTF-8');
+        return mb_strrpos($haystack, $needle, $offset, self::UNICODE);
     }
 
     /**
@@ -131,5 +133,39 @@ class Str extends \Illuminate\Support\Str
         }
 
         return $string;
+    }
+
+    /**
+     * @param string $string
+     * @param string $char
+     * @return int
+     */
+    public static function maxConsecutiveCharsCount(string $string, string $char): int
+    {
+        $max = 0;
+
+        $current = 0;
+        foreach(Str::split($string) as $val){
+            if($val === $char) {
+                $current++;
+                if($current > $max){
+                    $max = $current;
+                }
+            } else {
+                $current = 0;
+            }
+        }
+
+        return $max;
+    }
+
+    /**
+     * @param string $string
+     * @param int $length
+     * @return array|false|string[]|null
+     */
+    public static function split(string $string, int $length = 1)
+    {
+        return mb_str_split($string, $length, self::UNICODE);
     }
 }

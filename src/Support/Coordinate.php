@@ -8,15 +8,23 @@ class Coordinate extends \PhpOffice\PhpSpreadsheet\Cell\Coordinate
 {
     public const FIRST_COL = 'A';
     public const FIRST_ROW = 1;
+    private const COL_CHARS_MAXLENGTH = 3;
 
     /**
      * @param string $column
-     * @return string
+     * @return string|null
      * @throws Exception
      */
-    public static function nextColumn(string $column): string
+    public static function nextColumn(string $column): ?string
     {
-        return self::stringFromColumnIndex(self::columnIndexFromString($column) + 1);
+        $nextColumn = self::stringFromColumnIndex(self::columnIndexFromString($column) + 1);
+
+        // Column string index can not be longer than 3 characters
+        if (Str::length($nextColumn) > self::COL_CHARS_MAXLENGTH) {
+            return null;
+        }
+
+        return $nextColumn;
     }
 
     /**
