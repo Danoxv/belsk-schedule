@@ -344,7 +344,7 @@ class Lesson
         $space = ' ';
         $maxSpacesCount = Str::maxConsecutiveCharsCount($cellValue, $space);
 
-        if ($maxSpacesCount > 0) {
+        if ($maxSpacesCount > 1) {
             $uniqueChar = '|';
 
             // К Л А С С Н Ы Й   Ч А С -> К Л А С С Н Ы Й|Ч А С
@@ -357,11 +357,8 @@ class Lesson
             $lesson = str_replace($uniqueChar, $space, $lesson);
         }
 
-        // КЛАССНЫЙ ЧАС -> классный час
-        $lesson = Str::lower($lesson);
-
-        // классный час -> Классный час
-        return Str::ucfirst($lesson);
+        // КЛАССНЫЙ ЧАС -> Классный час
+        return Str::ucfirst(Str::lower($lesson));
     }
 
     private function init()
@@ -380,21 +377,16 @@ class Lesson
         $this->resolveIsMendeleeva4();
     }
 
-    /**
-     * TODO Possible optimization:
-     * execute $cell->process() only once
-     */
     private function resolveCellAndIsClassHour()
     {
-        $this->isClassHour = false;
-
         $sheet = $this->pair->getSheet();
 
         $cell = new Cell(
             $this->pair->getGroup()->getColumn() . $this->row,
             $sheet
         );
-        $cell->process();
+
+        $isClassHour = false;
 
         if ($cell->isEmpty() && $sheet->hasClassHourLessonColumn()) {
             $possibleClassHourCell = new Cell(
@@ -403,14 +395,19 @@ class Lesson
             );
 
             if (self::isClassHourLesson($possibleClassHourCell->getValue())) {
-                $possibleClassHourCell->process();
+                $isClassHour = true;
                 $cell = $possibleClassHourCell;
             }
         }
 
         $this->cell = $cell;
+        $this->cell->process();
 
-        $this->isClassHour = self::isClassHourLesson($this->cell->getValue());
+        if(!$isClassHour) {
+            $isClassHour = self::isClassHourLesson($this->cell->getValue());
+        }
+
+        $this->isClassHour = $isClassHour;
     }
 
     private function resolveIsMendeleeva4()
