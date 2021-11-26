@@ -344,7 +344,7 @@ class Lesson
         $space = ' ';
         $maxSpacesCount = Str::maxConsecutiveCharsCount($cellValue, $space);
 
-        if ($maxSpacesCount > 0) {
+        if ($maxSpacesCount > 1) {
             $uniqueChar = '|';
 
             // К Л А С С Н Ы Й   Ч А С -> К Л А С С Н Ы Й|Ч А С
@@ -357,11 +357,8 @@ class Lesson
             $lesson = str_replace($uniqueChar, $space, $lesson);
         }
 
-        // КЛАССНЫЙ ЧАС -> классный час
-        $lesson = Str::lower($lesson);
-
-        // классный час -> Классный час
-        return Str::ucfirst($lesson);
+        // КЛАССНЫЙ ЧАС -> Классный час
+        return Str::ucfirst(Str::lower($lesson));
     }
 
     private function init()
@@ -386,8 +383,6 @@ class Lesson
      */
     private function resolveCellAndIsClassHour()
     {
-        $this->isClassHour = false;
-
         $sheet = $this->pair->getSheet();
 
         $cell = new Cell(
@@ -396,21 +391,36 @@ class Lesson
         );
         $cell->process();
 
-        if ($cell->isEmpty() && $sheet->hasClassHourLessonColumn()) {
+        if (!$sheet->hasClassHourLessonColumn()) {
+            $this->cell = $cell;
+            $this->isClassHour = false;
+            return;
+        }
+
+        $isClassHour = null;
+
+        if ($cell->isEmpty()) {
             $possibleClassHourCell = new Cell(
                 $sheet->getClassHourLessonColumn() . $this->row,
                 $sheet
             );
 
             if (self::isClassHourLesson($possibleClassHourCell->getValue())) {
+                $isClassHour = true;
                 $possibleClassHourCell->process();
                 $cell = $possibleClassHourCell;
+            } else {
+                $isClassHour = false;
             }
         }
 
         $this->cell = $cell;
 
-        $this->isClassHour = self::isClassHourLesson($this->cell->getValue());
+        if ($isClassHour === null) {
+            $isClassHour = self::isClassHourLesson($this->cell->getValue());
+        }
+
+        $this->isClassHour = $isClassHour;
     }
 
     private function resolveIsMendeleeva4()
