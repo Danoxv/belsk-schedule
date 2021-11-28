@@ -12,6 +12,7 @@ class Group
     private string $name;
     private Sheet $sheet;
     private bool $isProcessed = false;
+    private bool $isValid;
 
     private Collection $pairs;
 
@@ -104,11 +105,19 @@ class Group
         return $this->name;
     }
 
+    public function isValid(): bool
+    {
+        return $this->isValid;
+    }
+
     private function init()
     {
         // Resolve name
         $this->name = $this->sheet->getCellValue(
             $this->column . $this->sheet->getGroupNamesRow()
         );
+
+        // Resolve isValid
+        $this->isValid = $this->name !== '';
     }
 }
