@@ -181,6 +181,10 @@ class Pair
         } while ($day === '');
 
         $this->day = Day::normalize($day);
+
+        if($this->day === '') {
+            $this->isValid = false;
+        }
     }
 
     private function resolveTimeAndNumber()
