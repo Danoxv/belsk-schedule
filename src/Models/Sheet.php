@@ -337,6 +337,10 @@ class Sheet
 
             $group = new Group($column, $this);
 
+            if(!$group->isValid()) {
+                continue;
+            }
+
             // Apply filter by student's group
             if ($hasFilterByGroup && $conf->studentsGroup !== $group->getName()) {
                 continue;
