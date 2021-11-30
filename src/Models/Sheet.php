@@ -239,8 +239,7 @@ class Sheet
             foreach ($rows as $row) {
                 $coordinate = $column.$row;
 
-                $rawCellValue = $this->getCellValue($coordinate, true);
-                $cellValue = trim($rawCellValue);
+                $cellValue = $this->getCellValue($coordinate);
 
                 if (Str::startsWith($cellValue, $this->config->skipCellsThatStartsWith)) {
                     $this->coordinatesForSkip[] = ['column' => $column, 'row' => $row];
