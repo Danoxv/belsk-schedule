@@ -9,7 +9,7 @@ class Arr extends \Illuminate\Support\Arr
      * @param $value
      * @param bool $strict
      */
-    public static function removeByValue(array &$arr, $value, bool $strict = true)
+    public static function unsetByValue(array &$arr, $value, bool $strict = true)
     {
         foreach (array_keys($arr, $value, $strict) as $key) {
             unset($arr[$key]);

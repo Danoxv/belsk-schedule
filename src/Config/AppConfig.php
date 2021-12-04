@@ -42,7 +42,6 @@ class AppConfig
 
     public array $dayWords = ['день недели', 'дни'];
     public array $timeWords = ['часы', 'пара'];
-    public array $skipCellsThatStartsWith = ['Цветом отмечены'];
     public array $mendeleeva4HouseCellColors = ['000000'];
     public string $mendeleeva4KeywordInFilename = 'менделеева';
     public array $mendeleeva4KeywordsInSheetCell = ['менделеева', '4'];

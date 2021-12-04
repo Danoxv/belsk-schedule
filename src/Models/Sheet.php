@@ -8,7 +8,6 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use Src\Config\AppConfig;
 use Src\Config\SheetConfig;
 use Src\Config\SheetProcessingConfig;
-use Src\Support\Arr;
 use Src\Support\Collection;
 use Src\Support\Coordinate;
 use Src\Support\Security;
@@ -30,9 +29,6 @@ class Sheet
     private Collection $groups;
 
     private string $id;
-
-    /** @var array */
-    private array $coordinatesForSkip = [];
 
     /**
      * @param Worksheet $worksheet
@@ -241,10 +237,6 @@ class Sheet
 
                 $cellValue = $this->getCellValue($coordinate);
 
-                if (Str::startsWith($cellValue, $this->config->skipCellsThatStartsWith)) {
-                    $this->coordinatesForSkip[] = ['column' => $column, 'row' => $row];
-                }
-
                 /*
                  * Resolve Excel config
                  */
@@ -347,35 +339,12 @@ class Sheet
 
             // Add group
             if ($conf->processGroups) {
-                $processableRows = $this->removeUnprocessableRows($rows, $column);
-                $group->process($processableRows);
+                $group->process($rows);
             }
             $this->groups->put($column, $group);
         }
 
         // All done, mark sheet as processed
         $this->isProcessed = true;
-    }
-
-    /**
-     * @param array $rows
-     * @param string $currentColumn
-     * @return array
-     */
-    private function removeUnprocessableRows(array $rows, string $currentColumn): array
-    {
-        $rowsWasRemoved = false;
-
-        foreach ($this->coordinatesForSkip as $coordinate) {
-            if ($coordinate['column'] !== $currentColumn) {
-                continue;
-            }
-
-            Arr::removeByValue($rows, $coordinate['row']);
-
-            $rowsWasRemoved = true;
-        }
-
-        return $rowsWasRemoved ? array_values($rows) : $rows;
     }
 }
