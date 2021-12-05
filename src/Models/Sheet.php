@@ -231,6 +231,8 @@ class Sheet
         $sheetCfg = &$this->sheetConfig;
 
         $dayColFound = $timeColFound = $classHourColFound = false;
+        $needMendeleeva4Detect = $this->sheetProcessingConfig->detectMendeleeva4;
+
         foreach ($columns as $column) {
             foreach ($rows as $row) {
                 $coordinate = $column.$row;
@@ -247,13 +249,13 @@ class Sheet
                         $cleanCellValue = Str::lower(Str::replaceManySpacesWithOne($cellValue));
                     }
 
-                    if (!$dayColFound && in_array($cleanCellValue, $this->config->dayWords)) {
+                    if (!$dayColFound && in_array($cleanCellValue, $this->config->dayWords, true)) {
                         $dayColFound                = true;
                         $sheetCfg->dayCol           = $column;
 
                         $sheetCfg->groupNamesRow    = $row;
                         $sheetCfg->firstScheduleRow = Coordinate::nextRow($sheetCfg->groupNamesRow);
-                    } elseif (!$timeColFound && in_array($cleanCellValue, $this->config->timeWords)) {
+                    } elseif (!$timeColFound && in_array($cleanCellValue, $this->config->timeWords, true)) {
                         $timeColFound               = true;
                         $sheetCfg->timeCol          = $column;
                         $sheetCfg->firstGroupCol    = Coordinate::nextColumn($sheetCfg->timeCol);
@@ -270,16 +272,25 @@ class Sheet
                  * Detect "Has Mendeleeva 4 house"
                  */
 
-                if ($this->sheetProcessingConfig->detectMendeleeva4) {
+                if ($needMendeleeva4Detect) {
                     if ($this->sheetProcessingConfig->forceApplyMendeleeva4ToLessons) {
                         $this->hasMendeleeva4 = true;
+                        $needMendeleeva4Detect = false;
                     }
 
-                    if (!$this->hasMendeleeva4 && $cellValue) {
-                        if (Str::containsAll(Str::lower($cellValue), $this->config->mendeleeva4KeywordsInSheetCell)) {
-                            $this->hasMendeleeva4 = true;
-                        }
+                    if (
+                        $needMendeleeva4Detect &&
+                        $cellValue &&
+                        Str::containsAll(Str::lower($cellValue), $this->config->mendeleeva4KeywordsInCell)
+                    ) {
+                        $this->hasMendeleeva4 = true;
+                        $needMendeleeva4Detect = false;
                     }
+                }
+
+                // Optimization: "Gotta Catch 'Em All" challenge completed
+                if ($dayColFound && $timeColFound && $classHourColFound && !$needMendeleeva4Detect) {
+                    break(2);
                 }
             }
         }
@@ -287,7 +298,7 @@ class Sheet
         $sheetCfg->lastGroupCol = $highestColumn;
         $sheetCfg->lastScheduleRow = $highestRow;
 
-        if ($sheetCfg->classHourLessonColumn === null) {
+        if (!$classHourColFound) {
             $sheetCfg->classHourLessonColumn = false;
         }
     }

@@ -426,8 +426,8 @@ class Lesson
     private function resolveIsMendeleeva4()
     {
         $this->isMendeleeva4 = false;
+
         if ($this->isClassHour()) {
-            $this->isMendeleeva4 = false;
             return;
         }
 

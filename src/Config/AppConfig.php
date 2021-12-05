@@ -17,7 +17,7 @@ class AppConfig
     public bool $enableSystemPages = false;
     public string $visitsStorageFile = ROOT . '/src/storage/visits.csv';
 
-    public int $maxFileSize = 512; // in kilobytes
+    public int $maxFileSize = 256; // in kilobytes
     public int $minFileSize = 25; // in kilobytes
     public array $allowedMimes = [
         'application/vnd.ms-excel', // xls
@@ -44,7 +44,7 @@ class AppConfig
     public array $timeWords = ['часы', 'пара'];
     public array $mendeleeva4HouseCellColors = ['000000'];
     public string $mendeleeva4KeywordInFilename = 'менделеева';
-    public array $mendeleeva4KeywordsInSheetCell = ['менделеева', '4'];
+    public array $mendeleeva4KeywordsInCell = ['менделеева', '4'];
     public string $classHourCellKeyword = 'классный час';
 
     protected function __construct()
