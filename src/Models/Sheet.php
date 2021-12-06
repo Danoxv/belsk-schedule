@@ -223,7 +223,7 @@ class Sheet
      */
     private function init()
     {
-        $this->title = trim(Security::sanitizeString($this->worksheet->getTitle()));
+        $this->title = Security::sanitizeString($this->worksheet->getTitle(), true);
 
         $this->resolveId();
 
