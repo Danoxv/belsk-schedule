@@ -115,13 +115,13 @@ class Helpers
 
         foreach ($romanNumberMap as $roman => $number){
             //divide to get  matches
-            $matches = intval($num / $number);
+            $matches = (int)($num / $number);
 
             //assign the roman char * $matches
             $res .= str_repeat($roman, $matches);
 
             //substract from the number
-            $num = $num % $number;
+            $num %= $number;
         }
 
         return $res;
@@ -204,9 +204,9 @@ class Helpers
      */
     public static function formatBytes(int $size)
     {
-        static $unit=array('b','KB','MB','GB','TB','PB');
+        static $unit = ['b','KB','MB','GB','TB','PB'];
 
-        return @round($size/pow(1024,($i=floor(log($size,1024)))),2).' '.$unit[$i];
+        return @round($size/(1024 ** ($i = floor(log($size, 1024)))),2).' '.$unit[$i];
     }
 
     public static function goToLocation(string $location)

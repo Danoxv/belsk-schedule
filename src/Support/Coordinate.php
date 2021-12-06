@@ -13,11 +13,14 @@ class Coordinate extends \PhpOffice\PhpSpreadsheet\Cell\Coordinate
     /**
      * @param string $column
      * @return string|null
-     * @throws Exception
      */
     public static function nextColumn(string $column): ?string
     {
-        $nextColumn = self::stringFromColumnIndex(self::columnIndexFromString($column) + 1);
+        try {
+            $nextColumn = self::stringFromColumnIndex(self::columnIndexFromString($column) + 1);
+        } catch (Exception $e) {
+            return null;
+        }
 
         // Column string index can not be longer than 3 characters
         if (Str::length($nextColumn) > self::COL_CHARS_MAXLENGTH) {

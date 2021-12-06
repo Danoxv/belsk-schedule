@@ -65,7 +65,7 @@ class Str extends \Illuminate\Support\Str
             return '';
         }
 
-        return Str::substr($str, -1);
+        return self::substr($str, -1);
     }
 
     /**
@@ -89,13 +89,13 @@ class Str extends \Illuminate\Support\Str
      */
     public static function insertBefore(string $search, string $value, string $subject): string
     {
-        $pos = Str::rpos($subject, $search);
+        $pos = self::rpos($subject, $search);
 
         if ($pos === false) {
             return $subject;
         }
 
-        return Str::substrReplace($subject, $value, $pos, 0);
+        return self::substrReplace($subject, $value, $pos, 0);
     }
 
     /**
@@ -112,8 +112,8 @@ class Str extends \Illuminate\Support\Str
      */
     public static function substrReplace(string $string, string $replacement, int $start, int $length = 1)
     {
-        $startString = Str::substr($string, 0, $start);
-        $endString = Str::substr($string, $start + $length, Str::length($string));
+        $startString = self::substr($string, 0, $start);
+        $endString = self::substr($string, $start + $length, self::length($string));
 
         return $startString . $replacement . $endString;
     }
@@ -127,9 +127,9 @@ class Str extends \Illuminate\Support\Str
      */
     public static function removePrefix(string $string, string $prefix): string
     {
-        $prefixLen = Str::length($prefix);
-        if (Str::substr($string, 0, $prefixLen) === $prefix) {
-            $string = Str::substr($string, $prefixLen);
+        $prefixLen = self::length($prefix);
+        if (self::substr($string, 0, $prefixLen) === $prefix) {
+            $string = self::substr($string, $prefixLen);
         }
 
         return $string;
@@ -145,7 +145,7 @@ class Str extends \Illuminate\Support\Str
         $max = 0;
 
         $current = 0;
-        foreach(Str::split($string) as $val){
+        foreach(self::split($string) as $val){
             if($val === $char) {
                 $current++;
                 if($current > $max){
@@ -167,5 +167,18 @@ class Str extends \Illuminate\Support\Str
     public static function split(string $string, int $length = 1)
     {
         return mb_str_split($string, $length, self::UNICODE);
+    }
+
+    /**
+     * @param string $title
+     * @param string $separator
+     * @param string $language
+     * @return string
+     */
+    public static function slug($title, $separator = '-', $language = 'en')
+    {
+        return trim(
+            parent::slug($title, $separator, $language)
+        );
     }
 }

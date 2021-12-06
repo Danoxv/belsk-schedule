@@ -385,10 +385,7 @@ class Lesson
     {
         $sheet = $this->pair->getSheet();
 
-        $cell = new Cell(
-            $this->pair->getGroup()->getColumn() . $this->row,
-            $sheet
-        );
+        $cell = $sheet->getCell($this->pair->getGroup()->getColumn() . $this->row);
         $cell->process();
 
         if (!$sheet->hasClassHourLessonColumn()) {
@@ -400,10 +397,7 @@ class Lesson
         $isClassHour = null;
 
         if ($cell->isEmpty()) {
-            $possibleClassHourCell = new Cell(
-                $sheet->getClassHourLessonColumn() . $this->row,
-                $sheet
-            );
+            $possibleClassHourCell = $sheet->getCell($sheet->getClassHourLessonColumn() . $this->row);
 
             if (self::isClassHourLesson($possibleClassHourCell->getValue())) {
                 $isClassHour = true;

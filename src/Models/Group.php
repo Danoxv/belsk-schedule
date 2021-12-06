@@ -35,7 +35,7 @@ class Group
         $timeCol = $this->sheet->getTimeColumn();
         foreach ($rows as $row) {
             $pairTimeCellCoord = $timeCol . $row;
-            $pairTimeCell = new Cell($pairTimeCellCoord, $this->getSheet());
+            $pairTimeCell = $this->getSheet()->getCell($pairTimeCellCoord);
 
             $pair = new Pair($pairTimeCell, $this);
 

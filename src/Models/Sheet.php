@@ -75,12 +75,21 @@ class Sheet
 
     /**
      * @param string $coordinate
+     * @return Cell
+     */
+    public function getCell(string $coordinate)
+    {
+        return new Cell($coordinate, $this);
+    }
+
+    /**
+     * @param string $coordinate
      * @param bool $rawValue
      * @return string
      */
     public function getCellValue(string $coordinate, bool $rawValue = false): string
     {
-        return (new Cell($coordinate, $this))->getValue($rawValue);
+        return $this->getCell($coordinate)->getValue($rawValue);
     }
 
     /**
@@ -230,42 +239,41 @@ class Sheet
 
         $sheetCfg = &$this->sheetConfig;
 
+        $sheetCfg->lastGroupCol = $highestColumn;
+        $sheetCfg->lastScheduleRow = $highestRow;
+
         $dayColFound = $timeColFound = $classHourColFound = false;
         $needMendeleeva4Detect = $this->sheetProcessingConfig->detectMendeleeva4;
 
         foreach ($columns as $column) {
             foreach ($rows as $row) {
-                $coordinate = $column.$row;
-
-                $cellValue = $this->getCellValue($coordinate);
+                $cellValue = $this->getCellValue($column.$row);
 
                 /*
                  * Resolve Excel config
                  */
 
-                if (!$sheetCfg->isProcessable()) {
-                    $cleanCellValue = '';
-                    if (!$dayColFound || !$timeColFound) {
-                        $cleanCellValue = Str::lower(Str::replaceManySpacesWithOne($cellValue));
-                    }
+                $cleanCellValue = '';
+                if (!$dayColFound || !$timeColFound) {
+                    $cleanCellValue = Str::lower(Str::replaceManySpacesWithOne($cellValue));
+                }
 
-                    if (!$dayColFound && in_array($cleanCellValue, $this->config->dayWords, true)) {
-                        $dayColFound                = true;
-                        $sheetCfg->dayCol           = $column;
+                if (!$dayColFound && in_array($cleanCellValue, $this->config->dayWords, true)) {
+                    $dayColFound                = true;
+                    $sheetCfg->dayCol           = $column;
 
-                        $sheetCfg->groupNamesRow    = $row;
-                        $sheetCfg->firstScheduleRow = Coordinate::nextRow($sheetCfg->groupNamesRow);
-                    } elseif (!$timeColFound && in_array($cleanCellValue, $this->config->timeWords, true)) {
-                        $timeColFound               = true;
-                        $sheetCfg->timeCol          = $column;
-                        $sheetCfg->firstGroupCol    = Coordinate::nextColumn($sheetCfg->timeCol);
+                    $sheetCfg->groupNamesRow    = $row;
+                    $sheetCfg->firstScheduleRow = Coordinate::nextRow($sheetCfg->groupNamesRow);
+                } elseif (!$timeColFound && in_array($cleanCellValue, $this->config->timeWords, true)) {
+                    $timeColFound               = true;
+                    $sheetCfg->timeCol          = $column;
+                    $sheetCfg->firstGroupCol    = Coordinate::nextColumn($sheetCfg->timeCol);
 
-                        $sheetCfg->groupNamesRow    = $row;
-                        $sheetCfg->firstScheduleRow = Coordinate::nextRow($sheetCfg->groupNamesRow);
-                    } else if (!$classHourColFound && Lesson::isClassHourLesson($cellValue)) {
-                        $classHourColFound                  = true;
-                        $sheetCfg->classHourLessonColumn    = $column;
-                    }
+                    $sheetCfg->groupNamesRow    = $row;
+                    $sheetCfg->firstScheduleRow = Coordinate::nextRow($sheetCfg->groupNamesRow);
+                } else if (!$classHourColFound && Lesson::isClassHourLesson($cellValue)) {
+                    $classHourColFound                  = true;
+                    $sheetCfg->classHourLessonColumn    = $column;
                 }
 
                 /*
@@ -294,9 +302,6 @@ class Sheet
                 }
             }
         }
-
-        $sheetCfg->lastGroupCol = $highestColumn;
-        $sheetCfg->lastScheduleRow = $highestRow;
 
         if (!$classHourColFound) {
             $sheetCfg->classHourLessonColumn = false;

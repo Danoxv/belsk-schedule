@@ -25,9 +25,9 @@ class Cell
 
     /**
      * @param string $coordinate
-     * @param $sheet
+     * @param Sheet $sheet
      */
-    public function __construct(string $coordinate, $sheet)
+    public function __construct(string $coordinate, Sheet $sheet)
     {
         $this->sheet = $sheet;
 
