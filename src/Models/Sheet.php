@@ -3,6 +3,7 @@
 namespace Src\Models;
 
 use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Reader\Exception;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use Src\Config\AppConfig;
@@ -52,7 +53,7 @@ class Sheet
      * @param string $filePath
      * @param SheetProcessingConfig $sheetProcessingConfig
      * @return Spreadsheet
-     * @throws \PhpOffice\PhpSpreadsheet\Reader\Exception
+     * @throws Exception
      */
     public static function createSpreadsheet(string $filePath, SheetProcessingConfig $sheetProcessingConfig): Spreadsheet
     {
