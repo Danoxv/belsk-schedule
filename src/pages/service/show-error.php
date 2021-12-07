@@ -1,8 +1,8 @@
 <?php
 
 use Src\Config\AppConfig;
-use Src\Support\Str;
 use Src\Exceptions\TerminateException;
+use Src\Support\Str;
 
 /** @var TerminateException $exception */
 $message = $exception->getMessage();

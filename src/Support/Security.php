@@ -10,7 +10,7 @@ class Security
      *
      * Source: @link https://www.oreilly.com/library/view/learning-php-mysql/9781491979075/
      *
-     * @param $var
+     * @param mixed $var
      * @param bool $applyTrim
      * @return string
      */
@@ -51,7 +51,7 @@ class Security
      * @param array $array Array to walk while sanitizing contents.
      * @return array Sanitized $array.
      */
-    public static function sanitizeArray(array $array)
+    public static function sanitizeArray(array $array): array
     {
         foreach ($array as $k => $v) {
             if (is_array($v)) {

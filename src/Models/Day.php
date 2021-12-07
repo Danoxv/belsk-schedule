@@ -1,18 +1,18 @@
 <?php
 
-namespace Src\Enums;
+namespace Src\Models;
 
 use Src\Support\Str;
 
 class Day
 {
-    const MONDAY    = 'понедельник';
-    const TUESDAY   = 'вторник';
-    const WEDNESDAY = 'среда';
-    const THURSDAY  = 'четверг';
-    const FRIDAY    = 'пятница';
-    const SATURDAY  = 'суббота';
-    const SUNDAY    = 'воскресенье';
+    private const MONDAY    = 'понедельник';
+    private const TUESDAY   = 'вторник';
+    private const WEDNESDAY = 'среда';
+    private const THURSDAY  = 'четверг';
+    private const FRIDAY    = 'пятница';
+    private const SATURDAY  = 'суббота';
+    private const SUNDAY    = 'воскресенье';
 
     /**
      * @return string[]
@@ -34,7 +34,7 @@ class Day
      * @param string $day
      * @return string
      */
-    public static function normalize(string $day)
+    public static function normalize(string $day): string
     {
         return Str::lower($day);
     }

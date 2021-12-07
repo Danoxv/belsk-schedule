@@ -4,15 +4,15 @@ use Src\Config\AppConfig;
 
 $_routes = [
     /*
-     * Service pages
-     */
-    '/terms-and-conditions' => 'pages/service/terms-and-conditions.php',
-
-    /*
      * Schedule viewer pages
      */
     '/'                     => 'pages/schedule-viewer/select-schedule-file.php',
     '/view-schedule-file'   => 'pages/schedule-viewer/view-schedule-file.php',
+
+    /*
+     * Service pages
+     */
+    '/terms-and-conditions' => 'pages/service/terms-and-conditions.php',
 ];
 
 if (AppConfig::getInstance()->enableSystemPages) {

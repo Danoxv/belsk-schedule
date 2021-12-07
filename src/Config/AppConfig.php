@@ -2,6 +2,8 @@
 
 namespace Src\Config;
 
+use RuntimeException;
+
 class AppConfig
 {
     public array $version = [
@@ -15,7 +17,7 @@ class AppConfig
      * System
      */
     public bool $enableSystemPages = false;
-    public string $visitsStorageFile = ROOT . '/src/storage/visits.csv';
+    public string $visitsStorageFile = ROOT . '/storage/visits.csv';
 
     public int $maxFileSize = 256; // in kilobytes
     public int $minFileSize = 25; // in kilobytes
@@ -56,13 +58,16 @@ class AppConfig
      * Singleton stuff
      */
 
-    private static $instances = [];
+    private static array $instances = [];
 
     protected function __clone() { }
 
-    public function __wakeup()
+    /**
+     * @throws RuntimeException
+     */
+    public function __wakeup(): void
     {
-        throw new \Exception('Cannot unserialize a singleton.');
+        throw new RuntimeException('Cannot unserialize a singleton.');
     }
 
     public static function getInstance(): self

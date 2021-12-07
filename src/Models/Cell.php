@@ -2,6 +2,7 @@
 
 namespace Src\Models;
 
+use PhpOffice\PhpSpreadsheet\Exception;
 use Src\Support\Coordinate;
 use PhpOffice\PhpSpreadsheet\Cell\Cell as PhpSpreadsheetCell;
 use Src\Support\Security;
@@ -34,7 +35,10 @@ class Cell
         $this->init($coordinate);
     }
 
-    private function init(string $coordinate)
+    /**
+     * @param string $coordinate
+     */
+    private function init(string $coordinate): void
     {
         $this->setCoordinate($coordinate);
         $this->cell     = $this->sheet->getWorksheet()->getCell($this->coordinate);
@@ -47,7 +51,7 @@ class Cell
      * WARNING: High-cost operations was performed,
      * call processing only in necessary cases.
      */
-    public function process()
+    public function process(): void
     {
         $this->resolveIsInvisible();
 
@@ -65,17 +69,24 @@ class Cell
     /**
      * @return Sheet
      */
-    public function getSheet()
+    public function getSheet(): Sheet
     {
         return $this->sheet;
     }
 
+    /**
+     * @return bool
+     */
     public function isInvisible(): bool
     {
         return $this->isInvisible;
     }
 
-    private function resolveIsInvisible()
+    /**
+     * @return void
+     * @throws Exception
+     */
+    private function resolveIsInvisible(): void
     {
         // Using a lookup cache adds a slight memory overhead, but boosts speed
         // caching using a static within the method is faster than a class static,
@@ -134,7 +145,7 @@ class Cell
         return $this->value;
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         return $this->getValue();
     }
@@ -142,7 +153,7 @@ class Cell
     /**
      * @return string
      */
-    public function getColumn()
+    public function getColumn(): string
     {
         return $this->column;
     }
@@ -150,7 +161,7 @@ class Cell
     /**
      * @return int
      */
-    public function getRow()
+    public function getRow(): int
     {
         return $this->row;
     }
@@ -168,7 +179,7 @@ class Cell
         return $this->cell->getStyle()->getFill()->getEndColor()->getRGB();
     }
 
-    private function setCoordinate(string $coordinate)
+    private function setCoordinate(string $coordinate): void
     {
         $this->coordinate = $coordinate;
 

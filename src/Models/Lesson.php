@@ -14,16 +14,15 @@ class Lesson
     private const PARSE_TEACHERS_AUDITORIES_REGEX =
         '#((?<teachersSurnames>\p{Lu}\p{Ll}+)\s+(?<teachersInitials>\p{Lu}\.\s*\p{Lu}\.)\s+(?<auditory>\S+))|((?<teacher>\*+)\s*(?<auditory2>\S+))#u';
 
-    public const FIRST_WEEK = 1;
-    public const SECOND_WEEK = 2;
-    public const FIRST_AND_SECOND_WEEK = 12;
+    public const FIRST_WEEK = '1';
+    public const SECOND_WEEK = '2';
+    public const FIRST_AND_SECOND_WEEK = '1 and 2';
 
     private Pair $pair;
     private int $row;
     private Cell $cell;
 
-    /** @var int */
-    private int $weekPosition;
+    private string $weekPosition;
     private bool $isEmpty;
     private bool $isClassHour;
     private bool $isMendeleeva4;
@@ -43,10 +42,10 @@ class Lesson
     }
 
     /**
-     * @param int $weekPosition
+     * @param string $weekPosition
      * @return Lesson
      */
-    public function setWeekPosition(int $weekPosition): self
+    public function setWeekPosition(string $weekPosition): self
     {
         $this->weekPosition = $weekPosition;
 
@@ -64,7 +63,11 @@ class Lesson
         return $this;
     }
 
-    private function setTeachersAuditories(Collection $teachersAuditories)
+    /**
+     * @param Collection $teachersAuditories
+     * @return $this
+     */
+    private function setTeachersAuditories(Collection $teachersAuditories): self
     {
         $this->teachersAuditories = $teachersAuditories;
 
@@ -75,7 +78,7 @@ class Lesson
      * @param bool $isValid
      * @return $this
      */
-    public function setIsValid(bool $isValid)
+    public function setIsValid(bool $isValid): self
     {
         $this->isValid = $isValid;
 
@@ -208,7 +211,7 @@ class Lesson
      * @param Lesson $lesson1
      * @param Lesson $lesson2
      */
-    public static function processResolving(Lesson $lesson1, Lesson $lesson2)
+    public static function processResolving(Lesson $lesson1, Lesson $lesson2): void
     {
         if ($lesson1->isValid()) {
             /*
@@ -361,7 +364,7 @@ class Lesson
         return Str::ucfirst(Str::lower($lesson));
     }
 
-    private function init()
+    private function init(): void
     {
         $this->resolveCellAndIsClassHour();
 
@@ -381,7 +384,7 @@ class Lesson
      * TODO Possible optimization:
      * execute $cell->process() only once
      */
-    private function resolveCellAndIsClassHour()
+    private function resolveCellAndIsClassHour(): void
     {
         $sheet = $this->pair->getSheet();
 
@@ -417,7 +420,7 @@ class Lesson
         $this->isClassHour = $isClassHour;
     }
 
-    private function resolveIsMendeleeva4()
+    private function resolveIsMendeleeva4(): void
     {
         $this->isMendeleeva4 = false;
 

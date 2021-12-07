@@ -9,7 +9,9 @@ use Src\Support\Security;
 
 $contentTemplate =
 '<?php
-
+// Auto-generated file by src/scripts/group-list/generate.php
+// Regenerate with:
+// $ php public/index.php group-list/generate.php 
 return {{groupNames}};
 ';
 

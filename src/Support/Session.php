@@ -15,14 +15,14 @@ class Session
      * @param string $name
      * @param mixed $value
      */
-    public function set(string $name, $value)
+    public function set(string $name, $value): void
     {
         $_SESSION[$name] = $value;
     }
 
     /**
      * @param string $name
-     * @param null $default
+     * @param mixed $default
      * @return mixed|null
      */
     public function get(string $name, $default = null)
@@ -33,7 +33,7 @@ class Session
     /**
      * @param string $name
      */
-    public function del(string $name)
+    public function del(string $name): void
     {
         unset($_SESSION[$name]);
     }
@@ -50,7 +50,7 @@ class Session
     /**
      * Destroy all session data.
      */
-    public function destroy()
+    public function destroy(): void
     {
         $_SESSION = [];
         setcookie(session_name(), '', time() - 2592000, '/'); // subtract 30 days

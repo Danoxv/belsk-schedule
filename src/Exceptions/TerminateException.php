@@ -6,9 +6,9 @@ use Throwable;
 
 class TerminateException extends \RuntimeException
 {
-    const TYPE_INFO = 'info';
-    const TYPE_WARNING = 'warning';
-    const TYPE_DANGER = 'danger';
+    public const TYPE_INFO      = 'info';
+    public const TYPE_WARNING   = 'warning';
+    public const TYPE_DANGER    = 'danger';
 
     private string $type;
 

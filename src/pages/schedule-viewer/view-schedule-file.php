@@ -2,7 +2,8 @@
 
 use Src\Config\AppConfig;
 use Src\Config\SheetProcessingConfig;
-use Src\Enums\Day;
+use Src\Exceptions\TerminateException;
+use Src\Models\Day;
 use Src\Models\Group;
 use Src\Models\Lesson;
 use Src\Models\Pair;
@@ -11,7 +12,6 @@ use Src\Support\Helpers;
 use Src\Support\Security;
 use Src\Support\Session;
 use Src\Support\Str;
-use Src\Exceptions\TerminateException;
 
 /*
  * Take settings from app config and user's input.

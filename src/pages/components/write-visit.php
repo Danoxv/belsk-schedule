@@ -17,7 +17,7 @@ $post = _getFormattedPost();
 
 $visitsStorage = AppConfig::getInstance()->visitsStorageFile;
 
-$fp = fopen($visitsStorage, 'a');
+$fp = fopen($visitsStorage, 'ab');
 fputcsv($fp, [$datetime, $ip, $ua, $uri, $post]);
 fclose($fp);
 

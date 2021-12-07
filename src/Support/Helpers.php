@@ -202,14 +202,14 @@ class Helpers
      * @param int $size
      * @return string
      */
-    public static function formatBytes(int $size)
+    public static function formatBytes(int $size): string
     {
         static $unit = ['b','KB','MB','GB','TB','PB'];
 
         return @round($size/(1024 ** ($i = floor(log($size, 1024)))),2).' '.$unit[$i];
     }
 
-    public static function goToLocation(string $location)
+    public static function goToLocation(string $location): void
     {
         header('Location: '.$location);
         die(0);

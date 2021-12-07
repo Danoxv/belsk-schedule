@@ -78,7 +78,7 @@ class Sheet
      * @param string $coordinate
      * @return Cell
      */
-    public function getCell(string $coordinate)
+    public function getCell(string $coordinate): Cell
     {
         return new Cell($coordinate, $this);
     }
@@ -186,7 +186,10 @@ class Sheet
        return $this->title;
     }
 
-    public function getId()
+    /**
+     * @return string
+     */
+    public function getId(): string
     {
         return $this->id;
     }
@@ -196,6 +199,7 @@ class Sheet
      * columns range.
      *
      * @return array
+     * @throws \PhpOffice\PhpSpreadsheet\Exception
      */
     private function getColumnsRange(): array
     {
@@ -222,7 +226,7 @@ class Sheet
     /**
      * Resolve Excel config, detect "Has Mendeleeva 4 house".
      */
-    private function init()
+    private function init(): void
     {
         $this->title = Security::sanitizeString($this->worksheet->getTitle(), true);
 
@@ -309,7 +313,7 @@ class Sheet
         }
     }
 
-    private function resolveId()
+    private function resolveId(): void
     {
         $id = Str::slug($this->getTitle());
 
@@ -324,7 +328,7 @@ class Sheet
      * Start Sheet processing:
      * recognize and add Groups.
      */
-    private function process()
+    private function process(): void
     {
         if (!$this->isProcessable()) {
             return;

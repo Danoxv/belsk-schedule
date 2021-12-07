@@ -29,7 +29,7 @@ class Str extends \Illuminate\Support\Str
      * @param string $placeholder
      * @return string
      */
-    public static function empty(string $value, string $placeholder = '-')
+    public static function empty(string $value, string $placeholder = '-'): string
     {
         return empty(trim($value)) ? $placeholder : $value;
     }
@@ -110,7 +110,7 @@ class Str extends \Illuminate\Support\Str
      * @param int $length
      * @return string
      */
-    public static function substrReplace(string $string, string $replacement, int $start, int $length = 1)
+    public static function substrReplace(string $string, string $replacement, int $start, int $length = 1): string
     {
         $startString = self::substr($string, 0, $start);
         $endString = self::substr($string, $start + $length, self::length($string));
@@ -175,7 +175,7 @@ class Str extends \Illuminate\Support\Str
      * @param string $language
      * @return string
      */
-    public static function slug($title, $separator = '-', $language = 'en')
+    public static function slug($title, $separator = '-', $language = 'en'): string
     {
         return trim(
             parent::slug($title, $separator, $language)

@@ -2,7 +2,6 @@
 
 namespace Src\Models;
 
-use Src\Enums\Day;
 use Src\Support\Collection;
 use Src\Support\Helpers;
 
@@ -30,7 +29,7 @@ class Group
      *
      * @param int[] $rows
      */
-    public function process(array $rows)
+    public function process(array $rows): void
     {
         $timeCol = $this->sheet->getTimeColumn();
         foreach ($rows as $row) {
@@ -110,7 +109,7 @@ class Group
         return $this->isValid;
     }
 
-    private function init()
+    private function init(): void
     {
         // Resolve name
         $this->name = $this->sheet->getCellValue(

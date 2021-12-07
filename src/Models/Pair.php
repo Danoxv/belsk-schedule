@@ -2,7 +2,6 @@
 
 namespace Src\Models;
 
-use Src\Enums\Day;
 use Src\Support\Collection;
 use Src\Support\Coordinate;
 use Src\Support\Str;
@@ -81,7 +80,7 @@ class Pair
         return $this->number;
     }
 
-    public function setNumber(string $number)
+    public function setNumber(string $number): void
     {
         $this->number = $number;
     }
@@ -113,7 +112,7 @@ class Pair
     /**
      * Find and add Lessons.
      */
-    private function process()
+    private function process(): void
     {
         $row1 = $this->timeCell->getRow();
         $lesson1 = new Lesson($this, $row1);
@@ -153,7 +152,7 @@ class Pair
         }
     }
 
-    private function resolveDay()
+    private function resolveDay(): void
     {
         $dayCol = $this->getSheet()->getDayCol();
         $dayRow = $this->timeCell->getRow();
@@ -187,7 +186,7 @@ class Pair
         }
     }
 
-    private function resolveTimeAndNumber()
+    private function resolveTimeAndNumber(): void
     {
         $this->time = $this->number = '';
 

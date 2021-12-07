@@ -7,7 +7,7 @@ $config = AppConfig::getInstance();
 
 $visitsStorage = $config->visitsStorageFile;
 
-@$handle = fopen($visitsStorage, 'r');
+@$handle = fopen($visitsStorage, 'rb');
 if ($handle === false) {
     throw new TerminateException('Отсутствует лог файлов', TerminateException::TYPE_INFO);
 }

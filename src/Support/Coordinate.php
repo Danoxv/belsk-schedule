@@ -8,7 +8,6 @@ class Coordinate extends \PhpOffice\PhpSpreadsheet\Cell\Coordinate
 {
     public const FIRST_COL = 'A';
     private const LAST_COL = 'ZZZ';
-    private const COL_CHARS_MAXLENGTH = 3;
 
     public const FIRST_ROW = 1;
 
@@ -26,7 +25,7 @@ class Coordinate extends \PhpOffice\PhpSpreadsheet\Cell\Coordinate
         $nextColumn = self::stringFromColumnIndex(self::columnIndexFromString($column) + 1);
 
         // Column string index can not be longer than 3 characters
-        if (Str::length($nextColumn) > self::COL_CHARS_MAXLENGTH) {
+        if (Str::length($nextColumn) > Str::length(self::LAST_COL)) {
             return null;
         }
 
@@ -69,8 +68,8 @@ class Coordinate extends \PhpOffice\PhpSpreadsheet\Cell\Coordinate
 
         $prevRow = $row - 1;
 
-        if ($prevRow < 1) {
-            throw new Exception('Row can not be less than 1');
+        if ($prevRow < self::FIRST_ROW) {
+            throw new Exception('Row can not be less than ' . self::FIRST_ROW);
         }
 
         return $prevRow;
@@ -84,17 +83,17 @@ class Coordinate extends \PhpOffice\PhpSpreadsheet\Cell\Coordinate
      */
     public static function generateColumnsRange(string $start, string $end): array
     {
-        $letters = [];
+        $columns = [];
 
         $startIndex = self::columnIndexFromString($start);
         $endIndex = self::columnIndexFromString($end);
 
         do {
-            $letters[] = self::stringFromColumnIndex($startIndex);
+            $columns[] = self::stringFromColumnIndex($startIndex);
             $startIndex++;
         } while ($startIndex <= $endIndex);
 
-        return $letters;
+        return $columns;
     }
 
     /**
