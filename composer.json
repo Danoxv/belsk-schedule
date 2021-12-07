@@ -1,6 +1,6 @@
 {
     "require": {
-        "php": ">=7.4",
+        "php": "^7.4",
         "ext-curl": "*",
         "ext-dom": "*",
         "phpoffice/phpspreadsheet": "^1.18",
@@ -14,5 +14,9 @@
     "require-dev": {
         "roave/security-advisories": "dev-latest",
         "symfony/var-dumper": "^5.3"
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "apcu-autoloader": true
     }
 }
