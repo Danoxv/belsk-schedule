@@ -145,12 +145,10 @@ class Str extends \Illuminate\Support\Str
         $max = 0;
 
         $current = 0;
-        foreach(self::split($string) as $val){
+        foreach(self::split($string) as $val) {
             if($val === $char) {
                 $current++;
-                if($current > $max){
-                    $max = $current;
-                }
+                $max = max($current, $max);
             } else {
                 $current = 0;
             }
