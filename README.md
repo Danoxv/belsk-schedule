@@ -6,7 +6,7 @@
 
 ## Демо
 * http://d66237p1.beget.tech/
-* http://school-schedule.byethost7.com/
+* http://belsk.pp.ua (алиас для http://school-schedule.byethost7.com/)
 
 ## Требования
 * PHP >= 7.4
