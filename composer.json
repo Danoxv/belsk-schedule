@@ -16,7 +16,6 @@
         "symfony/var-dumper": "^5.3"
     },
     "config": {
-        "optimize-autoloader": true,
-        "apcu-autoloader": true
+        "classmap-authoritative": true
     }
 }
