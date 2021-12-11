@@ -174,6 +174,9 @@ class Cell
         return $this->isEmpty;
     }
 
+    /**
+     * @return string
+     */
     public function getEndColorRgb(): string
     {
         return $this->cell->getStyle()->getFill()->getEndColor()->getRGB();
