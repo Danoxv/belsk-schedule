@@ -22,19 +22,7 @@ class Coordinate extends \PhpOffice\PhpSpreadsheet\Cell\Coordinate
             return null;
         }
 
-        $nextColumn = self::stringFromColumnIndex(self::columnIndexFromString($column) + 1);
-
-        static $lastColLength = null;
-        if ($lastColLength === null) {
-            $lastColLength = Str::length(self::LAST_COL);
-        }
-
-        // Column string index can not be longer than 3 characters
-        if (Str::length($nextColumn) > $lastColLength) {
-            return null;
-        }
-
-        return $nextColumn;
+        return self::stringFromColumnIndex(self::columnIndexFromString($column) + 1);
     }
 
     /**

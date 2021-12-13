@@ -4,7 +4,7 @@ namespace Src\Support;
 
 class Str extends \Illuminate\Support\Str
 {
-    private const UNICODE = 'UTF-8';
+    private const UTF_8 = 'UTF-8';
 
     /**
      * @param string $string
@@ -42,7 +42,7 @@ class Str extends \Illuminate\Support\Str
      */
     public static function rpos(string $haystack, string $needle, int $offset = 0)
     {
-        return mb_strrpos($haystack, $needle, $offset, self::UNICODE);
+        return mb_strrpos($haystack, $needle, $offset, self::UTF_8);
     }
 
     /**
@@ -164,7 +164,7 @@ class Str extends \Illuminate\Support\Str
      */
     public static function split(string $string, int $length = 1)
     {
-        return mb_str_split($string, $length, self::UNICODE);
+        return mb_str_split($string, $length, self::UTF_8);
     }
 
     /**
@@ -178,5 +178,16 @@ class Str extends \Illuminate\Support\Str
         return trim(
             parent::slug($title, $separator, $language)
         );
+    }
+
+    /**
+     * @param string $value
+     * @param int $limit
+     * @param string $end
+     * @return string
+     */
+    public static function limit($value, $limit = 255, $end = ''): string
+    {
+        return parent::limit($value, $limit, $end);
     }
 }

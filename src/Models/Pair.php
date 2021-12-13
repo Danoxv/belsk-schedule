@@ -147,7 +147,7 @@ class Pair
             $lesson2->setWeekPosition(Lesson::SECOND_WEEK);
             $this->lessons->put($lesson2->getCoordinate(), $lesson2);
         } else {
-            $lesson1->setWeekPosition(Lesson::FIRST_AND_SECOND_WEEK);
+            $lesson1->setWeekPosition(Lesson::BOTH_WEEKS);
             $this->lessons->put($lesson1->getCoordinate(), $lesson1);
         }
     }

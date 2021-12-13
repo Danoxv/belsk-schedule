@@ -2,6 +2,11 @@
 
 namespace Src\Support;
 
+/**
+ * Session helper.
+ *
+ * Source: @url http://code.mu/ru/php/book/oop/class/SessionShell/
+ */
 class Session
 {
     public function __construct()

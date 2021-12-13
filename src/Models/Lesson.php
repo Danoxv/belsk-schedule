@@ -14,9 +14,9 @@ class Lesson
     private const PARSE_TEACHERS_AUDITORIES_REGEX =
         '#((?<teachersSurnames>\p{Lu}\p{Ll}+)\s+(?<teachersInitials>\p{Lu}\.\s*\p{Lu}\.)\s+(?<auditory>\S+))|((?<teacher>\*+)\s*(?<auditory2>\S+))#u';
 
-    public const FIRST_WEEK = '1';
-    public const SECOND_WEEK = '2';
-    public const FIRST_AND_SECOND_WEEK = '1 and 2';
+    public const FIRST_WEEK     = '1st week';
+    public const SECOND_WEEK    = '2nd week';
+    public const BOTH_WEEKS     = 'both weeks';
 
     private Pair $pair;
     private int $row;

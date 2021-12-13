@@ -321,7 +321,9 @@ class Sheet
             $id = $this->worksheet->getHashCode();
         }
 
-        $this->id = $id . '_' . Str::random(4);
+        $id = Str::limit($id);
+
+        $this->id = $id . '__' . Str::random(4);
     }
 
     /**
