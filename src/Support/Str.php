@@ -168,19 +168,6 @@ class Str extends \Illuminate\Support\Str
     }
 
     /**
-     * @param string $title
-     * @param string $separator
-     * @param string $language
-     * @return string
-     */
-    public static function slug($title, $separator = '-', $language = 'en'): string
-    {
-        return trim(
-            parent::slug($title, $separator, $language)
-        );
-    }
-
-    /**
      * @param string $value
      * @param int $limit
      * @param string $end
