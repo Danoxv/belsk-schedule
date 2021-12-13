@@ -18,6 +18,8 @@ class Coordinate extends \PhpOffice\PhpSpreadsheet\Cell\Coordinate
      */
     public static function nextColumn(string $column): ?string
     {
+        $column = Str::upper($column);
+
         if ($column === self::LAST_COL) {
             return null;
         }
@@ -32,6 +34,8 @@ class Coordinate extends \PhpOffice\PhpSpreadsheet\Cell\Coordinate
      */
     public static function prevColumn(string $column): ?string
     {
+        $column = Str::upper($column);
+
         if ($column === self::FIRST_COL) {
             return null;
         }
