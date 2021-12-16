@@ -55,7 +55,7 @@ class Helpers
      * @param string $curlError
      * @return ?string
      */
-    public static function httpGet(string $link, &$curlError = '', int $timeout = 3): ?string
+    public static function httpGet(string $link, &$curlError = '', int $timeout = 5): ?string
     {
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $link);
