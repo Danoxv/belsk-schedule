@@ -8,7 +8,7 @@ use Src\Support\Str;
 $message = $exception->getMessage();
 
 if (!$message) {
-    $message = 'Что-то пошло не так.';
+    $message = TerminateException::ABSTRACT_ERROR_MSG;
 }
 
 $message = Str::finish($message, '.');

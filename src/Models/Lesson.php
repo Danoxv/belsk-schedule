@@ -348,15 +348,15 @@ class Lesson
         $maxSpacesCount = Str::maxConsecutiveCharsCount($cellValue, $space);
 
         if ($maxSpacesCount > 1) {
-            $uniqueChar = '|';
+            $uniqueChar = Str::getNotExistingChar($cellValue);
 
-            // К Л А С С Н Ы Й   Ч А С -> К Л А С С Н Ы Й|Ч А С
+            // К Л А С С Н Ы Й   Ч А С -> К Л А С С Н Ы Й!Ч А С
             $lesson = str_replace(str_repeat($space, $maxSpacesCount), $uniqueChar, $lesson);
 
-            // К Л А С С Н Ы Й|Ч А С -> КЛАССНЫЙ|ЧАС
+            // К Л А С С Н Ы Й!Ч А С -> КЛАССНЫЙ!ЧАС
             $lesson = Str::removeSpaces($lesson);
 
-            // КЛАССНЫЙ|ЧАС -> КЛАССНЫЙ ЧАС
+            // КЛАССНЫЙ!ЧАС -> КЛАССНЫЙ ЧАС
             $lesson = str_replace($uniqueChar, $space, $lesson);
         }
 

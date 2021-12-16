@@ -40,6 +40,7 @@ $_requestUri = Src\Support\Helpers::uriWithoutGetPart($_requestUri);
 
 $_routes = require ROOT . '/src/Config/routes.php';
 
+$_errorPagePath = ROOT . '/src/pages/service/show-error.php';
 try {
     if (!isset($_routes[$_requestUri])) {
         throw new Src\Exceptions\TerminateException('Страница не найдена (404)', TerminateException::TYPE_WARNING, 404);
@@ -47,7 +48,10 @@ try {
 
     require_once ROOT . '/src/' . $_routes[$_requestUri];
 } catch (Src\Exceptions\TerminateException $exception) {
-    require ROOT . '/src/pages/service/show-error.php';
+    require $_errorPagePath;
+} catch (Throwable $e) {
+    $exception = Src\Exceptions\TerminateException::fromThrowable($e);
+    require $_errorPagePath;
 }
 
 require_once ROOT . '/src/pages/components/write-visit.php';

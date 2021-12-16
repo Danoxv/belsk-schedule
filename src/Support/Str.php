@@ -177,4 +177,26 @@ class Str extends \Illuminate\Support\Str
     {
         return parent::limit($value, $limit, $end);
     }
+
+    /**
+     * Returns char that string not contains.
+     *
+     * @param string $string
+     * @return string|null
+     */
+    public static function getNotExistingChar(string $string): ?string
+    {
+        // 33 and 126 - ASCII symbol codes ('!' and '~' accordingly)
+        // see https://www.man7.org/linux/man-pages/man7/ascii.7.html
+        for ($ascii = 33; $ascii <= 126; $ascii++) {
+            // Convert ASCII symbol code to char
+            $char = sprintf('%c', $ascii);
+
+            if (!self::contains($string, $char)) {
+                return $char;
+            }
+        }
+
+        return null;
+    }
 }
