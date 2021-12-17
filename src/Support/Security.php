@@ -18,11 +18,13 @@ class Security
     {
         $var = (string) $var;
 
+        $var = htmlentities(strip_tags($var));
+
         if ($applyTrim) {
             $var = trim($var);
         }
 
-        return htmlentities(strip_tags($var));
+        return $var;
     }
 
     /**
@@ -36,10 +38,11 @@ class Security
      *
      * @param string $varName
      * Name of a variable to get.
+     * @return string
      */
     public static function filterInputString(int $type, string $varName): string
     {
-        $input = filter_input($type, $varName, FILTER_SANITIZE_STRING);
+        $input = filter_input($type, $varName);
         return self::sanitizeString($input, true);
     }
 

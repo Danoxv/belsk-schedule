@@ -80,6 +80,9 @@ class Coordinate extends \PhpOffice\PhpSpreadsheet\Cell\Coordinate
      */
     public static function generateColumnsRange(string $start, string $end): array
     {
+        $start = Str::upper($start);
+        $end = Str::upper($end);
+
         $columns = [];
 
         $startIndex = self::columnIndexFromString($start);
@@ -109,6 +112,8 @@ class Coordinate extends \PhpOffice\PhpSpreadsheet\Cell\Coordinate
      */
     public static function explodeCoordinate(string $coordinate): array
     {
+        $coordinate = Str::upper($coordinate);
+
         $col = '';
         $row = 0;
 

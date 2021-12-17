@@ -6,6 +6,7 @@ use PhpOffice\PhpSpreadsheet\Exception;
 use Src\Support\Coordinate;
 use PhpOffice\PhpSpreadsheet\Cell\Cell as PhpSpreadsheetCell;
 use Src\Support\Security;
+use Src\Support\Str;
 
 class Cell
 {
@@ -184,6 +185,8 @@ class Cell
 
     private function setCoordinate(string $coordinate): void
     {
+        $coordinate = Str::upper($coordinate);
+
         $this->coordinate = $coordinate;
 
         [$this->column, $this->row] = Coordinate::explodeCoordinate($this->coordinate);
