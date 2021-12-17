@@ -82,7 +82,9 @@ class Helpers
      */
     public static function sanitizeScheduleLink(string $scheduleLink): string
     {
-        return str_replace(' ', '%20', $scheduleLink); // TODO простой хак, нужен нормальный urlencode
+        // TODO Hacky, need to process other possible replacements.
+        // urlencode / rawurlencode and many others doesn't work
+        return str_replace(' ', '%20', $scheduleLink);
     }
 
     /**
