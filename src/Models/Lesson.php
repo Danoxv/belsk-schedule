@@ -271,11 +271,6 @@ class Lesson
      */
     private static function parse(string $value)
     {
-        $parsed = [
-            'subject' => '',
-            'teachersAuditories' => new Collection(),
-        ];
-
         $value = trim($value);
 
         if (empty($value)) {
@@ -289,6 +284,11 @@ class Lesson
         if (empty($matched)) {
             return false;
         }
+
+        $parsed = [
+            'subject' => '',
+            'teachersAuditories' => new Collection(),
+        ];
 
         /*
          * Resolve subject
@@ -345,10 +345,10 @@ class Lesson
         }
 
         $space = ' ';
-        $maxSpacesCount = Str::maxConsecutiveCharsCount($cellValue, $space);
+        $maxSpacesCount = Str::maxConsecutiveCharsCount($lesson, $space);
 
         if ($maxSpacesCount > 1) {
-            $uniqueChar = Str::getNotExistingChar($cellValue);
+            $uniqueChar = Str::getNotExistingChar($lesson);
 
             // К Л А С С Н Ы Й   Ч А С -> К Л А С С Н Ы Й!Ч А С
             $lesson = str_replace(str_repeat($space, $maxSpacesCount), $uniqueChar, $lesson);
