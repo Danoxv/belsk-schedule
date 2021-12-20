@@ -185,10 +185,8 @@ class Cell
 
     private function setCoordinate(string $coordinate): void
     {
-        $coordinate = Str::upper($coordinate);
-
-        $this->coordinate = $coordinate;
-
-        [$this->column, $this->row] = Coordinate::explodeCoordinate($this->coordinate);
+        [$this->column, $this->row] = Coordinate::explodeCoordinate($coordinate);
+        
+        $this->coordinate = $this->column . $this->row;
     }
 }
