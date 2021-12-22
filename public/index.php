@@ -63,6 +63,6 @@ $_finish = round(microtime(true) - $_start, 2);
 
 echo "<div class='card'>
   <div class='card-body'>
-    <code>v{$_config->version['number']} {$_config->version['stability']} / $_finish sec / $_memoryUsage</code>
+    <code>v{$_config->version['number']} {$_config->version['stability']} | $_finish sec | $_memoryUsage | <a href='https://github.com/NewEXE/belsk-schedule'>GitHub</a></code>
   </div>
 </div>";
