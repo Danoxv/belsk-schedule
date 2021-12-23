@@ -198,34 +198,39 @@ class Pair
         $value = $this->timeCell->getValue();
         $value = Str::replaceManySpacesWithOne($value);
 
-        if (empty($value)) {
+        if ($value === '') {
             return;
         }
 
-        if (Helpers::isRomanNumber($value, true)) {
-            $this->number = Str::upper($value);
+        if (!Str::contains($value, ' ')) {
+            if (Helpers::isRomanNumber($value)) {
+                $this->number = $this->formatNumber($value);
+            } else {
+                $this->time = $this->formatTime($value);
+            }
+
             return;
         }
 
-        $parts = explode(' ', $value);
+        $number = Str::before($value, ' ');
+        $time = Str::after($value, ' ');
 
-        foreach ($parts as &$part) {
-            $part = trim($part);
-            $part = Str::replaceManySpacesWithOne($part);
+        if (Helpers::isRomanNumber($number)) {
+            $this->number = $this->formatNumber($number);
         }
 
-        if (!isset($parts[1])) {
-            $this->time = $this->formatTime($parts[0] ?? '');
-            $this->number = '';
-            return;
-        }
+        $this->time = $this->formatTime($time);
+    }
 
-        $this->time = $this->formatTime($parts[1] ?? '');
-        $this->number = $parts[0] ?? '';
+    private function formatNumber(string $number): string
+    {
+        return Str::upper($number);
     }
 
     private function formatTime(string $time): string
     {
+        $time = Str::removeSpaces($time);
+
         $time = str_replace([
             '.',
             '-'
@@ -233,8 +238,6 @@ class Pair
             ':',
             ' - '
         ], $time);
-
-        $time = Str::replaceManySpacesWithOne($time);
 
         return trim($time);
     }

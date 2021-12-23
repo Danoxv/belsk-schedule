@@ -134,16 +134,16 @@ class Helpers
      * @param bool $caseInsensitive
      * @return bool
      */
-    public static function isRomanNumber(string $string, bool $caseInsensitive = false): bool
+    public static function isRomanNumber(string $string, bool $caseInsensitive = true): bool
     {
         if ($string === '') {
             return false;
         }
 
-        $regex = '/^M*(C[MD]|D?C{0,3})(X[CL]|L?X{0,3})(I[XV]|V?I{0,3})$/';
+        $regex = '/^M*(C[MD]|D?C{0,3})(X[CL]|L?X{0,3})(I[XV]|V?I{0,3})$/i';
 
-        if ($caseInsensitive) {
-            $regex .= 'i';
+        if (!$caseInsensitive) {
+            $regex = rtrim($regex, 'i');
         }
 
         return preg_match($regex, $string) > 0;
