@@ -25,16 +25,6 @@ class Str extends \Illuminate\Support\Str
     }
 
     /**
-     * @param string $value
-     * @param string $placeholder
-     * @return string
-     */
-    public static function empty(string $value, string $placeholder = '-'): string
-    {
-        return empty(trim($value)) ? $placeholder : $value;
-    }
-
-    /**
      * @param string $haystack
      * @param string $needle
      * @param int $offset

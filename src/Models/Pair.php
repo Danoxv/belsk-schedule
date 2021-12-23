@@ -4,6 +4,7 @@ namespace Src\Models;
 
 use Src\Support\Collection;
 use Src\Support\Coordinate;
+use Src\Support\Helpers;
 use Src\Support\Str;
 
 class Pair
@@ -198,6 +199,11 @@ class Pair
         $value = Str::replaceManySpacesWithOne($value);
 
         if (empty($value)) {
+            return;
+        }
+
+        if (Helpers::isRomanNumber($value)) {
+            $this->number = Str::upper($value);
             return;
         }
 

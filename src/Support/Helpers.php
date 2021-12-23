@@ -130,6 +130,19 @@ class Helpers
     }
 
     /**
+     * @param string $string
+     * @return bool
+     */
+    public static function isRomanNumber(string $string): bool
+    {
+        if ($string === '') {
+            return false;
+        }
+
+        return preg_match('/^M*(C[MD]|D?C{0,3})(X[CL]|L?X{0,3})(I[XV]|V?I{0,3})$/i', $string) > 0;
+    }
+
+    /**
      * @param string $curlError
      * @return array
      */
