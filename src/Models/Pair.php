@@ -202,7 +202,7 @@ class Pair
             return;
         }
 
-        if (Helpers::isRomanNumber($value)) {
+        if (Helpers::isRomanNumber($value, true)) {
             $this->number = Str::upper($value);
             return;
         }

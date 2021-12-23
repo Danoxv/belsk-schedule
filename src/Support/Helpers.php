@@ -131,15 +131,22 @@ class Helpers
 
     /**
      * @param string $string
+     * @param bool $caseInsensitive
      * @return bool
      */
-    public static function isRomanNumber(string $string): bool
+    public static function isRomanNumber(string $string, bool $caseInsensitive = false): bool
     {
         if ($string === '') {
             return false;
         }
 
-        return preg_match('/^M*(C[MD]|D?C{0,3})(X[CL]|L?X{0,3})(I[XV]|V?I{0,3})$/i', $string) > 0;
+        $regex = '/^M*(C[MD]|D?C{0,3})(X[CL]|L?X{0,3})(I[XV]|V?I{0,3})$/';
+
+        if ($caseInsensitive) {
+            $regex .= 'i';
+        }
+
+        return preg_match($regex, $string) > 0;
     }
 
     /**
