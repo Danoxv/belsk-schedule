@@ -252,31 +252,31 @@ class Sheet
 
         foreach ($columns as $column) {
             foreach ($rows as $row) {
-                $cellValue = $this->getCellValue($column.$row);
+                $value = $this->getCellValue($column.$row);
 
                 /*
                  * Resolve Excel config
                  */
 
-                $cleanCellValue = '';
+                $cleanValue = '';
                 if (!$dayColFound || !$timeColFound) {
-                    $cleanCellValue = Str::lower(Str::replaceManySpacesWithOne($cellValue));
+                    $cleanValue = Str::lower(Str::replaceManySpacesWithOne($value));
                 }
 
-                if (!$dayColFound && in_array($cleanCellValue, $this->config->dayWords, true)) {
+                if (!$dayColFound && $cleanValue && in_array($cleanValue, $this->config->dayWords, true)) {
                     $dayColFound                = true;
                     $sheetCfg->dayCol           = $column;
 
                     $sheetCfg->groupNamesRow    = $row;
                     $sheetCfg->firstScheduleRow = Coordinate::nextRow($sheetCfg->groupNamesRow);
-                } elseif (!$timeColFound && in_array($cleanCellValue, $this->config->timeWords, true)) {
+                } elseif (!$timeColFound && $cleanValue && in_array($cleanValue, $this->config->timeWords, true)) {
                     $timeColFound               = true;
                     $sheetCfg->timeCol          = $column;
                     $sheetCfg->firstGroupCol    = Coordinate::nextColumn($sheetCfg->timeCol);
 
                     $sheetCfg->groupNamesRow    = $row;
                     $sheetCfg->firstScheduleRow = Coordinate::nextRow($sheetCfg->groupNamesRow);
-                } else if (!$classHourColFound && Lesson::isClassHourLesson($cellValue)) {
+                } else if (!$classHourColFound && $value && Lesson::isClassHourLesson($value)) {
                     $classHourColFound                  = true;
                     $sheetCfg->classHourLessonColumn    = $column;
                 }
@@ -293,8 +293,8 @@ class Sheet
 
                     if (
                         $needMendeleeva4Detect &&
-                        $cellValue &&
-                        Str::containsAll(Str::lower($cellValue), $this->config->mendeleeva4KeywordsInCell)
+                        $value &&
+                        Str::containsAll(Str::lower($value), $this->config->mendeleeva4KeywordsInCell)
                     ) {
                         $this->hasMendeleeva4 = true;
                         $needMendeleeva4Detect = false;

@@ -3,7 +3,7 @@
         "php": "^7.4",
         "ext-curl": "*",
         "ext-dom": "*",
-        "illuminate/support": "^8.76",
+        "illuminate/support": "^8.77",
         "phpoffice/phpspreadsheet": "^1.20"
     },
     "autoload": {

@@ -24,8 +24,6 @@ class Pair
     /** @var Collection */
     private Collection $lessons;
 
-    private bool $isClassHour;
-
     /** @var string */
     private string $day;
 
@@ -103,14 +101,6 @@ class Pair
     }
 
     /**
-     * @return bool
-     */
-    public function isClassHour(): bool
-    {
-        return $this->isClassHour;
-    }
-
-    /**
      * Find and add Lessons.
      */
     private function process(): void
@@ -126,8 +116,6 @@ class Pair
             $this->isValid = false;
             return;
         }
-
-        $this->isClassHour = $lesson1->isClassHour();
 
         $this->resolveTimeAndNumber();
         $this->resolveDay();
@@ -191,19 +179,18 @@ class Pair
     {
         $this->time = $this->number = '';
 
-        if ($this->isClassHour()) {
-            return;
-        }
-
         $value = $this->timeCell->getValue();
-        $value = Str::replaceManySpacesWithOne($value);
 
+        // Handle empty values
         if ($value === '') {
             return;
         }
 
+        $value = Str::replaceManySpacesWithOne($value);
+
+        // Handle values like 'IV' or '15.05-16.40'
         if (!Str::contains($value, ' ')) {
-            if (Helpers::isRomanNumber($value)) {
+            if ($this->isNumber($value)) {
                 $this->number = $this->formatNumber($value);
             } else {
                 $this->time = $this->formatTime($value);
@@ -212,14 +199,20 @@ class Pair
             return;
         }
 
+        // Handle values like 'IV 15.05-16.40'
         $number = Str::before($value, ' ');
         $time = Str::after($value, ' ');
 
-        if (Helpers::isRomanNumber($number)) {
+        if ($this->isNumber($number)) {
             $this->number = $this->formatNumber($number);
         }
 
         $this->time = $this->formatTime($time);
+    }
+
+    private function isNumber(string $string): bool
+    {
+        return Helpers::isRomanNumber($string);
     }
 
     private function formatNumber(string $number): string
@@ -229,16 +222,14 @@ class Pair
 
     private function formatTime(string $time): string
     {
-        $time = Str::removeSpaces($time);
-
-        $time = str_replace([
+        return str_replace([
             '.',
             '-'
         ], [
             ':',
             ' - '
-        ], $time);
-
-        return trim($time);
+        ],
+            Str::removeSpaces($time)
+        );
     }
 }
