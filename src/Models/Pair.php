@@ -109,6 +109,7 @@ class Pair
         $lesson1 = new Lesson($this, $row1);
 
         $this->isValid = true;
+
         // If Pair cell is empty (without pair start-end time)
         // and it's lesson is not "class hour"
         // then Pair is invalid (because without time).
@@ -117,7 +118,6 @@ class Pair
             return;
         }
 
-        $this->resolveTimeAndNumber();
         $this->resolveDay();
 
         if (!$this->isValid()) {
@@ -128,6 +128,13 @@ class Pair
         $lesson2 = new Lesson($this, $row2);
 
         Lesson::processResolving($lesson1, $lesson2);
+
+        if (!$lesson1->isValid()) {
+            $this->isValid = false;
+            return;
+        }
+
+        $this->resolveTimeAndNumber($lesson1);
 
         if ($lesson2->isValid()) {
             $lesson1->setWeekPosition(Lesson::FIRST_WEEK);
@@ -175,9 +182,13 @@ class Pair
         }
     }
 
-    private function resolveTimeAndNumber(): void
+    private function resolveTimeAndNumber(Lesson $validFirstLesson): void
     {
         $this->time = $this->number = '';
+
+        if ($validFirstLesson->isClassHour()) {
+            return;
+        }
 
         $value = $this->timeCell->getValue();
 
