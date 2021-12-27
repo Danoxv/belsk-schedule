@@ -1,7 +1,6 @@
 <?php
 
 use Src\Support\Helpers;
-use Src\Support\Path;
 use Src\Support\Str;
 
 if (!defined('ROOT')) {
@@ -22,18 +21,15 @@ if (empty($scriptName)) {
 $scriptName = Str::finish($scriptName, '.php');
 
 $scriptFile = ROOT . '/src/console/scripts/' . $scriptName;
-$scriptFile = Path::normalize($scriptFile);
-
-if ($scriptFile === Path::normalize(__FILE__)) {
-    die('Cannot run self');
-}
 
 if (!file_exists($scriptFile) || !is_file($scriptFile)) {
-    die("File $scriptFile is not exists");
+    echo "File $scriptFile is not exists";
+    die(2);
 }
 
 require_once $scriptFile;
 
 function _printUsageExample() {
-    die('Usage example: php public/index.php group-list/generate.php');
+    echo 'Usage example: php public/index.php group-list/generate.php';
+    die(1);
 }
