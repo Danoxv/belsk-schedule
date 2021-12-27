@@ -30,6 +30,6 @@ if (!file_exists($scriptFile) || !is_file($scriptFile)) {
 require_once $scriptFile;
 
 function _printUsageExample() {
-    echo 'Usage example: php public/index.php group-list/generate.php';
+    echo 'Usage example: php public/index.php generate-group-list.php';
     die(1);
 }

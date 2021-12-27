@@ -154,7 +154,7 @@ class Lesson
      * @param bool $rawValue
      * @return string
      */
-    public function getCellValue(bool $rawValue = false)
+    public function getCellValue(bool $rawValue = false): string
     {
         return $this->cell->getValue($rawValue);
     }
