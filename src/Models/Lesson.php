@@ -348,7 +348,7 @@ class Lesson
         $maxSpacesCount = Str::maxConsecutiveCharsCount($lesson, $space);
 
         if ($maxSpacesCount > 1) {
-            $uniqueChar = Str::getNotExistingChar($lesson);
+            $uniqueChar = Str::getNotExistingChar($lesson, '|');
 
             // К Л А С С Н Ы Й   Ч А С -> К Л А С С Н Ы Й!Ч А С
             $lesson = str_replace(str_repeat($space, $maxSpacesCount), $uniqueChar, $lesson);

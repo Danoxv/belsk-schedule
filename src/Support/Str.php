@@ -109,9 +109,10 @@ class Str extends \Illuminate\Support\Str
      * Returns char that string not contains.
      *
      * @param string $string
-     * @return string|null
+     * @param string|null $fallbackChar
+     * @return string|null Fallback char or NULL (by default)
      */
-    public static function getNotExistingChar(string $string): ?string
+    public static function getNotExistingChar(string $string, ?string $fallbackChar = null): ?string
     {
         // 33 and 126 - ASCII symbol codes ('!' and '~' accordingly)
         // see https://www.man7.org/linux/man-pages/man7/ascii.7.html
@@ -124,6 +125,6 @@ class Str extends \Illuminate\Support\Str
             }
         }
 
-        return null;
+        return $fallbackChar;
     }
 }
