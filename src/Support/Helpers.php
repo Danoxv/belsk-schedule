@@ -11,19 +11,6 @@ class Helpers
 {
     /**
      * @param string $link
-     * @return bool
-     */
-    public static function isScheduleLinkValid(string $link): bool
-    {
-        $config = AppConfig::getInstance();
-
-        return
-            Str::endsWith($link, $config->allowedExtensions) &&
-            self::getHost($link) === self::getHost($config->pageWithScheduleFiles);
-    }
-
-    /**
-     * @param string $link
      * @return string
      */
     public static function getHost(string $link): string
@@ -74,17 +61,6 @@ class Helpers
         }
 
         return $data;
-    }
-
-    /**
-     * @param string $scheduleLink
-     * @return string
-     */
-    public static function sanitizeScheduleLink(string $scheduleLink): string
-    {
-        // TODO Hacky, need to process other possible replacements.
-        // urlencode / rawurlencode and many others doesn't work
-        return str_replace(' ', '%20', $scheduleLink);
     }
 
     /**
@@ -185,8 +161,8 @@ class Helpers
 
             $linkUri = "$host/$linkUri";
 
-            $linkUri = Helpers::sanitizeScheduleLink($linkUri);
-            if (!Helpers::isScheduleLinkValid($linkUri)) {
+            $linkUri = Security::sanitizeScheduleLink($linkUri);
+            if (!Security::isScheduleLinkValid($linkUri)) {
                 continue;
             }
 

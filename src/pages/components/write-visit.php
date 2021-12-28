@@ -10,14 +10,17 @@ if (!$ip) {
     return;
 }
 
-$datetime = gmdate('d-m-Y H:i:s');
+$datetime = gmdate('d.m.Y H:i:s');
 $ua = Security::filterInputString(INPUT_SERVER, 'HTTP_USER_AGENT');
 $uri = Security::filterInputString(INPUT_SERVER, 'REQUEST_URI');
 $post = _getFormattedPost();
 
-$visitsStorage = AppConfig::getInstance()->visitsStorageFile;
+$visitsStorageFileTemplate = AppConfig::getInstance()->visitsStorageFileTemplate;
 
-$fp = fopen($visitsStorage, 'ab');
+// Write visit to file by current ISO week number (W)
+$visitsStorageFile = str_replace('{date}', date('Y-m-W'), $visitsStorageFileTemplate);
+
+$fp = fopen($visitsStorageFile, 'ab');
 fputcsv($fp, [$datetime, $ip, $ua, $uri, $post]);
 fclose($fp);
 

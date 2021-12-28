@@ -2,14 +2,22 @@
 
 use Src\Config\AppConfig;
 use Src\Exceptions\TerminateException;
+use Src\Support\Security;
+
+$fileName = Security::filterInputString(INPUT_GET, 'f');
+$fileName = Security::sanitizeCsvFilename($fileName);
+
+if ($fileName === '') {
+    throw new TerminateException('GET param "f" is required');
+}
 
 $config = AppConfig::getInstance();
 
-$visitsStorage = $config->visitsStorageFile;
+$visitsStorageFile = dirname($config->visitsStorageFileTemplate)."/$fileName";
 
-@$handle = fopen($visitsStorage, 'rb');
+@$handle = fopen($visitsStorageFile, 'rb');
 if ($handle === false) {
-    throw new TerminateException('Отсутствует лог файлов', TerminateException::TYPE_INFO);
+    throw new TerminateException('Отсутствует файл '.$fileName, TerminateException::TYPE_WARNING);
 }
 ?>
 
@@ -52,15 +60,15 @@ if ($handle === false) {
             <?php while (($row = fgetcsv($handle, 10000)) !== false): ?>
                 <tr>
                 <?php foreach ($row as $col): ?>
-                    <td><?= nl2br($col); ?></td>
+                    <td><?= nl2br($col) ?></td>
                 <?php endforeach; ?>
                 </tr>
             <?php endwhile; ?>
         </tbody>
     </table>
 
-    <a class="btn btn-primary" href="/" role="button">На главную</a>
-    <a class='btn btn btn-danger' href='/system/visits/clean' role='button'>Очистить</a>
+    <a class="btn btn-primary" href="/system/visits" role="button">Назад</a>
+    <a class='btn btn-danger' href='/system/visits/delete?f=<?= $fileName ?>' role='button'>Удалить</a>
 </div>
 </body>
 </html>

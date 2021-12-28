@@ -35,9 +35,9 @@ if (!in_array($inputGroup, $config->groupsList, true)) {
 }
 
 $scheduleLink = Security::filterInputString(INPUT_POST, 'scheduleLink');
-$scheduleLink = Helpers::sanitizeScheduleLink($scheduleLink);
+$scheduleLink = Security::sanitizeScheduleLink($scheduleLink);
 
-if ($scheduleLink && !Helpers::isScheduleLinkValid($scheduleLink)) {
+if ($scheduleLink && !Security::isScheduleLinkValid($scheduleLink)) {
     throw new TerminateException('Недопустимая ссылка на файл расписания', TerminateException::TYPE_DANGER);
 }
 

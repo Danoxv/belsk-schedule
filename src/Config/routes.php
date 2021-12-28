@@ -21,8 +21,10 @@ if (AppConfig::getInstance()->enableSystemPages) {
          * System pages
          */
         '/system/opcache'       => 'pages/system/opcache-gui-3.3.0/index.php',
-        '/system/visits'        => 'pages/system/visits/viewer.php',
-        '/system/visits/clean'  => 'pages/system/visits/cleaner.php',
+
+        '/system/visits'        => 'pages/system/visits/index.php',
+        '/system/visits/show'   => 'pages/system/visits/show.php',
+        '/system/visits/delete' => 'pages/system/visits/delete.php',
     ];
 }
 

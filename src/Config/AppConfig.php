@@ -7,7 +7,7 @@ use RuntimeException;
 class AppConfig
 {
     public array $version = [
-        'number' => '1.1.8',
+        'number' => '1.1.9',
         'stability' => 'beta'
     ];
     public bool $debug = false;
@@ -17,7 +17,7 @@ class AppConfig
      * System
      */
     public bool $enableSystemPages = false;
-    public string $visitsStorageFile = ROOT . '/storage/visits.csv';
+    public string $visitsStorageFileTemplate = ROOT . '/storage/visits/visits-{date}.csv';
 
     public int $maxFileSize = 256; // in kilobytes
     public int $minFileSize = 25; // in kilobytes

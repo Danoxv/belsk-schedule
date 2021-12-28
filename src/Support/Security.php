@@ -2,6 +2,8 @@
 
 namespace Src\Support;
 
+use Src\Config\AppConfig;
+
 class Security
 {
     /**
@@ -65,5 +67,55 @@ class Security
         }
 
         return $array;
+    }
+
+    /**
+     * @param string $link
+     * @return bool
+     */
+    public static function isScheduleLinkValid(string $link): bool
+    {
+        if ($link === '') {
+            return false;
+        }
+
+        $config = AppConfig::getInstance();
+
+        return
+            Str::endsWith($link, $config->allowedExtensions) &&
+            Helpers::getHost($link) === Helpers::getHost($config->pageWithScheduleFiles);
+    }
+
+    /**
+     * @param string $scheduleLink
+     * @return string
+     */
+    public static function sanitizeScheduleLink(string $scheduleLink): string
+    {
+        // TODO Hacky, need to process other possible replacements.
+        // urlencode / rawurlencode and many others doesn't work
+        return str_replace(' ', '%20', $scheduleLink);
+    }
+
+    /**
+     * @param string $fileName
+     * @return string
+     */
+    public static function sanitizeCsvFilename(string $fileName): string
+    {
+        // Must contains one "dot" (before extension)
+        if (!Str::containsOne($fileName, '.')) {
+            return '';
+        }
+
+        // Remove any funky symbols (including "dot")
+        $fileName = Str::slug($fileName);
+
+        if ($fileName === '') {
+            return '';
+        }
+
+        // Revert "dot" symbol
+        return Str::insertBefore('csv', '.', $fileName);
     }
 }

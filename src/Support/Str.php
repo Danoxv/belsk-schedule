@@ -127,4 +127,45 @@ class Str extends \Illuminate\Support\Str
 
         return $fallbackChar;
     }
+
+    /**
+     * @param string $search
+     * @param string $value
+     * @param string $subject
+     * @return string
+     */
+    public static function insertBefore(string $search, string $value, string $subject): string
+    {
+        $pos = self::rpos($subject, $search);
+
+        if ($pos === false) {
+            return $subject;
+        }
+
+        return self::substrReplace($subject, $value, $pos, 0);
+    }
+
+    /**
+     * Replace text within a portion of a string
+     * (substr_replace for unicode characters)
+     *
+     * Source: @link https://github.com/sallaizalan/mb-substr-replace/blob/master/mbsubstrreplace.php
+     *
+     * @param string $string
+     * @param string $replace
+     * @param int $offset
+     * @param int $length
+     * @return string
+     */
+    public static function substrReplace($string, $replace, $offset = 0, $length = NULL): string
+    {
+        if ($length === null) {
+            $length = self::length($string);
+        }
+
+        $startString = self::substr($string, 0, $offset);
+        $endString = self::substr($string, $offset + $length, self::length($string));
+
+        return $startString . $replace . $endString;
+    }
 }
