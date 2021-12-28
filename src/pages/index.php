@@ -39,7 +39,7 @@ $session = new Session();
 <body>
     <div class="container" id="main-container">
         <?php require ROOT . '/src/pages/components/dark-mode.php' ?>
-        <form method="post" action="view-schedule-file" enctype="multipart/form-data">
+        <form method="post" action="/schedule-file" enctype="multipart/form-data">
             <div class="row">
                 <div class="col">
                     <div class="mb-3">

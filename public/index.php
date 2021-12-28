@@ -51,7 +51,7 @@ try {
         $exception = Src\Exceptions\TerminateException::fromThrowable($exception);
     }
 
-    require ROOT . '/src/pages/service/show-error.php';
+    require ROOT . '/src/pages/error.php';
 }
 
 require_once ROOT . '/src/pages/components/write-visit.php';
