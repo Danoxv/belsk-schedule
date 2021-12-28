@@ -258,25 +258,20 @@ class Sheet
                  * Resolve Excel config
                  */
 
-                $cleanValue = '';
-                if (!$dayColFound || !$timeColFound) {
-                    $cleanValue = Str::lower(Str::replaceManySpacesWithOne($value));
-                }
-
-                if (!$dayColFound && $cleanValue && in_array($cleanValue, $this->config->dayWords, true)) {
+                if (!$dayColFound && $this->isDayCell($value)) {
                     $dayColFound                = true;
                     $sheetCfg->dayCol           = $column;
 
                     $sheetCfg->groupNamesRow    = $row;
                     $sheetCfg->firstScheduleRow = Coordinate::nextRow($sheetCfg->groupNamesRow);
-                } elseif (!$timeColFound && $cleanValue && in_array($cleanValue, $this->config->timeWords, true)) {
+                } elseif (!$timeColFound && $this->isTimeCell($value)) {
                     $timeColFound               = true;
                     $sheetCfg->timeCol          = $column;
                     $sheetCfg->firstGroupCol    = Coordinate::nextColumn($sheetCfg->timeCol);
 
                     $sheetCfg->groupNamesRow    = $row;
                     $sheetCfg->firstScheduleRow = Coordinate::nextRow($sheetCfg->groupNamesRow);
-                } else if (!$classHourColFound && $value && Lesson::isClassHourLesson($value)) {
+                } else if (!$classHourColFound && $this->isClassHourLessonCell($value)) {
                     $classHourColFound                  = true;
                     $sheetCfg->classHourLessonColumn    = $column;
                 }
@@ -291,11 +286,7 @@ class Sheet
                         $needMendeleeva4Detect = false;
                     }
 
-                    if (
-                        $needMendeleeva4Detect &&
-                        $value &&
-                        Str::containsAll(Str::lower($value), $this->config->mendeleeva4KeywordsInCell)
-                    ) {
+                    if ($needMendeleeva4Detect && $this->isMendeleeva4Cell($value)) {
                         $this->hasMendeleeva4 = true;
                         $needMendeleeva4Detect = false;
                     }
@@ -311,6 +302,38 @@ class Sheet
         if (!$classHourColFound) {
             $sheetCfg->classHourLessonColumn = false;
         }
+    }
+
+    private function isDayCell(string $cellValue): bool
+    {
+        if ($cellValue === '') {
+            return false;
+        }
+
+        $cleanCellValue = Str::lower(Str::replaceManySpacesWithOne($cellValue));
+
+        return $cleanCellValue && in_array($cleanCellValue, $this->config->dayWords, true);
+    }
+
+    private function isTimeCell(string $cellValue): bool
+    {
+        if ($cellValue === '') {
+            return false;
+        }
+
+        $cleanCellValue = Str::lower(Str::replaceManySpacesWithOne($cellValue));
+
+        return $cleanCellValue && in_array($cleanCellValue, $this->config->timeWords, true);
+    }
+
+    private function isClassHourLessonCell(string $cellValue): bool
+    {
+        return $cellValue && Lesson::isClassHourLesson($cellValue);
+    }
+
+    private function isMendeleeva4Cell(string $cellValue): bool
+    {
+        return $cellValue && Str::containsAll(Str::lower($cellValue), $this->config->mendeleeva4KeywordsInCell);
     }
 
     private function resolveId(): void

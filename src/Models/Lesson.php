@@ -184,7 +184,7 @@ class Lesson
     {
         $cellValue = trim($cellValue);
 
-        if (empty($cellValue)) {
+        if ($cellValue === '') {
             return false;
         }
 
