@@ -188,9 +188,12 @@ class Lesson
             return false;
         }
 
-        $config = AppConfig::getInstance();
+        static $classHourCellKeyword = null;
+        if ($classHourCellKeyword === null) {
+            $classHourCellKeyword = Str::lower(Str::removeSpaces(AppConfig::getInstance()->classHourCellKeyword));
+        }
 
-        return Str::lower(Str::removeSpaces($cellValue)) === Str::lower(Str::removeSpaces($config->classHourCellKeyword));
+        return Str::lower(Str::removeSpaces($cellValue)) === $classHourCellKeyword;
     }
 
     /**
