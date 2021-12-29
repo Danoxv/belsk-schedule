@@ -5,7 +5,7 @@ use Src\Config\AppConfig;
 $_routes = [
     '/'                     => 'pages/index.php',
     '/schedule-file'        => 'pages/schedule-file.php',
-    '/terms-and-conditions' => 'pages/service/terms-and-conditions.php',
+    '/terms-and-conditions' => 'pages/terms-and-conditions.php',
 ];
 
 if (AppConfig::getInstance()->enableSystemPages) {
