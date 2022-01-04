@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 use Src\Support\Helpers;
 use Src\Support\Str;

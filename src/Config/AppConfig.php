@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Src\Config;
 
@@ -7,7 +8,7 @@ use RuntimeException;
 class AppConfig
 {
     public array $version = [
-        'number' => '1.1.12',
+        'number' => '1.1.13',
         'stability' => 'beta'
     ];
     public bool $debug = false;

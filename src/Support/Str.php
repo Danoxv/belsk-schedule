@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Src\Support;
 
@@ -228,6 +229,8 @@ class Str extends \Illuminate\Support\Str
         if ($str1 === $str2) {
             return true;
         }
+
+        //return false;
 
         return self::slug($str1) === self::slug($str2);
     }
