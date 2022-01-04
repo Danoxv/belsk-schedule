@@ -12,7 +12,9 @@ class Str extends \Illuminate\Support\Str
      */
     public static function removeSpaces(string $string): string
     {
-        return preg_replace('/\s+/', '', $string);
+        $string = preg_replace('/\s+/', '', $string);
+
+        return self::replaceFunkyWhiteSpace($string);
     }
 
     /**
@@ -21,7 +23,42 @@ class Str extends \Illuminate\Support\Str
      */
     public static function replaceManySpacesWithOne(string $string): string
     {
-        return preg_replace('/\s+/', ' ', $string);
+        $string = preg_replace('/\s+/', ' ', $string);
+
+        return self::replaceFunkyWhiteSpace($string);
+    }
+
+    /**
+     * Replace unprintable characters and invalid unicode characters.
+     *
+     * Replace any next symbol:
+     * \p{C} or \p{Other}: invisible control characters and unused code points.
+     * - \p{Cc} or \p{Control}: an ASCII or Latin-1 control character: 0x00–0x1F and 0x7F–0x9F.
+     * - \p{Cf} or \p{Format}: invisible formatting indicator.
+     * - \p{Co} or \p{Private_Use}: any code point reserved for private use.
+     * - \p{Cs} or \p{Surrogate}: one half of a surrogate pair in UTF-16 encoding.
+     * - \p{Cn} or \p{Unassigned}: any code point to which no character has been assigned.
+     *
+     * Result examples:
+     * "my\x00string"       => "mystring"      ("\x00" was replaced)
+     * "s\ti.php"           => "si.php"        ("\ti" was replaced)
+     * "some\x00/path.txt"  => "some/path.txt" ("\x00" was replaced)
+     *
+     * @source https://gist.github.com/NewEXE/05c2cb337218d562133e9c715334972f
+     * @param string $string
+     * @param string $replacement
+     * @return string
+     */
+    public static function replaceFunkyWhiteSpace(string $string, string $replacement = ''): string
+    {
+        // We do this check in a loop, since removing invalid unicode characters
+        // can lead to new characters being created.
+        $pattern = '#\p{C}+#u';
+        while (preg_match($pattern, $string)) {
+            $string = (string) preg_replace($pattern, $replacement, $string);
+        }
+
+        return $string;
     }
 
     /**
