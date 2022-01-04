@@ -207,9 +207,10 @@ class Str extends \Illuminate\Support\Str
 
     /**
      * Returns true when strings "semantically equals"
-     * (case-insensitive, whitespaces-less comparison of strings).
+     * (case-insensitive, whitespaces-less, "slugify" comparison of strings).
      *
      * isSemanticallyEquals('понедельник', ' П О Не деЛЬ НИк '); // true
+     * isSemanticallyEquals('понедельник', 'п o н е"del"nik'); // true
      *
      * @param string $str1
      * @param string $str2
@@ -234,7 +235,8 @@ class Str extends \Illuminate\Support\Str
     /**
      * WARNING: beta version of method
      *
-     * Returns true when strings equals or "almost equals" (some "similarity" percent is allowed)
+     * Returns true when strings semantically equals or
+     * "almost equals" (some "similarity" percent is allowed)
      *
      * @param string $str1
      * @param string $str2
@@ -250,10 +252,6 @@ class Str extends \Illuminate\Support\Str
         $str1 = self::lower(self::replaceManyWhiteSpacesWithOne($str1));
         $str2 = self::lower(self::replaceManyWhiteSpacesWithOne($str2));
 
-        if ($str1 === $str2) {
-            return true;
-        }
-
         $str1Len = self::length($str1);
         $str2Len = self::length($str2);
 
@@ -262,15 +260,14 @@ class Str extends \Illuminate\Support\Str
             return false;
         }
 
-        $minStrLen = min($str1Len, $str2Len);
-
-        $minSimilarChars = (int) round($minPercentForSimilarity * $minStrLen / 100);
-
         $distance = self::levenshtein($str1, $str2);
 
         if ($distance === 0) {
             return true;
         }
+
+        $minStrLen = min($str1Len, $str2Len);
+        $minSimilarChars = (int) round($minPercentForSimilarity * $minStrLen / 100);
 
         return ($minStrLen - $minSimilarChars) > $distance;
     }
