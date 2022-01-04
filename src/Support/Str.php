@@ -10,28 +10,28 @@ class Str extends \Illuminate\Support\Str
      * @param string $string
      * @return string
      */
-    public static function removeSpaces(string $string): string
+    public static function removeWhiteSpace(string $string): string
     {
         $string = preg_replace('/\s+/', '', $string);
 
-        return self::replaceFunkyWhiteSpace($string);
+        return self::removeFunkyWhiteSpace($string);
     }
 
     /**
      * @param string $string
      * @return string
      */
-    public static function replaceManySpacesWithOne(string $string): string
+    public static function replaceManyWhiteSpacesWithOne(string $string): string
     {
         $string = preg_replace('/\s+/', ' ', $string);
 
-        return self::replaceFunkyWhiteSpace($string);
+        return self::removeFunkyWhiteSpace($string);
     }
 
     /**
-     * Replace unprintable characters and invalid unicode characters.
+     * Remove unprintable characters and invalid unicode characters.
      *
-     * Replace any next symbol:
+     * Remove any next entity:
      * \p{C} or \p{Other}: invisible control characters and unused code points.
      * - \p{Cc} or \p{Control}: an ASCII or Latin-1 control character: 0x00–0x1F and 0x7F–0x9F.
      * - \p{Cf} or \p{Format}: invisible formatting indicator.
@@ -44,18 +44,17 @@ class Str extends \Illuminate\Support\Str
      * "s\ti.php"           => "si.php"        ("\ti" was replaced)
      * "some\x00/path.txt"  => "some/path.txt" ("\x00" was replaced)
      *
-     * @source https://gist.github.com/NewEXE/05c2cb337218d562133e9c715334972f
+     * Source: @link https://gist.github.com/NewEXE/05c2cb337218d562133e9c715334972f
      * @param string $string
-     * @param string $replacement
      * @return string
      */
-    public static function replaceFunkyWhiteSpace(string $string, string $replacement = ''): string
+    public static function removeFunkyWhiteSpace(string $string): string
     {
         // We do this check in a loop, since removing invalid unicode characters
         // can lead to new characters being created.
         $pattern = '#\p{C}+#u';
         while (preg_match($pattern, $string)) {
-            $string = (string) preg_replace($pattern, $replacement, $string);
+            $string = (string) preg_replace($pattern, '', $string);
         }
 
         return $string;
@@ -204,5 +203,121 @@ class Str extends \Illuminate\Support\Str
         $endString = self::substr($string, $offset + $length, self::length($string));
 
         return $startString . $replace . $endString;
+    }
+
+    /**
+     * Returns true when strings "semantically equals"
+     * (case-insensitive, whitespaces-less comparison of strings).
+     *
+     * Equal stings example:
+     * 'понедельник', ' П О Н е д е ЛЬ НИк ', ''
+     *
+     * @param string $str1
+     * @param string $str2
+     * @return bool
+     */
+    public static function isSemanticallyEquals(string $str1, string $str2): bool
+    {
+        if ($str1 === $str2) {
+            return true;
+        }
+
+        return self::lower(self::removeWhiteSpace($str1)) === self::lower(self::removeWhiteSpace($str2));
+    }
+
+    /**
+     * Returns true when strings equals or "almost equals" (two characters inaccuracy allowed)
+     *
+     * @param string $str1
+     * @param string $str2
+     * @param float $minPercentForSimilarity
+     * @return bool
+     */
+    public static function isSimilar(string $str1, string $str2, float $minPercentForSimilarity = 80.0): bool
+    {
+        if ($str1 === $str2) {
+            return true;
+        }
+
+        if (self::isSemanticallyEquals($str1, $str2)) {
+            return true;
+        }
+
+        $str1Len = self::length($str1);
+        $str2Len = self::length($str2);
+
+        // \levenshtein() can accept only small strings
+        if ($str1Len > 255 || $str2Len > 255) {
+            return false;
+        }
+
+        $str1 = self::lower(self::replaceManyWhiteSpacesWithOne($str1));
+        $str2 = self::lower(self::replaceManyWhiteSpacesWithOne($str2));
+
+        $maxStrLen = max($str1Len, $str2Len);
+
+        $minSimilarChars = (int) round($minPercentForSimilarity * $maxStrLen / 100);
+
+        $distance = self::levenshtein($str1, $str2);
+
+        return ($maxStrLen - $minSimilarChars) > $distance;
+    }
+
+    /**
+     * Calculate Levenshtein distance between two strings. Supports multibyte.
+     *
+     * @see https://php.net/manual/en/function.levenshtein.php
+     * Source: @link https://github.com/KEINOS/mb_levenshtein
+     *
+     * @param string $str1
+     * @param string $str2
+     * @return int
+     */
+    public static function levenshtein(string $str1, string $str2): int
+    {
+        if ($str1 === '' && $str2 === '') {
+            return 0;
+        }
+
+        $map = [];
+        self::convertMbAscii($str1, $map);
+        self::convertMbAscii($str2, $map);
+
+        $distance = @\levenshtein($str1, $str2);
+
+        if ($distance === -1) {
+            throw new \RuntimeException('levenshtein(): Argument string(s) too long');
+        }
+
+        return $distance;
+    }
+
+    /**
+     * Helper for self::levenshtein()
+     *
+     * @param string $str
+     * @param array $map
+     */
+    private static function convertMbAscii(string &$str, array &$map): void
+    {
+        if ($str === '') {
+            return;
+        }
+
+        // find all utf-8 characters
+        $matches = [];
+        if (! preg_match_all('/[\xC0-\xF7][\x80-\xBF]+/', $str, $matches)) {
+            return; // plain ascii string
+        }
+
+        // update the encoding map with the characters not already met
+        foreach ($matches[0] as $mbc) {
+            if (!isset($map[$mbc])) {
+                $map[$mbc] = chr(128 + count($map));
+            }
+        }
+
+        // finally remap non-ascii characters
+        $str = strtr($str, $map);
     }
 }

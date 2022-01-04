@@ -197,7 +197,7 @@ class Pair
             return;
         }
 
-        $value = Str::replaceManySpacesWithOne($value);
+        $value = Str::replaceManyWhiteSpacesWithOne($value);
 
         // Handle values like 'IV' or '15.05-16.40'
         if (!Str::contains($value, ' ')) {
@@ -240,7 +240,7 @@ class Pair
             ':',
             ' - '
         ],
-            Str::removeSpaces($time)
+            Str::removeWhiteSpace($time)
         );
     }
 }
