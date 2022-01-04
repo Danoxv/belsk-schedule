@@ -262,13 +262,17 @@ class Str extends \Illuminate\Support\Str
             return false;
         }
 
-        $maxStrLen = max($str1Len, $str2Len);
+        $minStrLen = min($str1Len, $str2Len);
 
-        $minSimilarChars = (int) round($minPercentForSimilarity * $maxStrLen / 100);
+        $minSimilarChars = (int) round($minPercentForSimilarity * $minStrLen / 100);
 
         $distance = self::levenshtein($str1, $str2);
 
-        return ($maxStrLen - $minSimilarChars) > $distance;
+        if ($distance === 0) {
+            return true;
+        }
+
+        return ($minStrLen - $minSimilarChars) > $distance;
     }
 
     /**
