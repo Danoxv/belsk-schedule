@@ -32,19 +32,29 @@ class Day
 
     /**
      * @param string $day
-     * @return string
+     * @return string|null Day or NULL if day is not recognized
      */
-    public static function normalize(string $day): string
+    public static function recognize(string $day): ?string
     {
-        return Str::lower($day);
+        foreach (self::getAll() as $validDay) {
+            if (Str::isSimilar($day, $validDay)) {
+                return $validDay;
+            }
+        }
+
+        return null;
     }
 
     /**
+     * Format day for printing
+     *
+     * 'понедельник' -> 'Понедельник'
+     *
      * @param string $day
      * @return string
      */
     public static function format(string $day): string
     {
-        return Str::ucfirst(Str::lower($day));
+        return Str::ucfirst($day);
     }
 }

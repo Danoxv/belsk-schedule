@@ -209,8 +209,7 @@ class Str extends \Illuminate\Support\Str
      * Returns true when strings "semantically equals"
      * (case-insensitive, whitespaces-less comparison of strings).
      *
-     * Equal stings example:
-     * 'понедельник', ' П О Н е д е ЛЬ НИк ', ''
+     * isSemanticallyEquals('понедельник', ' П О Не деЛЬ НИк '); // true
      *
      * @param string $str1
      * @param string $str2
@@ -222,11 +221,20 @@ class Str extends \Illuminate\Support\Str
             return true;
         }
 
-        return self::lower(self::removeWhiteSpace($str1)) === self::lower(self::removeWhiteSpace($str2));
+        $str1 = self::lower(self::removeWhiteSpace($str1));
+        $str2 = self::lower(self::removeWhiteSpace($str2));
+
+        if ($str1 === $str2) {
+            return true;
+        }
+
+        return self::slug($str1) === self::slug($str2);
     }
 
     /**
-     * Returns true when strings equals or "almost equals" (two characters inaccuracy allowed)
+     * WARNING: beta version of method
+     *
+     * Returns true when strings equals or "almost equals" (some "similarity" percent is allowed)
      *
      * @param string $str1
      * @param string $str2
@@ -235,11 +243,14 @@ class Str extends \Illuminate\Support\Str
      */
     public static function isSimilar(string $str1, string $str2, float $minPercentForSimilarity = 80.0): bool
     {
-        if ($str1 === $str2) {
+        if (self::isSemanticallyEquals($str1, $str2)) {
             return true;
         }
 
-        if (self::isSemanticallyEquals($str1, $str2)) {
+        $str1 = self::lower(self::replaceManyWhiteSpacesWithOne($str1));
+        $str2 = self::lower(self::replaceManyWhiteSpacesWithOne($str2));
+
+        if ($str1 === $str2) {
             return true;
         }
 
@@ -250,9 +261,6 @@ class Str extends \Illuminate\Support\Str
         if ($str1Len > 255 || $str2Len > 255) {
             return false;
         }
-
-        $str1 = self::lower(self::replaceManyWhiteSpacesWithOne($str1));
-        $str2 = self::lower(self::replaceManyWhiteSpacesWithOne($str2));
 
         $maxStrLen = max($str1Len, $str2Len);
 

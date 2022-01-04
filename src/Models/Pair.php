@@ -175,10 +175,13 @@ class Pair
             }
         } while ($day === '');
 
-        $this->day = Day::normalize($day);
+        $recognizedDay = Day::recognize($day);
 
-        if($this->day === '') {
+        if ($recognizedDay === null) {
+            $this->day = "*INVALID* ($day)";
             $this->isValid = false;
+        } else {
+            $this->day = $recognizedDay;
         }
     }
 
