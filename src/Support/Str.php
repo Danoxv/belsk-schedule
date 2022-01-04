@@ -230,8 +230,6 @@ class Str extends \Illuminate\Support\Str
             return true;
         }
 
-        //return false;
-
         return self::slug($str1) === self::slug($str2);
     }
 
@@ -287,7 +285,7 @@ class Str extends \Illuminate\Support\Str
      */
     public static function levenshtein(string $str1, string $str2): int
     {
-        if ($str1 === '' && $str2 === '') {
+        if ($str1 === $str2) {
             return 0;
         }
 
