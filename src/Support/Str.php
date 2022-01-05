@@ -30,6 +30,15 @@ class Str extends \Illuminate\Support\Str
     }
 
     /**
+     * @param string $str
+     * @return string
+     */
+    public static function removeSymbols(string $str): string
+    {
+        return preg_replace('/[^\pL\pN]+/u', '', $str);
+    }
+
+    /**
      * Remove unprintable characters and invalid unicode characters.
      *
      * Remove any next entity:
@@ -227,8 +236,8 @@ class Str extends \Illuminate\Support\Str
         }
 
         // Replace any symbol and convert strings to lowercase
-        $str1 = preg_replace('/[^\pL\pN]+/u', '', self::lower($str1));
-        $str2 = preg_replace('/[^\pL\pN]+/u', '', self::lower($str2));
+        $str1 = self::removeSymbols(self::lower($str1));
+        $str2 = self::removeSymbols(self::lower($str2));
 
         if ($str1 === $str2) {
             return true;
