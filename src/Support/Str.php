@@ -207,70 +207,65 @@ class Str extends \Illuminate\Support\Str
     }
 
     /**
-     * Returns true when strings "semantically equals"
-     * (case-insensitive, whitespaces-less, "slugify" comparison of strings).
-     *
-     * isSemanticallyEquals('понедельник', ' П О Не деЛЬ НИк '); // true
-     * isSemanticallyEquals('понедельник', 'п o н е"del"nik'); // true
-     *
-     * @param string $str1
-     * @param string $str2
-     * @return bool
-     */
-    public static function isSemanticallyEquals(string $str1, string $str2): bool
-    {
-        if ($str1 === $str2) {
-            return true;
-        }
-
-        $str1 = self::lower(self::removeWhiteSpace($str1));
-        $str2 = self::lower(self::removeWhiteSpace($str2));
-
-        if ($str1 === $str2) {
-            return true;
-        }
-
-        return self::slug($str1) === self::slug($str2);
-    }
-
-    /**
      * WARNING: beta version of method
      *
-     * Returns true when strings semantically equals or
-     * "almost equals" (some "similarity" percent is allowed)
+     * Returns true when strings "similar"
+     * (case-insensitive, whitespace-less and symbol-less comparison of strings).
+     * Allow 85% of similarity and max 3 typos.
+     *
+     * isSimilar('понедельник', ' О Не деЛЬ НИк!!! '); // true
      *
      * @param string $str1
      * @param string $str2
-     * @param float $minPercentForSimilarity
      * @return bool
      */
-    public static function isSimilar(string $str1, string $str2, float $minPercentForSimilarity = 80.0): bool
+    public static function isSimilar(string $str1, string $str2): bool
     {
-        if (self::isSemanticallyEquals($str1, $str2)) {
+        // Maybe we are lucky
+        if ($str1 === $str2) {
             return true;
         }
 
-        $str1 = self::lower(self::replaceManyWhiteSpacesWithOne($str1));
-        $str2 = self::lower(self::replaceManyWhiteSpacesWithOne($str2));
+        // Replace any symbol and convert strings to lowercase
+        $str1 = preg_replace('/[^\pL\pN]+/u', '', self::lower($str1));
+        $str2 = preg_replace('/[^\pL\pN]+/u', '', self::lower($str2));
 
+        if ($str1 === $str2) {
+            return true;
+        }
+
+        /*
+         * Try to decide Levenshtein distance.
+         */
+
+        // levenshtein() can accept only small strings
         $str1Len = self::length($str1);
         $str2Len = self::length($str2);
 
-        // \levenshtein() can accept only small strings
-        if ($str1Len > 255 || $str2Len > 255) {
-            return false;
+        if ($str1Len <= 255 && $str2Len <= 255) {
+            $distance = self::levenshtein($str1, $str2);
+
+            // Strings are equal
+            if ($distance === 0) {
+                return true;
+            }
+
+            // More than 3 typos
+            if ($distance > 3) {
+                return false;
+            }
+
+            // Decide how many typos are allowed
+            $minStrLen = min($str1Len, $str2Len);
+            $minSimilarChars = (int) round(85.0 * $minStrLen / 100);
+
+            // Distance is small
+            if (($minStrLen - $minSimilarChars) >= $distance) {
+                return true;
+            }
         }
 
-        $distance = self::levenshtein($str1, $str2);
-
-        if ($distance === 0) {
-            return true;
-        }
-
-        $minStrLen = min($str1Len, $str2Len);
-        $minSimilarChars = (int) round($minPercentForSimilarity * $minStrLen / 100);
-
-        return ($minStrLen - $minSimilarChars) > $distance;
+        return false;
     }
 
     /**
@@ -303,7 +298,10 @@ class Str extends \Illuminate\Support\Str
     }
 
     /**
-     * Helper for self::levenshtein()
+     * Helper for self::levenshtein().
+     * Convert an UTF-8 encoded string to a single-byte string.
+     *
+     * @see https://github.com/KEINOS/mb_levenshtein/blob/master/mb_levenshtein.php
      *
      * @param string $str
      * @param array $map
@@ -316,14 +314,16 @@ class Str extends \Illuminate\Support\Str
 
         // find all utf-8 characters
         $matches = [];
-        if (! preg_match_all('/[\xC0-\xF7][\x80-\xBF]+/', $str, $matches)) {
+        if (!preg_match_all('/[\xC0-\xF7][\x80-\xBF]+/', $str, $matches)) {
             return; // plain ascii string
         }
 
         // update the encoding map with the characters not already met
+        $count = count($map);
         foreach ($matches[0] as $mbc) {
             if (!isset($map[$mbc])) {
-                $map[$mbc] = chr(128 + count($map));
+                $map[$mbc] = chr(128 + $count);
+                $count++;
             }
         }
 
