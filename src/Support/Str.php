@@ -192,30 +192,6 @@ class Str extends \Illuminate\Support\Str
     }
 
     /**
-     * Replace text within a portion of a string
-     * (substr_replace for unicode characters)
-     *
-     * Source: @link https://github.com/sallaizalan/mb-substr-replace/blob/master/mbsubstrreplace.php
-     *
-     * @param string $string
-     * @param string $replace
-     * @param int $offset
-     * @param int $length
-     * @return string
-     */
-    public static function substrReplace($string, $replace, $offset = 0, $length = NULL): string
-    {
-        if ($length === null) {
-            $length = self::length($string);
-        }
-
-        $startString = self::substr($string, 0, $offset);
-        $endString = self::substr($string, $offset + $length, self::length($string));
-
-        return $startString . $replace . $endString;
-    }
-
-    /**
      * WARNING: beta version of method
      *
      * Returns true when strings "similar"
@@ -223,6 +199,7 @@ class Str extends \Illuminate\Support\Str
      * Allow 85% of similarity and max 3 typos.
      *
      * isSimilar('понедельник', ' О Не деЛЬ НИк!!! '); // true
+     * isSimilar('понедельник', 'поне"del"nik(:'); // true
      *
      * @param string $str1
      * @param string $str2
@@ -259,22 +236,56 @@ class Str extends \Illuminate\Support\Str
                 return true;
             }
 
-            // More than 3 typos
-            if ($distance > 3) {
-                return false;
-            }
+            // Just few typos
+            if ($distance <= 3) {
+                // Decide how many typos are allowed
+                $minStrLen = min($str1Len, $str2Len);
+                $minSimilarChars = (int) round(85.0 * $minStrLen / 100);
 
-            // Decide how many typos are allowed
-            $minStrLen = min($str1Len, $str2Len);
-            $minSimilarChars = (int) round(85.0 * $minStrLen / 100);
-
-            // Distance is small
-            if (($minStrLen - $minSimilarChars) >= $distance) {
-                return true;
+                // Distance is small
+                if (($minStrLen - $minSimilarChars) >= $distance) {
+                    return true;
+                }
             }
         }
 
-        return false;
+        /*
+         * Try to decide by ASCII-comparing
+         * ('понедельник' == 'ponedelnik')
+         */
+
+        if ($str1 === '' || $str2 === '') {
+            return false;
+        }
+
+        $firstChar1 = self::firstChar($str1);
+        $firstChar2 = self::firstChar($str2);
+
+        // Seems like first chars already in one language, so no need to ASCII-fy
+        if ($firstChar1 === $firstChar2) {
+            return false;
+        }
+
+        // First letter is not equal already
+        if (self::ascii($firstChar1) !== self::ascii($firstChar2)) {
+            return false;
+        }
+
+        // Compare all other letter
+        return self::ascii(self::after($str1,$firstChar1)) === self::ascii(self::after($str2,$firstChar2));
+    }
+
+    /**
+     * @param string $str
+     * @return string
+     */
+    public static function firstChar(string $str): string
+    {
+        if ($str === '') {
+            return '';
+        }
+
+        return self::substr($str, 0, 1);
     }
 
     /**
