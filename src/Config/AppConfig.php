@@ -8,7 +8,7 @@ use RuntimeException;
 class AppConfig
 {
     public array $version = [
-        'number' => '1.1.15',
+        'number' => '1.1.16',
         'stability' => 'beta'
     ];
     public bool $debug = false;
@@ -44,6 +44,7 @@ class AppConfig
     ];
 
     public array $dayWords = ['день недели', 'дни'];
+    public string $maxDayColumn = 'B';
     public array $timeWords = ['часы', 'пара'];
     public array $mendeleeva4HouseCellColors = ['000000'];
     public string $mendeleeva4KeywordInFilename = 'менделеева';

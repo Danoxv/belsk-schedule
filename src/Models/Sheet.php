@@ -298,6 +298,12 @@ class Sheet
                     break(2);
                 }
             }
+
+            // Optimization: day column not found up to maxDayColumn,
+            // so no need to find all other config properties.
+            if (!$dayColFound && $column === $this->config->maxDayColumn) {
+                break;
+            }
         }
 
         if (!$classHourColFound) {
