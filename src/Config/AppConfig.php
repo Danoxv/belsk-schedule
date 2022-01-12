@@ -8,7 +8,7 @@ use RuntimeException;
 class AppConfig
 {
     public array $version = [
-        'number' => '1.2',
+        'number' => '1.2.1',
         'stability' => 'beta'
     ];
     public bool $debug = false;

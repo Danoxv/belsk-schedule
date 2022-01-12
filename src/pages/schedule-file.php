@@ -143,7 +143,7 @@ echo str_replace(
         '{{common-js-css}}',
     ], [
         $config->version['number'],
-        require ROOT . '/src/pages/components/common-js-css.php',
+        file_get_contents(ROOT . '/src/pages/components/common-js-css.php'),
     ], '
 <!doctype html>
 <html lang="ru">
