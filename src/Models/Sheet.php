@@ -317,7 +317,7 @@ class Sheet
             return false;
         }
 
-        $cleanCellValue = Str::lower(Str::replaceManyWhiteSpacesWithOne($cellValue));
+        $cleanCellValue = Str::lower(Str::collapseWhitespace($cellValue));
 
         return $cleanCellValue && in_array($cleanCellValue, $this->config->dayWords, true);
     }
@@ -328,7 +328,7 @@ class Sheet
             return false;
         }
 
-        $cleanCellValue = Str::lower(Str::replaceManyWhiteSpacesWithOne($cellValue));
+        $cleanCellValue = Str::lower(Str::collapseWhitespace($cellValue));
 
         return $cleanCellValue && in_array($cleanCellValue, $this->config->timeWords, true);
     }

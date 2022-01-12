@@ -201,10 +201,10 @@ class Pair
             return;
         }
 
-        $value = Str::replaceManyWhiteSpacesWithOne($value);
+        $value = Str::collapseWhitespace($value);
 
         // Handle values like 'IV' or '15.05-16.40'
-        if (!Str::contains($value, ' ')) {
+        if (Str::notContains($value, ' ')) {
             if ($this->isNumber($value)) {
                 $this->number = $this->formatNumber($value);
             } else {
@@ -244,7 +244,7 @@ class Pair
             ':',
             ' - '
         ],
-            Str::removeWhiteSpace($time)
+            Str::stripWhitespace($time)
         );
     }
 }

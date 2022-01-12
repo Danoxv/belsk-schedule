@@ -8,11 +8,13 @@ use RuntimeException;
 class AppConfig
 {
     public array $version = [
-        'number' => '1.1.16',
+        'number' => '1.2',
         'stability' => 'beta'
     ];
     public bool $debug = false;
     public bool $forceConsoleMode = false;
+
+    public bool $enableMendeleeva4DetectionByDefault = false;
 
     /*
      * System

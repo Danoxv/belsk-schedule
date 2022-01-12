@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Src\Support;
 
 use Src\Config\AppConfig;
+use voku\helper\UTF8;
 
 class Security
 {
@@ -21,10 +22,11 @@ class Security
     {
         $var = (string) $var;
 
-        $var = htmlentities(strip_tags($var));
+        $var = UTF8::html_escape(UTF8::strip_tags($var));
+        $var = UTF8::remove_invisible_characters($var);
 
         if ($applyTrim) {
-            $var = trim($var);
+            $var = UTF8::trim($var);
         }
 
         return $var;

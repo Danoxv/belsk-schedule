@@ -191,10 +191,10 @@ class Lesson
 
         static $classHourCellKeyword = null;
         if ($classHourCellKeyword === null) {
-            $classHourCellKeyword = Str::lower(Str::removeWhiteSpace(AppConfig::getInstance()->classHourCellKeyword));
+            $classHourCellKeyword = Str::lower(Str::stripWhitespace(AppConfig::getInstance()->classHourCellKeyword));
         }
 
-        return Str::lower(Str::removeWhiteSpace($cellValue)) === $classHourCellKeyword;
+        return Str::lower(Str::stripWhitespace($cellValue)) === $classHourCellKeyword;
     }
 
     /**
@@ -281,7 +281,7 @@ class Lesson
             return false;
         }
 
-        $value = Str::replaceManyWhiteSpacesWithOne($value);
+        $value = Str::collapseWhitespace($value);
 
         $matched = preg_match_all(self::PARSE_TEACHERS_AUDITORIES_REGEX, $value, $matches);
 
@@ -354,13 +354,13 @@ class Lesson
         if ($maxSpacesCount > 1) {
             $uniqueChar = Str::getNotExistingChar($lesson, '|');
 
-            // К Л А С С Н Ы Й   Ч А С -> К Л А С С Н Ы Й!Ч А С
+            // К Л А С С Н Ы Й   Ч А С -> К Л А С С Н Ы Й|Ч А С
             $lesson = str_replace(str_repeat($space, $maxSpacesCount), $uniqueChar, $lesson);
 
-            // К Л А С С Н Ы Й!Ч А С -> КЛАССНЫЙ!ЧАС
-            $lesson = Str::removeWhiteSpace($lesson);
+            // К Л А С С Н Ы Й|Ч А С -> КЛАССНЫЙ|ЧАС
+            $lesson = Str::stripWhitespace($lesson);
 
-            // КЛАССНЫЙ!ЧАС -> КЛАССНЫЙ ЧАС
+            // КЛАССНЫЙ|ЧАС -> КЛАССНЫЙ ЧАС
             $lesson = str_replace($uniqueChar, $space, $lesson);
         }
 

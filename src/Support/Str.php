@@ -3,71 +3,46 @@ declare(strict_types=1);
 
 namespace Src\Support;
 
-class Str extends \Illuminate\Support\Str
+use voku\helper\ASCII;
+use voku\helper\UTF8;
+
+class Str
 {
-    private const UTF_8 = 'UTF-8';
-
     /**
+     * Strip all whitespace characters. This includes tabs and newline
+     * characters, as well as multibyte whitespace such as the thin space
+     * and ideographic space.
+     *
      * @param string $string
      * @return string
      */
-    public static function removeWhiteSpace(string $string): string
+    public static function stripWhitespace(string $string): string
     {
-        $string = preg_replace('/\s+/', '', $string);
-
-        return self::removeFunkyWhiteSpace($string);
+        return UTF8::strip_whitespace($string);
     }
 
     /**
+     * Trims the string and replaces consecutive whitespace characters with a
+     * single space. This includes tabs and newline characters, as well as
+     * multibyte whitespace such as the thin space and ideographic space.
+     *
      * @param string $string
      * @return string
      */
-    public static function replaceManyWhiteSpacesWithOne(string $string): string
+    public static function collapseWhitespace(string $string): string
     {
-        $string = preg_replace('/\s+/', ' ', $string);
-
-        return self::removeFunkyWhiteSpace($string);
+        return UTF8::collapse_whitespace($string);
     }
 
     /**
+     * Remove all symbol characters (only letters and numbers will remain).
+     *
      * @param string $str
      * @return string
      */
-    public static function removeSymbols(string $str): string
+    public static function stripSymbols(string $str): string
     {
-        return preg_replace('/[^\pL\pN]+/u', '', $str);
-    }
-
-    /**
-     * Remove unprintable characters and invalid unicode characters.
-     *
-     * Remove any next entity:
-     * \p{C} or \p{Other}: invisible control characters and unused code points.
-     * - \p{Cc} or \p{Control}: an ASCII or Latin-1 control character: 0x00–0x1F and 0x7F–0x9F.
-     * - \p{Cf} or \p{Format}: invisible formatting indicator.
-     * - \p{Co} or \p{Private_Use}: any code point reserved for private use.
-     * - \p{Cs} or \p{Surrogate}: one half of a surrogate pair in UTF-16 encoding.
-     * - \p{Cn} or \p{Unassigned}: any code point to which no character has been assigned.
-     *
-     * Result examples:
-     * "my\x00string"       => "mystring"      ("\x00" was replaced)
-     * "s\ti.php"           => "si.php"        ("\ti" was replaced)
-     * "some\x00/path.txt"  => "some/path.txt" ("\x00" was replaced)
-     *
-     * Source: @link https://gist.github.com/NewEXE/05c2cb337218d562133e9c715334972f
-     * @param string $string
-     * @return string
-     */
-    public static function removeFunkyWhiteSpace(string $string): string
-    {
-        // We do this check in a loop, since removing invalid unicode characters
-        // can lead to new characters being created.
-        $pattern = '#\p{C}+#u';
-        while (preg_match($pattern, $string)) {
-            $string = (string) preg_replace($pattern, '', $string);
-        }
-
-        return $string;
+        return \preg_replace('/[^\pL\pN]+/u', '', $str);
     }
 
     /**
@@ -78,7 +53,7 @@ class Str extends \Illuminate\Support\Str
      */
     public static function rpos(string $haystack, string $needle, int $offset = 0)
     {
-        return mb_strrpos($haystack, $needle, $offset, self::UTF_8);
+        return UTF8::strrpos($haystack, $needle, $offset);
     }
 
     /**
@@ -92,20 +67,26 @@ class Str extends \Illuminate\Support\Str
     }
 
     /**
-     * Source: @link https://stackoverflow.com/a/4517270
-     *
+     * @param string $haystack
+     * @param string $needle
+     * @param int $offset
+     * @param int|null $length
+     * @return false|int
+     */
+    public static function substrCount(string $haystack, string $needle, int $offset = 0, int $length = null)
+    {
+        return UTF8::substr_count($haystack, $needle, $offset, $length);
+    }
+
+
+    /**
      * @param string $string
      * @param string $prefix
      * @return string
      */
     public static function removePrefix(string $string, string $prefix): string
     {
-        $prefixLen = self::length($prefix);
-        if (self::substr($string, 0, $prefixLen) === $prefix) {
-            $string = self::substr($string, $prefixLen);
-        }
-
-        return $string;
+        return UTF8::substr_left($string, $prefix);
     }
 
     /**
@@ -133,11 +114,11 @@ class Str extends \Illuminate\Support\Str
     /**
      * @param string $string
      * @param int $length
-     * @return array|false|string[]|null
+     * @return string[]
      */
-    public static function split(string $string, int $length = 1)
+    public static function split(string $string, int $length = 1): array
     {
-        return mb_str_split($string, $length, self::UTF_8);
+        return UTF8::str_split($string, $length);
     }
 
     /**
@@ -146,9 +127,9 @@ class Str extends \Illuminate\Support\Str
      * @param string $end
      * @return string
      */
-    public static function limit($value, $limit = 255, $end = ''): string
+    public static function limit(string $value, int $limit = 255, string $end = ''): string
     {
-        return parent::limit($value, $limit, $end);
+        return UTF8::str_limit($value, $limit, $end);
     }
 
     /**
@@ -160,18 +141,66 @@ class Str extends \Illuminate\Support\Str
      */
     public static function getNotExistingChar(string $string, ?string $fallbackChar = null): ?string
     {
-        // 33 and 126 - ASCII symbol codes ('!' and '~' accordingly)
-        // see https://www.man7.org/linux/man-pages/man7/ascii.7.html
-        for ($ascii = 33; $ascii <= 126; $ascii++) {
-            // Convert ASCII symbol code to char
-            $char = sprintf('%c', $ascii);
+        if (
+            $string === '' ||
+            ($fallbackChar !== null && self::notContains($string, $fallbackChar))
+        ) {
+            return $fallbackChar;
+        }
 
-            if (!self::contains($string, $char)) {
-                return $char;
-            }
+        $codepoints = UTF8::codepoints($string);
+        if ($codepoints === []) {
+            return $fallbackChar;
+        }
+        $maxCodepoint = \max($codepoints);
+
+        $notExistingChar = UTF8::chr($maxCodepoint + 1);
+
+        if (self::notContains($string, $notExistingChar)) {
+            return $notExistingChar;
         }
 
         return $fallbackChar;
+    }
+
+    /**
+     * Determine if a given string not contains a given substring.
+     *
+     * @param  string  $haystack
+     * @param  string|string[]  $needles
+     * @return bool
+     */
+    public static function notContains(string $haystack, $needles): bool
+    {
+        return !self::contains($haystack, $needles);
+    }
+
+    /**
+     * Determine if a given string contains a given substring.
+     *
+     * @param  string  $haystack
+     * @param  string|string[]  $needles
+     * @return bool
+     */
+    public static function contains(string $haystack, $needles): bool
+    {
+        if (is_array($needles)) {
+            return UTF8::str_contains_any($haystack, $needles);
+        }
+
+        return UTF8::str_contains($haystack, $needles);
+    }
+
+    /**
+     * Determine if a given string contains all array values.
+     *
+     * @param  string  $haystack
+     * @param  string[]  $needles
+     * @return bool
+     */
+    public static function containsAll(string $haystack, array $needles): bool
+    {
+        return UTF8::str_contains_all($haystack, $needles);
     }
 
     /**
@@ -189,6 +218,20 @@ class Str extends \Illuminate\Support\Str
         }
 
         return self::substrReplace($subject, $value, $pos, 0);
+    }
+
+    /**
+     * Replace text within a portion of a string.
+     *
+     * @param  string|string[] $string
+     * @param  string|string[] $replace
+     * @param  int|int[]       $offset
+     * @param  int|int[]|null  $length
+     * @return string|string[]
+     */
+    public static function substrReplace($string, $replace, $offset = 0, $length = null)
+    {
+        return UTF8::substr_replace($string, $replace, $offset, $length);
     }
 
     /**
@@ -213,8 +256,8 @@ class Str extends \Illuminate\Support\Str
         }
 
         // Replace any symbol and convert strings to lowercase
-        $str1 = self::removeSymbols(self::lower($str1));
-        $str2 = self::removeSymbols(self::lower($str2));
+        $str1 = self::stripSymbols(self::lower($str1));
+        $str2 = self::stripSymbols(self::lower($str2));
 
         if ($str1 === $str2) {
             return true;
@@ -281,11 +324,150 @@ class Str extends \Illuminate\Support\Str
      */
     public static function firstChar(string $str): string
     {
-        if ($str === '') {
-            return '';
+        return UTF8::first_char($str);
+    }
+
+    /**
+     * Begin a string with a single instance of a given value.
+     *
+     * @param  string  $value
+     * @param  string  $prefix
+     * @return string
+     */
+    public static function start(string $value, string $prefix): string
+    {
+       return UTF8::str_ensure_left($value, $prefix);
+    }
+
+    /**
+     * Cap a string with a single instance of a given value.
+     *
+     * @param  string  $value
+     * @param  string  $cap
+     * @return string
+     */
+    public static function finish(string $value, string $cap): string
+    {
+        return UTF8::str_ensure_right($value, $cap);
+    }
+
+    /**
+     * Determine if a given string ends with a given substring.
+     *
+     * @param  string  $haystack
+     * @param  string|string[]  $needles
+     * @return bool
+     */
+    public static function endsWith(string $haystack, $needles): bool
+    {
+        if (is_array($needles)) {
+            return UTF8::str_ends_with_any($haystack, $needles);
         }
 
-        return self::substr($str, 0, 1);
+        return UTF8::str_ends_with($haystack, $needles);
+    }
+
+    /**
+     * Convert the given string to lower-case.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    public static function lower(string $value): string
+    {
+        return UTF8::strtolower($value);
+    }
+
+    /**
+     * Generate a URL friendly "slug" from a given string.
+     *
+     * @param  string  $title
+     * @param  string  $separator
+     * @param  string  $language
+     * @return string
+     */
+    public static function slug(string $title, string $separator = '-', string $language = 'en')
+    {
+        return ASCII::to_slugify($title, $separator, $language);
+    }
+
+    /**
+     * Generate a more truly "random" alpha-numeric string.
+     *
+     * @param  int  $length
+     * @return string
+     */
+    public static function random(int $length = 16): string
+    {
+        return UTF8::get_random_string($length);
+    }
+
+    /**
+     * Return the remainder of a string after the first occurrence of a given value.
+     *
+     * @param  string  $subject
+     * @param  string  $search
+     * @return string
+     */
+    public static function after(string $subject, string $search): string
+    {
+        return UTF8::str_substr_after_first_separator($subject, $search);
+    }
+
+    /**
+     * Get the portion of a string before the first occurrence of a given value.
+     *
+     * @param  string  $subject
+     * @param  string  $search
+     * @return string
+     */
+    public static function before(string $subject, string $search): string
+    {
+        return UTF8::str_substr_before_first_separator($subject, $search);
+    }
+
+    /**
+     * Convert the given string to upper-case.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    public static function upper(string $value): string
+    {
+        return UTF8::strtoupper($value);
+    }
+
+    /**
+     * Return the length of the given string.
+     *
+     * @param  string  $value
+     * @return int|false Can return FALSE, if e.g. mbstring is not installed and we process invalid chars.
+     */
+    public static function length(string $value)
+    {
+        return UTF8::strlen($value);
+    }
+
+    /**
+     * Transliterate a UTF-8 value to ASCII.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    public static function ascii(string $value): string
+    {
+        return UTF8::to_ascii($value);
+    }
+
+    /**
+     * Make a string's first character uppercase.
+     *
+     * @param  string  $string
+     * @return string
+     */
+    public static function ucfirst(string $string): string
+    {
+        return UTF8::ucfirst($string);
     }
 
     /**

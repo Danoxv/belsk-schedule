@@ -22,9 +22,7 @@ $session = new Session();
     <meta charset="utf-8">
     <title>Просмотр расписания</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-U1DAWAznBHeqEIlVSCgzq+c9gqGAJn5c/t99JyeKa9xxaYpSvHU5awsuZVVFIhvj" crossorigin="anonymous"></script>
-    <script src="/js/common.js?v=<?= $config->version['number'] ?>"></script>
+    <?php require ROOT . '/src/pages/components/common-js-css.php' ?>
     <script src="/js/schedule-pages-functions.js?v=<?= $config->version['number'] ?>"></script>
     <style>
         #main-container {
@@ -107,7 +105,7 @@ $session = new Session();
                 <div class="mb-3">
                     <b>3. Настройки:</b>
                     <div class="form-check">
-                        <input name="detectMendeleeva4" class="form-check-input" type="checkbox" value="1" <?= $session->get('detectMendeleeva4', true) === true  ? ' checked ' : '' ?> id="detectMendeleeva4" aria-describedby="detectMendeleeva4Help">
+                        <input name="detectMendeleeva4" class="form-check-input" type="checkbox" value="1" <?= $session->get('detectMendeleeva4', $config->enableMendeleeva4DetectionByDefault) === true  ? ' checked ' : '' ?> id="detectMendeleeva4" aria-describedby="detectMendeleeva4Help">
                         <label class="form-check-label" for="detectMendeleeva4">
                             Выделять пары, проходящие на Менделеева, 4
                         </label>
