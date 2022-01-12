@@ -59,11 +59,13 @@ class Collection implements \IteratorAggregate
      */
     public function first()
     {
-        foreach ($this->items as $item) {
-            return $item;
+        $firstKey = array_key_first($this->items);
+
+        if ($firstKey === null) {
+            return null;
         }
 
-        return null;
+        return $this->items[$firstKey];
     }
 
     /**
