@@ -8,8 +8,8 @@ use RuntimeException;
 class AppConfig
 {
     public array $version = [
-        'number' => '1.2.2',
-        'stability' => 'beta'
+        'number' => '1.2.3',
+        'stability' => 'stable'
     ];
     public bool $debug = false;
     public bool $forceConsoleMode = false;
@@ -39,10 +39,10 @@ class AppConfig
     ];
     public array $groupsList; // initialized in constructor
     public array $messagesOnSchedulePage = [
-        [
+        /*[
             'type' => 'warning',
             'content' => 'Сервис в тестовом режиме - могут быть ошибки.',
-        ],
+        ],*/
     ];
 
     public array $dayWords = ['день недели', 'дни'];

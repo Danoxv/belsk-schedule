@@ -7,6 +7,7 @@ use PhpOffice\PhpSpreadsheet\Exception;
 use Src\Support\Coordinate;
 use PhpOffice\PhpSpreadsheet\Cell\Cell as PhpSpreadsheetCell;
 use Src\Support\Security;
+use Src\Support\Str;
 
 class Cell
 {
@@ -16,7 +17,6 @@ class Cell
 
     private string $rawValue;
     private string $value;
-    private bool $isEmpty;
 
     private bool $isProcessed = false;
 
@@ -44,8 +44,7 @@ class Cell
         $this->setCoordinate($coordinate);
         $this->cell     = $this->sheet->getWorksheet()->getCell($this->coordinate);
         $this->rawValue = Security::sanitizeString((string) $this->cell);
-        $this->value    = trim($this->rawValue);
-        $this->isEmpty  = empty($this->value);
+        $this->value    = Str::trim($this->rawValue);
     }
 
     /**
@@ -172,7 +171,7 @@ class Cell
      */
     public function isEmpty(): bool
     {
-        return $this->isEmpty;
+        return $this->value === '';
     }
 
     /**

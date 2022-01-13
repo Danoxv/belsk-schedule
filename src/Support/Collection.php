@@ -6,9 +6,9 @@ namespace Src\Support;
 use ArrayIterator;
 
 /**
- *
  * Simple collection realization with only necessary for this project methods.
- * Based on Laravel's Collection class.
+ *
+ * Based on Laravel's Illuminate\Support\Collection class.
  *
  * @package Src\Support
  */

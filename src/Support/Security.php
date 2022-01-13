@@ -4,15 +4,16 @@ declare(strict_types=1);
 namespace Src\Support;
 
 use Src\Config\AppConfig;
-use voku\helper\UTF8;
 
 class Security
 {
     /**
-     * Strip HTML and PHP tags from a string and
-     * convert all applicable characters to HTML entities.
-     *
-     * Source: @link https://www.oreilly.com/library/view/learning-php-mysql/9781491979075/
+     * 1) Cast input to string;
+     * 2) normalizes to UTF-8 NFC, converting from WINDOWS-1252 when needed;
+     * 3) strip HTML and PHP tags from a string;
+     * 4) convert all applicable characters to HTML entities;
+     * 5) remove invisible characters (like "\0");
+     * 6) optionally apply >= 8-Bit safe trim().
      *
      * @param mixed $var
      * @param bool $applyTrim
@@ -22,11 +23,12 @@ class Security
     {
         $var = (string) $var;
 
-        $var = UTF8::html_escape(UTF8::strip_tags($var));
-        $var = UTF8::remove_invisible_characters($var);
+        $var = Str::filter($var);
+        $var = Str::htmlEscape(Str::stripTags($var));
+        $var = Str::removeInvisibleCharacters($var);
 
         if ($applyTrim) {
-            $var = UTF8::trim($var);
+            $var = Str::trim($var);
         }
 
         return $var;
@@ -34,7 +36,7 @@ class Security
 
     /**
      * Gets a specific external variable by name and filters it as string.
-     * @link https://php.net/manual/en/function.filter-input.php
+     * @link https://php.net/manual/function.filter-input.php
      *
      * @param int $type
      * One of INPUT_GET, INPUT_POST,
@@ -53,8 +55,6 @@ class Security
 
     /**
      * Walks the array while sanitizing the contents.
-     *
-     * Source: @link https://github.com/WordPress/WordPress/blob/master/wp-includes/functions.php#L1253 (add_magic_quotes())
      *
      * @param array $array Array to walk while sanitizing contents.
      * @return array Sanitized $array.
@@ -111,7 +111,7 @@ class Security
             return '';
         }
 
-        // Remove any funky symbols (including "dot")
+        // Remove any funky symbol (including "dot")
         $fileName = Str::slug($fileName);
 
         if ($fileName === '') {

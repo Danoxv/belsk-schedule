@@ -163,9 +163,12 @@ class Sheet
      */
     public function getClassHourLessonColumn(): ?string
     {
-        return empty($this->sheetConfig->classHourLessonColumn) ? null : $this->sheetConfig->classHourLessonColumn;
+        return $this->hasClassHourLessonColumn() ? $this->sheetConfig->classHourLessonColumn : null;
     }
 
+    /**
+     * @return bool
+     */
     public function hasMendeleeva4(): bool
     {
         return $this->hasMendeleeva4;
@@ -229,8 +232,7 @@ class Sheet
      */
     private function init(): void
     {
-        $this->title = Security::sanitizeString($this->worksheet->getTitle(), true);
-
+        $this->resolveTitle();
         $this->resolveId();
 
         $firstColumn = Coordinate::FIRST_COL;
@@ -256,7 +258,7 @@ class Sheet
                 $value = $this->getCellValue($column.$row);
 
                 /*
-                 * Resolve Excel config
+                 * Resolve Sheet config
                  */
 
                 if (!$dayColFound && $this->isDayCell($value)) {
@@ -277,10 +279,7 @@ class Sheet
                     $sheetCfg->classHourLessonColumn    = $column;
                 }
 
-                /*
-                 * Detect "Has Mendeleeva 4 house"
-                 */
-
+                // Detect "Has Mendeleeva 4 house"
                 if ($needMendeleeva4Detect) {
                     if ($this->sheetProcessingConfig->forceApplyMendeleeva4ToLessons) {
                         $this->hasMendeleeva4 = true;
@@ -341,6 +340,11 @@ class Sheet
     private function isMendeleeva4Cell(string $cellValue): bool
     {
         return $cellValue && Str::containsAll(Str::lower($cellValue), $this->config->mendeleeva4KeywordsInCell);
+    }
+
+    private function resolveTitle(): void
+    {
+        $this->title = Security::sanitizeString($this->worksheet->getTitle(), true);
     }
 
     private function resolveId(): void

@@ -6,6 +6,14 @@ namespace Src\Support;
 use voku\helper\ASCII;
 use voku\helper\UTF8;
 
+/**
+ * String helper. All methods have unicode support.
+ * @see https://github.com/voku/portable-utf8
+ *
+ * Based on Laravel's Illuminate\Support\Str class.
+ *
+ * @package Src\Support
+ */
 class Str
 {
     /**
@@ -46,6 +54,10 @@ class Str
     }
 
     /**
+     * Find the position of the last occurrence of a substring in a string.
+     *
+     * @see http://php.net/manual/function.mb-strrpos.php
+     *
      * @param string $haystack
      * @param string $needle
      * @param int $offset
@@ -67,6 +79,10 @@ class Str
     }
 
     /**
+     * Count the number of substring occurrences.
+     *
+     * @see http://php.net/manual/function.substr-count.php
+     *
      * @param string $haystack
      * @param string $needle
      * @param int $offset
@@ -80,6 +96,8 @@ class Str
 
 
     /**
+     * Removes a prefix from the beginning of the string.
+     *
      * @param string $string
      * @param string $prefix
      * @return string
@@ -90,6 +108,10 @@ class Str
     }
 
     /**
+     * Get the max count of consecutive char's repeating times.
+     *
+     * Str::maxConsecutiveCharsCount('К Л А С С Н Ы Й   Ч А С', ' '); // 3
+     *
      * @param string $string
      * @param string $char
      * @return int
@@ -112,6 +134,10 @@ class Str
     }
 
     /**
+     * Convert a string to an array of unicode characters.
+     *
+     * @see https://php.net/manual/function.str-split.php
+     *
      * @param string $string
      * @param int $length
      * @return string[]
@@ -122,6 +148,8 @@ class Str
     }
 
     /**
+     * Limit the number of characters in a string.
+     *
      * @param string $value
      * @param int $limit
      * @param string $end
@@ -141,10 +169,12 @@ class Str
      */
     public static function getNotExistingChar(string $string, ?string $fallbackChar = null): ?string
     {
-        if (
-            $string === '' ||
-            ($fallbackChar !== null && self::notContains($string, $fallbackChar))
-        ) {
+        // String is blank, so we can returns any char.
+        if (trim($string) === '') {
+            return 'a';
+        }
+
+        if ($fallbackChar !== null && self::notContains($string, $fallbackChar)) {
             return $fallbackChar;
         }
 
@@ -204,6 +234,10 @@ class Str
     }
 
     /**
+     * Insert string ($value) before specified substring ($search) in $subject.
+     *
+     * Str::insertBefore('csv', '.', 'my-filecsv'); // 'my-file.csv'
+     *
      * @param string $search
      * @param string $value
      * @param string $subject
@@ -223,6 +257,8 @@ class Str
     /**
      * Replace text within a portion of a string.
      *
+     * @see https://www.php.net/manual/function.substr-replace.php
+     *
      * @param  string|string[] $string
      * @param  string|string[] $replace
      * @param  int|int[]       $offset
@@ -238,7 +274,7 @@ class Str
      * WARNING: beta version of method
      *
      * Returns true when strings "similar"
-     * (case-insensitive, whitespace-less and symbol-less comparison of strings).
+     * (by case-insensitive, whitespace-less and symbol-less comparison).
      * Allow 85% of similarity and max 3 typos.
      *
      * isSimilar('понедельник', ' О Не деЛЬ НИк!!! '); // true
@@ -319,12 +355,14 @@ class Str
     }
 
     /**
-     * @param string $str
+     * Returns the first character of the string.
+     *
+     * @param string $string The input string.
      * @return string
      */
-    public static function firstChar(string $str): string
+    public static function firstChar(string $string): string
     {
-        return UTF8::first_char($str);
+        return UTF8::first_char($string);
     }
 
     /**
@@ -386,13 +424,13 @@ class Str
      * @param  string  $language
      * @return string
      */
-    public static function slug(string $title, string $separator = '-', string $language = 'en')
+    public static function slug(string $title, string $separator = '-', string $language = 'en'): string
     {
         return ASCII::to_slugify($title, $separator, $language);
     }
 
     /**
-     * Generate a more truly "random" alpha-numeric string.
+     * Generate a "random" alpha-numeric string.
      *
      * @param  int  $length
      * @return string
@@ -400,6 +438,69 @@ class Str
     public static function random(int $length = 16): string
     {
         return UTF8::get_random_string($length);
+    }
+
+    /**
+     * Remove invisible characters from a string.
+     *
+     * Str::removeInvisibleCharacters("κόσ\0με"); // 'κόσμε'
+     *
+     *
+     * @param string $string
+     * @return string
+     */
+    public static function removeInvisibleCharacters(string $string): string
+    {
+        return UTF8::remove_invisible_characters($string);
+    }
+
+    /**
+     * Strip whitespace or other characters from the beginning and end of a UTF-8 string.
+     * INFO: This is slower then "trim()", but safe for >= 8-Bit strings.
+     *
+     * @param string $string
+     * @param string|null $chars
+     * @return string
+     */
+    public static function trim(string $string, string $chars = null): string
+    {
+        return UTF8::trim($string, $chars);
+    }
+
+    /**
+     * Normalizes to UTF-8 NFC, converting from WINDOWS-1252 when needed.
+     *
+     * @param string $string
+     * @return string
+     */
+    public static function filter(string $string): string
+    {
+        return UTF8::filter($string);
+    }
+
+    /**
+     * Create a escape html version of the string.
+     *
+     * @param string $string
+     * @return string
+     */
+    public static function htmlEscape(string $string): string
+    {
+        return UTF8::html_escape($string);
+    }
+
+    /**
+     * Strip HTML and PHP tags from a string.
+     *
+     * @see http://php.net/manual/function.strip-tags.php
+     *
+     * @param string $string
+     * @param string|null $allowableTags
+     * @return string
+     */
+    public static function stripTags(string $string, string $allowableTags = null): string
+    {
+        return UTF8::strip_tags($string, $allowableTags);
     }
 
     /**
@@ -449,7 +550,7 @@ class Str
     }
 
     /**
-     * Transliterate a UTF-8 value to ASCII.
+     * Convert a string into ASCII.
      *
      * @param  string  $value
      * @return string
@@ -471,7 +572,7 @@ class Str
     }
 
     /**
-     * Calculate Levenshtein distance between two strings. Supports multibyte.
+     * Calculate Levenshtein distance between two strings.
      *
      * @see https://php.net/manual/en/function.levenshtein.php
      * Source: @link https://github.com/KEINOS/mb_levenshtein
