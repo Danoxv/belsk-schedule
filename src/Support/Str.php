@@ -291,9 +291,17 @@ class Str
             return true;
         }
 
-        // Replace any symbol and convert strings to lowercase
-        $str1 = self::stripSymbols(self::lower($str1));
-        $str2 = self::stripSymbols(self::lower($str2));
+        // Convert strings to lowercase
+        $str1 = self::lower($str1);
+        $str2 = self::lower($str2);
+
+        if ($str1 === $str2) {
+            return true;
+        }
+
+        // Replace any symbol
+        $str1 = self::stripSymbols($str1);
+        $str2 = self::stripSymbols($str2);
 
         if ($str1 === $str2) {
             return true;
@@ -340,18 +348,22 @@ class Str
         $firstChar1 = self::firstChar($str1);
         $firstChar2 = self::firstChar($str2);
 
-        // Seems like first chars already in one language, so no need to ASCII-fy
+        // Seems like first chars already in one language, so no need to ASCII-fy,
+        // because compared via stripSymbols(lower()) comparison or levenshtein()
         if ($firstChar1 === $firstChar2) {
             return false;
         }
 
-        // First letter is not equal already
+        // ASCII of first letters is not equal already
         if (self::ascii($firstChar1) !== self::ascii($firstChar2)) {
             return false;
         }
 
+        $ascii1 = str_replace("'", '', self::ascii(self::after($str1, $firstChar1)));
+        $ascii2 = str_replace("'", '', self::ascii(self::after($str2, $firstChar2)));
+
         // Compare all other letter
-        return self::ascii(self::after($str1,$firstChar1)) === self::ascii(self::after($str2,$firstChar2));
+        return $ascii1 === $ascii2;
     }
 
     /**

@@ -232,7 +232,7 @@ class Pair
 
     private function formatNumber(string $number): string
     {
-        return Str::upper($number);
+        return strtoupper($number); // multibyte support is not necessary here
     }
 
     private function formatTime(string $time): string

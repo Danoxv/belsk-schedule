@@ -19,7 +19,7 @@ class Coordinate extends \PhpOffice\PhpSpreadsheet\Cell\Coordinate
      */
     public static function nextColumn(string $column): ?string
     {
-        $column = strtoupper($column); // mb_strtoupper() is not necessary here
+        $column = strtoupper($column); // multibyte support is not necessary here
 
         if ($column === self::LAST_COL) {
             return null;
@@ -35,7 +35,7 @@ class Coordinate extends \PhpOffice\PhpSpreadsheet\Cell\Coordinate
      */
     public static function prevColumn(string $column): ?string
     {
-        $column = strtoupper($column); // mb_strtoupper() is not necessary here
+        $column = strtoupper($column); // multibyte support is not necessary here
 
         if ($column === self::FIRST_COL) {
             return null;
@@ -110,7 +110,7 @@ class Coordinate extends \PhpOffice\PhpSpreadsheet\Cell\Coordinate
      */
     public static function explodeCoordinate(string $coordinate): array
     {
-        $coordinate = strtoupper($coordinate); // mb_strtoupper() is not necessary here
+        $coordinate = strtoupper($coordinate); // multibyte support is not necessary here
 
         $col = '';
         $row = 0;

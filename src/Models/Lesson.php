@@ -183,18 +183,7 @@ class Lesson
      */
     public static function isClassHourLesson(string $cellValue): bool
     {
-        $cellValue = trim($cellValue);
-
-        if ($cellValue === '') {
-            return false;
-        }
-
-        static $classHourCellKeyword = null;
-        if ($classHourCellKeyword === null) {
-            $classHourCellKeyword = Str::lower(Str::stripWhitespace(AppConfig::getInstance()->classHourCellKeyword));
-        }
-
-        return Str::lower(Str::stripWhitespace($cellValue)) === $classHourCellKeyword;
+        return Str::isSimilar($cellValue, AppConfig::getInstance()->classHourCellKeyword);
     }
 
     /**
@@ -225,7 +214,7 @@ class Lesson
             $value = $lesson1->getCellValue();
 
             if ($lesson1->isClassHour()) {
-                $value = self::formatClassHourLesson($value);
+                $value = self::formatClassHourLesson();
             }
 
             $parsed = self::parse($value);
@@ -255,7 +244,7 @@ class Lesson
             $value = $lesson2->getCellValue();
 
             if ($lesson2->isClassHour()) {
-                $value = self::formatClassHourLesson($value);
+                $value = self::formatClassHourLesson();
             }
 
             $parsed = self::parse($value);
@@ -332,40 +321,13 @@ class Lesson
     }
 
     /**
-     * Turn this one:
-     * 'К Л А С С Н Ы Й   Ч А С'
-     * Into this one:
-     * 'Классный час'
+     * Return formatted class hour value
      *
-     * @param string $cellValue
      * @return string
      */
-    private static function formatClassHourLesson(string $cellValue): string
+    private static function formatClassHourLesson(): string
     {
-        $lesson = trim($cellValue);
-
-        if (empty($lesson)) {
-            return '';
-        }
-
-        $space = ' ';
-        $maxSpacesCount = Str::maxConsecutiveCharsCount($lesson, $space);
-
-        if ($maxSpacesCount > 1) {
-            $uniqueChar = Str::getNotExistingChar($lesson, '|');
-
-            // К Л А С С Н Ы Й   Ч А С -> К Л А С С Н Ы Й|Ч А С
-            $lesson = str_replace(str_repeat($space, $maxSpacesCount), $uniqueChar, $lesson);
-
-            // К Л А С С Н Ы Й|Ч А С -> КЛАССНЫЙ|ЧАС
-            $lesson = Str::stripWhitespace($lesson);
-
-            // КЛАССНЫЙ|ЧАС -> КЛАССНЫЙ ЧАС
-            $lesson = str_replace($uniqueChar, $space, $lesson);
-        }
-
-        // КЛАССНЫЙ ЧАС -> Классный час
-        return Str::ucfirst(Str::lower($lesson));
+        return 'Классный час';
     }
 
     private function init(): void
