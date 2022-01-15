@@ -193,7 +193,7 @@ require ROOT . '/src/pages/components/dark-mode.php';
 if (!$debug) {
     foreach ($config->messagesOnSchedulePage as $message) {
         $type = $message['type'] ?? 'primary';
-        $content = trim($message['content'] ?? '');
+        $content = Str::trim($message['content'] ?? '');
         echo "
         <div class='alert alert-{$type} alert-dismissible fade show' role='alert'>
             {$content}

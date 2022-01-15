@@ -264,7 +264,7 @@ class Lesson
      */
     private static function parse(string $value)
     {
-        $value = trim($value);
+        $value = Str::trim($value);
 
         if (empty($value)) {
             return false;
@@ -291,7 +291,7 @@ class Lesson
         if (empty($firstTeacher)) {
             $firstTeacher = $matches['teacher'][0] ?? '';
         }
-        $parsed['subject'] = trim(Str::before($value, $firstTeacher));
+        $parsed['subject'] = Str::trim(Str::before($value, $firstTeacher));
 
         /*
          * Resolve teachers and auditories
@@ -302,7 +302,7 @@ class Lesson
             $initials = $matches['teachersInitials'][$k] ?? '';
             $auditory = $matches['auditory'][$k] ?? '';
 
-            $teacher = trim("$surname $initials");
+            $teacher = Str::trim("$surname $initials");
 
             if ($teacher) {
                 $teacherWasFound = true;

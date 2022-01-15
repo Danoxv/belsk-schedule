@@ -108,32 +108,6 @@ class Str
     }
 
     /**
-     * Get the max count of consecutive char's repeating times.
-     *
-     * Str::maxConsecutiveCharsCount('К Л А С С Н Ы Й   Ч А С', ' '); // 3
-     *
-     * @param string $string
-     * @param string $char
-     * @return int
-     */
-    public static function maxConsecutiveCharsCount(string $string, string $char): int
-    {
-        $max = 0;
-
-        $current = 0;
-        foreach(self::split($string) as $val) {
-            if($val === $char) {
-                $current++;
-                $max = max($current, $max);
-            } else {
-                $current = 0;
-            }
-        }
-
-        return $max;
-    }
-
-    /**
      * Convert a string to an array of unicode characters.
      *
      * @see https://php.net/manual/function.str-split.php
@@ -158,39 +132,6 @@ class Str
     public static function limit(string $value, int $limit = 255, string $end = ''): string
     {
         return UTF8::str_limit($value, $limit, $end);
-    }
-
-    /**
-     * Returns char that string not contains.
-     *
-     * @param string $string
-     * @param string|null $fallbackChar
-     * @return string|null Fallback char or NULL (by default)
-     */
-    public static function getNotExistingChar(string $string, ?string $fallbackChar = null): ?string
-    {
-        // String is blank, so we can returns any char.
-        if (trim($string) === '') {
-            return 'a';
-        }
-
-        if ($fallbackChar !== null && self::notContains($string, $fallbackChar)) {
-            return $fallbackChar;
-        }
-
-        $codepoints = UTF8::codepoints($string);
-        if ($codepoints === []) {
-            return $fallbackChar;
-        }
-        $maxCodepoint = \max($codepoints);
-
-        $notExistingChar = UTF8::chr($maxCodepoint + 1);
-
-        if (self::notContains($string, $notExistingChar)) {
-            return $notExistingChar;
-        }
-
-        return $fallbackChar;
     }
 
     /**
@@ -349,7 +290,7 @@ class Str
         $firstChar2 = self::firstChar($str2);
 
         // Seems like first chars already in one language, so no need to ASCII-fy,
-        // because compared via stripSymbols(lower()) comparison or levenshtein()
+        // because compared via lower() + stripSymbols() comparison or levenshtein()
         if ($firstChar1 === $firstChar2) {
             return false;
         }
@@ -386,7 +327,7 @@ class Str
      */
     public static function start(string $value, string $prefix): string
     {
-       return UTF8::str_ensure_left($value, $prefix);
+        return UTF8::str_ensure_left($value, $prefix);
     }
 
     /**
@@ -457,7 +398,6 @@ class Str
      *
      * Str::removeInvisibleCharacters("κόσ\0με"); // 'κόσμε'
      *
-     *
      * @param string $string
      * @return string
      */
@@ -467,16 +407,43 @@ class Str
     }
 
     /**
-     * Strip whitespace or other characters from the beginning and end of a UTF-8 string.
-     * INFO: This is slower then "trim()", but safe for >= 8-Bit strings.
+     * Strip whitespace (or other characters) from the beginning and end of a UTF-8 string.
+     * This is slower then "trim()", but safe for >= 8-Bit strings.
+     *
+     * @see UTF8::trim()
+     * @see https://php.net/manual/function.trim.php
      *
      * @param string $string
-     * @param string|null $chars
+     * @param string|null $characters
      * @return string
      */
-    public static function trim(string $string, string $chars = null): string
+    public static function trim(string $string, string $characters = null): string
     {
-        return UTF8::trim($string, $chars);
+        return UTF8::trim($string, $characters);
+    }
+
+    /**
+     * Strip whitespace (or other characters) from the end of a UTF-8 string.
+     *
+     * @param string $string
+     * @param string|null $characters
+     * @return string
+     */
+    public static function rtrim(string $string, string $characters = null): string
+    {
+        return UTF8::rtrim($string, $characters);
+    }
+
+    /**
+     * Strip whitespace (or other characters) from the beginning of a UTF-8 string.
+     *
+     * @param string $string
+     * @param string|null $characters
+     * @return string
+     */
+    public static function ltrim(string $string, string $characters = null): string
+    {
+        return UTF8::ltrim($string, $characters);
     }
 
     /**
@@ -507,12 +474,11 @@ class Str
      * @see http://php.net/manual/function.strip-tags.php
      *
      * @param string $string
-     * @param string|null $allowableTags
      * @return string
      */
-    public static function stripTags(string $string, string $allowableTags = null): string
+    public static function removeHtmlPhpTags(string $string): string
     {
-        return UTF8::strip_tags($string, $allowableTags);
+        return UTF8::remove_html($string);
     }
 
     /**

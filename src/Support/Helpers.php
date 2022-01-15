@@ -120,7 +120,7 @@ class Helpers
         $regex = '/^M*(C[MD]|D?C{0,3})(X[CL]|L?X{0,3})(I[XV]|V?I{0,3})$/i';
 
         if (!$caseInsensitive) {
-            $regex = rtrim($regex, 'i');
+            $regex = Str::rtrim($regex, 'i');
         }
 
         return preg_match($regex, $string) > 0;

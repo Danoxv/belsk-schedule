@@ -35,9 +35,9 @@ function _getFormattedPost(): string
 
     $post = print_r($post, true);
     $post = Str::removePrefix($post, 'Array');
-    $post = trim($post);
-    $post = ltrim($post, '(');
-    $post = rtrim($post, ')');
+    $post = Str::trim($post);
+    $post = Str::ltrim($post, '(');
+    $post = Str::rtrim($post, ')');
 
-    return trim($post);
+    return Str::trim($post);
 }
