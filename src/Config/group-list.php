@@ -1,7 +1,10 @@
 <?php
+declare(strict_types=1);
+
 // Auto-generated file by src/scripts/generate-group-list.php
 // Regenerate with:
-// $ php public/index.php generate-group-list.php 
+// $ php public/index.php generate-group-list.php
+
 return array (
   0 => '11-о',
   1 => '12-о',

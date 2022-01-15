@@ -89,7 +89,7 @@ class Security
      */
     public static function isScheduleLinkValid(string $link): bool
     {
-        if ($link === '') {
+        if ($link === Str::EMPTY) {
             return false;
         }
 
@@ -108,7 +108,7 @@ class Security
     {
         // TODO Hacky, need to process other possible replacements.
         // urlencode() / rawurlencode() and many others doesn't work
-        return str_replace(' ', '%20', $scheduleLink);
+        return Str::replace(Str::SPACE, '%20', $scheduleLink);
     }
 
     /**
@@ -119,14 +119,14 @@ class Security
     {
         // Must contains one "dot" (before extension)
         if (!Str::containsOne($fileName, '.')) {
-            return '';
+            return Str::EMPTY;
         }
 
         // Remove any funky symbol (including "dot")
         $fileName = Str::slug($fileName);
 
-        if ($fileName === '') {
-            return '';
+        if ($fileName === Str::EMPTY) {
+            return Str::EMPTY;
         }
 
         // Revert "dot" symbol

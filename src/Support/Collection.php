@@ -127,7 +127,7 @@ class Collection implements \IteratorAggregate
      * @param  string  $separator
      * @return string
      */
-    public function implode(string $separator = ''): string
+    public function implode(string $separator = Str::EMPTY): string
     {
         return \implode($separator, $this->items);
     }

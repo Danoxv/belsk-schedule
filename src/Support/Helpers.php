@@ -19,7 +19,7 @@ class Helpers
         $urlParts = parse_url($link);
 
         if (empty($urlParts['host'])) {
-            return '';
+            return Str::EMPTY;
         }
 
         return $urlParts['scheme'] . '://' . $urlParts['host'];
@@ -43,7 +43,7 @@ class Helpers
      * @param string $curlError
      * @return ?string
      */
-    public static function httpGet(string $link, &$curlError = '', int $timeout = 5): ?string
+    public static function httpGet(string $link, &$curlError = Str::EMPTY, int $timeout = 5): ?string
     {
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $link);
@@ -74,7 +74,7 @@ class Helpers
      */
     public static function intToRoman(int $num): string
     {
-        $res = '';
+        $res = Str::EMPTY;
 
         static $romanNumberMap = [
             'M'  => 1000,
@@ -97,7 +97,7 @@ class Helpers
             $matches = (int)($num / $number);
 
             //assign the roman char * $matches
-            $res .= str_repeat($roman, $matches);
+            $res .= \str_repeat($roman, $matches); // multibyte support is not necessary here
 
             //substract from the number
             $num %= $number;
@@ -113,7 +113,7 @@ class Helpers
      */
     public static function isRomanNumber(string $string, bool $caseInsensitive = true): bool
     {
-        if ($string === '') {
+        if ($string === Str::EMPTY) {
             return false;
         }
 
@@ -130,7 +130,7 @@ class Helpers
      * @param string $curlError
      * @return array
      */
-    public static function getScheduleFilesLinks(&$curlError = ''): array
+    public static function getScheduleFilesLinks(&$curlError = Str::EMPTY): array
     {
         $config = AppConfig::getInstance();
 
@@ -205,7 +205,7 @@ class Helpers
     {
         static $unit = ['b','KB','MB','GB','TB','PB'];
 
-        return @round($size/(1024 ** ($i = floor(log($size, 1024)))),2).' '.$unit[$i];
+        return @round($size/(1024 ** ($i = floor(log($size, 1024)))),2).Str::SPACE.$unit[$i];
     }
 
     public static function goToLocation(string $location): void

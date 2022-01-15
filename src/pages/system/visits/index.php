@@ -51,7 +51,7 @@ $files = scandir($dir, SCANDIR_SORT_DESCENDING);
                     continue;
                 }
 
-                $date = preg_replace('/[^0-9\-]+/', '', $file); // -2021-12-52
+                $date = preg_replace('/[^0-9\-]+/', Str::EMPTY, $file); // -2021-12-52
                 $date = Str::ltrim($date, '-');                              // 2021-12-52
                 $date = explode('-', $date);                            // ['2021', '12', '52']
 

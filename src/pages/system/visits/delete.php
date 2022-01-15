@@ -5,11 +5,12 @@ use Src\Config\AppConfig;
 use Src\Exceptions\TerminateException;
 use Src\Support\Helpers;
 use Src\Support\Security;
+use Src\Support\Str;
 
 $fileName = Security::filterInputString(INPUT_GET, 'f');
 $fileName = Security::sanitizeCsvFilename($fileName);
 
-if ($fileName === '') {
+if ($fileName === Str::EMPTY) {
     throw new TerminateException('GET param "f" is required');
 }
 

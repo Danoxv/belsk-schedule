@@ -4,6 +4,7 @@ declare(strict_types=1);
 use Src\Config\AppConfig;
 use Src\Support\Helpers;
 use Src\Support\Session;
+use Src\Support\Str;
 
 $config = AppConfig::getInstance();
 
@@ -46,7 +47,7 @@ $session = new Session();
                         <?php if (!empty($links)): ?>
                             <?php foreach ($links as $linkIdx => $link): ?>
                                 <div class="form-check">
-                                    <input name="scheduleLink" onchange="onScheduleLinkChange()" <?= ($linkIdx === 0 || $session->get('scheduleLink') === $link['uri']) ? 'checked' : '' ?> value="<?=$link['uri']?>" class="form-check-input" type="radio" id="scheduleLink<?=$linkIdx?>">
+                                    <input name="scheduleLink" onchange="onScheduleLinkChange()" <?= ($linkIdx === 0 || $session->get('scheduleLink') === $link['uri']) ? 'checked' : Str::EMPTY ?> value="<?=$link['uri']?>" class="form-check-input" type="radio" id="scheduleLink<?=$linkIdx?>">
                                     <label class="form-check-label" for="scheduleLink<?=$linkIdx?>">
                                         <?= $link['text'] ?>
                                     </label>
@@ -95,7 +96,7 @@ $session = new Session();
                     <select name="group" class="form-select" aria-label="Выберите группу" id="group" aria-describedby="groupHelp">
                         <!-- <option value="" selected disabled>Выберите...</option> -->
                         <?php foreach ($config->groupsList as $group): ?>
-                            <option value="<?= $group ?>" <?= $session->get('group') === $group ? ' selected ' : '' ?>><?= $group ?></option>
+                            <option value="<?= $group ?>" <?= $session->get('group') === $group ? ' selected ' : Str::EMPTY ?>><?= $group ?></option>
                         <?php endforeach; ?>
                     </select>
                     <div id="groupHelp" class="form-text">Выберите учебную группу, для которой хотите получить расписание.</div>
@@ -105,7 +106,7 @@ $session = new Session();
                 <div class="mb-3">
                     <b>3. Настройки:</b>
                     <div class="form-check">
-                        <input name="detectMendeleeva4" class="form-check-input" type="checkbox" value="1" <?= $session->get('detectMendeleeva4', $config->enableMendeleeva4DetectionByDefault) === true  ? ' checked ' : '' ?> id="detectMendeleeva4" aria-describedby="detectMendeleeva4Help">
+                        <input name="detectMendeleeva4" class="form-check-input" type="checkbox" value="1" <?= $session->get('detectMendeleeva4', $config->enableMendeleeva4DetectionByDefault) === true  ? ' checked ' : Str::EMPTY ?> id="detectMendeleeva4" aria-describedby="detectMendeleeva4Help">
                         <label class="form-check-label" for="detectMendeleeva4">
                             Выделять пары, проходящие на Менделеева, 4
                         </label>

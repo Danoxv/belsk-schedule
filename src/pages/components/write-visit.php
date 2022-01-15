@@ -19,7 +19,7 @@ $post = _getFormattedPost();
 $visitsStorageFileTemplate = AppConfig::getInstance()->visitsStorageFileTemplate;
 
 // Write visit to file by current ISO week number (W)
-$visitsStorageFile = str_replace('{date}', gmdate('Y-m-W'), $visitsStorageFileTemplate);
+$visitsStorageFile = Str::replace('{date}', gmdate('Y-m-W'), $visitsStorageFileTemplate);
 
 $fp = fopen($visitsStorageFile, 'ab');
 fputcsv($fp, [$datetime, $ip, $ua, $uri, $post]);
@@ -30,7 +30,7 @@ function _getFormattedPost(): string
     $post = Security::sanitizeArray($_POST);
 
     if (empty($post)) {
-        return '';
+        return Str::EMPTY;
     }
 
     $post = print_r($post, true);

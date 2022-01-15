@@ -160,11 +160,11 @@ class Pair
             $day = $sheet->getCellValue($dayCol.$dayRow);
 
             // Hack: try to find day on the previous column also
-            if ($day === '') {
+            if ($day === Str::EMPTY) {
                 $dayPrevCol = Coordinate::prevColumn($dayCol);
                 if ($dayPrevCol !== null) {
                     $dayPrevCell = $sheet->getCellValue($dayPrevCol.$dayRow);
-                    if ($dayPrevCell !== '') {
+                    if ($dayPrevCell !== Str::EMPTY) {
                         $day = $dayPrevCell;
                     }
                 }
@@ -174,7 +174,7 @@ class Pair
             if ($dayRow === null) {
                 break;
             }
-        } while ($day === '');
+        } while ($day === Str::EMPTY);
 
         $recognizedDay = Day::recognize($day);
 
@@ -188,7 +188,7 @@ class Pair
 
     private function resolveTimeAndNumber(Lesson $validFirstLesson): void
     {
-        $this->time = $this->number = '';
+        $this->time = $this->number = Str::EMPTY;
 
         if ($validFirstLesson->isClassHour()) {
             return;
@@ -197,14 +197,14 @@ class Pair
         $value = $this->timeCell->getValue();
 
         // Handle empty values
-        if ($value === '') {
+        if ($value === Str::EMPTY) {
             return;
         }
 
         $value = Str::collapseWhitespace($value);
 
         // Handle values like 'IV' or '15.05-16.40'
-        if (Str::notContains($value, ' ')) {
+        if (Str::notContains($value, Str::SPACE)) {
             if ($this->isNumber($value)) {
                 $this->number = $this->formatNumber($value);
             } else {
@@ -215,8 +215,8 @@ class Pair
         }
 
         // Handle values like 'IV 15.05-16.40'
-        $number = Str::before($value, ' ');
-        $time = Str::after($value, ' ');
+        $number = Str::before($value, Str::SPACE);
+        $time = Str::after($value, Str::SPACE);
 
         if ($this->isNumber($number)) {
             $this->number = $this->formatNumber($number);
@@ -237,7 +237,7 @@ class Pair
 
     private function formatTime(string $time): string
     {
-        return str_replace([
+        return Str::replace([
             '.',
             '-'
         ], [

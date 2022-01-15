@@ -7,12 +7,16 @@ use Src\Models\Group;
 use Src\Models\Sheet;
 use Src\Support\Helpers;
 use Src\Support\Security;
+use Src\Support\Str;
 
 $contentTemplate =
 '<?php
+declare(strict_types=1);
+
 // Auto-generated file by src/scripts/generate-group-list.php
 // Regenerate with:
-// $ php public/index.php generate-group-list.php 
+// $ php public/index.php generate-group-list.php
+
 return {{groupNames}};
 ';
 
@@ -83,7 +87,7 @@ $groupNames = array_values($groupNames);
 
 $written = file_put_contents(
     $groupListFile,
-    str_replace('{{groupNames}}', var_export($groupNames, true), $contentTemplate)
+    Str::replace('{{groupNames}}', var_export($groupNames, true), $contentTemplate)
 );
 
 if ($written) {

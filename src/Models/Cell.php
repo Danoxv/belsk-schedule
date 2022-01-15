@@ -171,7 +171,7 @@ class Cell
      */
     public function isEmpty(): bool
     {
-        return $this->value === '';
+        return $this->value === Str::EMPTY;
     }
 
     /**

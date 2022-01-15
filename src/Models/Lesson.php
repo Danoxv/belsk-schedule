@@ -28,7 +28,7 @@ class Lesson
     private bool $isClassHour;
     private bool $isMendeleeva4;
 
-    private string $subject = '';
+    private string $subject = Str::EMPTY;
     private Collection $teachersAuditories;
 
     private bool $isValid = true;
@@ -138,7 +138,7 @@ class Lesson
      * @param string $separator
      * @return string
      */
-    public function getTeachersAsString(string $separator = ''): string
+    public function getTeachersAsString(string $separator = Str::EMPTY): string
     {
         return $this->teachersAuditories->keys()->implode($separator);
     }
@@ -148,7 +148,7 @@ class Lesson
      */
     public function hasAuditories(): bool
     {
-        return !empty($this->getAuditoriesAsString(''));
+        return !empty($this->getAuditoriesAsString(Str::EMPTY));
     }
 
     /**
@@ -164,7 +164,7 @@ class Lesson
      * @param string $separator
      * @return string
      */
-    public function getAuditoriesAsString(string $separator = ''): string
+    public function getAuditoriesAsString(string $separator = Str::EMPTY): string
     {
         return $this->teachersAuditories->values()->implode($separator);
     }
@@ -279,7 +279,7 @@ class Lesson
         }
 
         $parsed = [
-            'subject' => '',
+            'subject' => Str::EMPTY,
             'teachersAuditories' => new Collection(),
         ];
 
@@ -287,9 +287,9 @@ class Lesson
          * Resolve subject
          */
 
-        $firstTeacher = $matches['teachersSurnames'][0] ?? '';
+        $firstTeacher = $matches['teachersSurnames'][0] ?? Str::EMPTY;
         if (empty($firstTeacher)) {
-            $firstTeacher = $matches['teacher'][0] ?? '';
+            $firstTeacher = $matches['teacher'][0] ?? Str::EMPTY;
         }
         $parsed['subject'] = Str::trim(Str::before($value, $firstTeacher));
 
@@ -299,8 +299,8 @@ class Lesson
 
         $teacherWasFound = false;
         foreach ($matches['teachersSurnames'] as $k => $surname) {
-            $initials = $matches['teachersInitials'][$k] ?? '';
-            $auditory = $matches['auditory'][$k] ?? '';
+            $initials = $matches['teachersInitials'][$k] ?? Str::EMPTY;
+            $auditory = $matches['auditory'][$k] ?? Str::EMPTY;
 
             $teacher = Str::trim("$surname $initials");
 
@@ -311,9 +311,9 @@ class Lesson
         }
 
         if (!$teacherWasFound) {
-            $teacher = $matches['teacher'][0] ?? '';
+            $teacher = $matches['teacher'][0] ?? Str::EMPTY;
             if ($teacher) {
-                $parsed['teachersAuditories']->put($teacher, $matches['auditory2'][0] ?? '');
+                $parsed['teachersAuditories']->put($teacher, $matches['auditory2'][0] ?? Str::EMPTY);
             }
         }
 

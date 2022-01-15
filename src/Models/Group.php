@@ -5,6 +5,7 @@ namespace Src\Models;
 
 use Src\Support\Collection;
 use Src\Support\Helpers;
+use Src\Support\Str;
 
 class Group
 {
@@ -118,6 +119,6 @@ class Group
         );
 
         // Resolve isValid
-        $this->isValid = $this->name !== '';
+        $this->isValid = $this->name !== Str::EMPTY;
     }
 }

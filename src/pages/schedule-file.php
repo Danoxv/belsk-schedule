@@ -53,7 +53,7 @@ $detectMendeleeva4 = (bool) $detectMendeleeva4;
 
 $session = new Session();
 
-$originalFileName = '';
+$originalFileName = Str::EMPTY;
 if ($scheduleLink) {
     $originalFileName = $scheduleLink;
 
@@ -137,7 +137,7 @@ if ($group === null) {
  * Rendering
  */
 
-echo str_replace(
+echo Str::replace(
     [
         '{{appVersion}}',
         '{{common-js-css}}',
@@ -193,7 +193,7 @@ require ROOT . '/src/pages/components/dark-mode.php';
 if (!$debug) {
     foreach ($config->messagesOnSchedulePage as $message) {
         $type = $message['type'] ?? 'primary';
-        $content = Str::trim($message['content'] ?? '');
+        $content = Str::trim($message['content'] ?? Str::EMPTY);
         echo "
         <div class='alert alert-{$type} alert-dismissible fade show' role='alert'>
             {$content}
@@ -267,7 +267,7 @@ foreach (Day::getAll() as $day) {
                     'table-warning',
                 );
             } else {
-                $hint = '';
+                $hint = Str::EMPTY;
             }
 
             echo '<tr>';

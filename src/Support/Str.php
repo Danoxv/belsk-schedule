@@ -16,6 +16,9 @@ use voku\helper\UTF8;
  */
 class Str
 {
+    public const EMPTY = '';
+    public const SPACE = ' ';
+
     /**
      * Strip all whitespace characters. This includes tabs and newline
      * characters, as well as multibyte whitespace such as the thin space
@@ -50,7 +53,7 @@ class Str
      */
     public static function stripSymbols(string $str): string
     {
-        return \preg_replace('/[^\pL\pN]+/u', '', $str);
+        return \preg_replace('/[^\pL\pN]+/u', self::EMPTY, $str);
     }
 
     /**
@@ -129,7 +132,7 @@ class Str
      * @param string $end
      * @return string
      */
-    public static function limit(string $value, int $limit = 255, string $end = ''): string
+    public static function limit(string $value, int $limit = 255, string $end = self::EMPTY): string
     {
         return UTF8::str_limit($value, $limit, $end);
     }
@@ -209,102 +212,6 @@ class Str
     public static function substrReplace($string, $replace, $offset = 0, $length = null)
     {
         return UTF8::substr_replace($string, $replace, $offset, $length);
-    }
-
-    /**
-     * WARNING: beta version of method
-     *
-     * Returns true when strings "similar"
-     * (by case-insensitive, whitespace-less and symbol-less comparison).
-     * Allow 85% of similarity and max 3 typos.
-     *
-     * isSimilar('понедельник', ' О Не деЛЬ НИк!!! '); // true
-     * isSimilar('понедельник', 'поне"del"nik(:'); // true
-     *
-     * @param string $str1
-     * @param string $str2
-     * @return bool
-     */
-    public static function isSimilar(string $str1, string $str2): bool
-    {
-        // Maybe we are lucky
-        if ($str1 === $str2) {
-            return true;
-        }
-
-        // Convert strings to lowercase
-        $str1 = self::lower($str1);
-        $str2 = self::lower($str2);
-
-        if ($str1 === $str2) {
-            return true;
-        }
-
-        // Replace any symbol
-        $str1 = self::stripSymbols($str1);
-        $str2 = self::stripSymbols($str2);
-
-        if ($str1 === $str2) {
-            return true;
-        }
-
-        /*
-         * Try to decide Levenshtein distance.
-         */
-
-        // levenshtein() can accept only small strings
-        $str1Len = self::length($str1);
-        $str2Len = self::length($str2);
-
-        if ($str1Len <= 255 && $str2Len <= 255) {
-            $distance = self::levenshtein($str1, $str2);
-
-            // Strings are equal
-            if ($distance === 0) {
-                return true;
-            }
-
-            // Just few typos
-            if ($distance <= 3) {
-                // Decide how many typos are allowed
-                $minStrLen = min($str1Len, $str2Len);
-                $minSimilarChars = (int) round(85.0 * $minStrLen / 100);
-
-                // Distance is small
-                if (($minStrLen - $minSimilarChars) >= $distance) {
-                    return true;
-                }
-            }
-        }
-
-        /*
-         * Try to decide by ASCII-comparing
-         * ('понедельник' == 'ponedelnik')
-         */
-
-        if ($str1 === '' || $str2 === '') {
-            return false;
-        }
-
-        $firstChar1 = self::firstChar($str1);
-        $firstChar2 = self::firstChar($str2);
-
-        // Seems like first chars already in one language, so no need to ASCII-fy,
-        // because compared via lower() + stripSymbols() or levenshtein() comparison
-        if ($firstChar1 === $firstChar2) {
-            return false;
-        }
-
-        // ASCII of first letters is not equal already
-        if (self::ascii($firstChar1) !== self::ascii($firstChar2)) {
-            return false;
-        }
-
-        $ascii1 = str_replace("'", '', self::ascii(self::after($str1, $firstChar1)));
-        $ascii2 = str_replace("'", '', self::ascii(self::after($str2, $firstChar2)));
-
-        // Compare all other letter
-        return $ascii1 === $ascii2;
     }
 
     /**
@@ -550,6 +457,133 @@ class Str
     }
 
     /**
+     * Replace all occurrences of the search string with the replacement string.
+     * The original \str_replace() is already UTF-8 safe.
+     *
+     * @see https://php.net/manual/function.str-replace.php
+     *
+     * @param string|string[] $search
+     * @param string|string[] $replace
+     * @param string|string[] $subject
+     * @param int|null &$count
+     * @return string|string[]
+     */
+    public static function replace($search, $replace, $subject, int &$count = null)
+    {
+        return \str_replace($search, $replace, $subject, $count);
+    }
+
+    /**
+     * Repeat a string.
+     *
+     * @see https://php.net/manual/function.str-repeat.php
+     *
+     * @param string $string
+     * @param int $multiplier
+     * @return string
+     */
+    public function repeat(string $string, int $multiplier)
+    {
+        return UTF8::str_repeat($string, $multiplier);
+    }
+
+    /**
+     * WARNING: beta version of method
+     *
+     * Returns true when strings "similar"
+     * (by case-insensitive, whitespace-less and symbol-less comparison).
+     * Allow 85% of similarity and max 3 typos.
+     *
+     * isSimilar('понедельник', ' О Не деЛЬ НИк!!! '); // true
+     * isSimilar('понедельник', 'pоне"del"nik(:'); // true
+     *
+     * @param string $str1
+     * @param string $str2
+     * @return bool
+     */
+    public static function isSimilar(string $str1, string $str2): bool
+    {
+        // Maybe we are lucky
+        if ($str1 === $str2) {
+            return true;
+        }
+
+        // Convert strings to lowercase
+        $str1 = self::lower($str1);
+        $str2 = self::lower($str2);
+
+        if ($str1 === $str2) {
+            return true;
+        }
+
+        // Replace any symbol
+        $str1 = self::stripSymbols($str1);
+        $str2 = self::stripSymbols($str2);
+
+        if ($str1 === $str2) {
+            return true;
+        }
+
+        /*
+         * Try to decide Levenshtein distance.
+         */
+
+        // levenshtein() can accept only small strings
+        $str1Len = self::length($str1);
+        $str2Len = self::length($str2);
+
+        if ($str1Len <= 255 && $str2Len <= 255) {
+            $distance = self::levenshtein($str1, $str2);
+
+            // Strings are equal
+            if ($distance === 0) {
+                return true;
+            }
+
+            // Just few typos
+            if ($distance <= 3) {
+                // Decide how many typos are allowed
+                $minStrLen = min($str1Len, $str2Len);
+                $minSimilarChars = (int) round(85.0 * $minStrLen / 100);
+
+                // Distance is small
+                if (($minStrLen - $minSimilarChars) >= $distance) {
+                    return true;
+                }
+            }
+        }
+
+        /*
+         * Try to decide by ASCII-comparing
+         * ('понедельник' == 'ponedelnik')
+         */
+
+        if ($str1 === self::EMPTY || $str2 === self::EMPTY) {
+            return false;
+        }
+
+        $firstChar1 = self::firstChar($str1);
+        $firstChar2 = self::firstChar($str2);
+
+        // Seems like first chars already in one language, so no need to ASCII-fy,
+        // because compared via lower() + stripSymbols() or levenshtein() comparison
+        if ($firstChar1 === $firstChar2) {
+            return false;
+        }
+
+        // ASCII of first letters is not equal already
+        if (self::ascii($firstChar1) !== self::ascii($firstChar2)) {
+            return false;
+        }
+
+        $ascii1 = self::replace("'", self::EMPTY, self::ascii(self::after($str1, $firstChar1)));
+        $ascii2 = self::replace("'", self::EMPTY, self::ascii(self::after($str2, $firstChar2)));
+
+        // Compare all other letter
+        return $ascii1 === $ascii2;
+    }
+
+    /**
      * Calculate Levenshtein distance between two strings.
      *
      * @see https://php.net/manual/en/function.levenshtein.php
@@ -589,7 +623,7 @@ class Str
      */
     private static function convertMbAscii(string &$str, array &$map): void
     {
-        if ($str === '') {
+        if ($str === self::EMPTY) {
             return;
         }
 

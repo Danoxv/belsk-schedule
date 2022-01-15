@@ -312,7 +312,7 @@ class Sheet
 
     private function isDayCell(string $cellValue): bool
     {
-        if ($cellValue === '') {
+        if ($cellValue === Str::EMPTY) {
             return false;
         }
 
@@ -323,7 +323,7 @@ class Sheet
 
     private function isTimeCell(string $cellValue): bool
     {
-        if ($cellValue === '') {
+        if ($cellValue === Str::EMPTY) {
             return false;
         }
 

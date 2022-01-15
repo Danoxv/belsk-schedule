@@ -13,7 +13,7 @@ if (!Helpers::isCli()) {
     _printUsageExample();
 }
 
-$scriptName = $argv[1] ?? '';
+$scriptName = $argv[1] ?? Str::EMPTY;
 
 if (empty($scriptName)) {
     _printUsageExample();

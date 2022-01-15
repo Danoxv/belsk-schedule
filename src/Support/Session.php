@@ -59,7 +59,7 @@ class Session
     public function destroy(): void
     {
         $_SESSION = [];
-        setcookie(session_name(), '', time() - 2592000, '/'); // subtract 30 days
+        setcookie(session_name(), Str::EMPTY, time() - 2592000, '/'); // subtract 30 days
         session_destroy();
     }
 }

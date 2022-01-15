@@ -112,7 +112,7 @@ class Coordinate extends \PhpOffice\PhpSpreadsheet\Cell\Coordinate
     {
         $coordinate = strtoupper($coordinate); // multibyte support is not necessary here
 
-        $col = '';
+        $col = Str::EMPTY;
         $row = 0;
 
         sscanf($coordinate, '%[A-Z]%d', $col, $row);
