@@ -482,7 +482,7 @@ class Str
      * @param int $multiplier
      * @return string
      */
-    public function repeat(string $string, int $multiplier)
+    public function repeat(string $string, int $multiplier): string
     {
         return UTF8::str_repeat($string, $multiplier);
     }
