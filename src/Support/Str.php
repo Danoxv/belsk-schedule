@@ -290,7 +290,7 @@ class Str
         $firstChar2 = self::firstChar($str2);
 
         // Seems like first chars already in one language, so no need to ASCII-fy,
-        // because compared via lower() + stripSymbols() comparison or levenshtein()
+        // because compared via lower() + stripSymbols() or levenshtein() comparison
         if ($firstChar1 === $firstChar2) {
             return false;
         }
