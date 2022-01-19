@@ -192,12 +192,16 @@ class Str
      */
     public static function isSimilar(string $str1, string $str2): bool
     {
-        // Maybe we are lucky
+        /*
+         * Handle equal strings ('строка' == 'строка')
+         */
         if ($str1 === $str2) {
             return true;
         }
 
-        // Convert strings to lowercase
+        /*
+         * Handle case-insensitive comparison ('строка' == 'СТРОКА')
+         */
         $str1 = self::lower($str1);
         $str2 = self::lower($str2);
 
@@ -205,7 +209,9 @@ class Str
             return true;
         }
 
-        // Replace any symbol
+        /*
+         * Handle whitespace-less and symbol-less comparison ('строка' == 'с.трока! ~ ~`')
+         */
         $str1 = self::stripSymbols($str1);
         $str2 = self::stripSymbols($str2);
 
@@ -214,10 +220,11 @@ class Str
         }
 
         /*
-         * Try to decide Levenshtein distance.
+         * Handle 'строка' == 'строк' (with few typos)
          */
 
-        // levenshtein() can accept only small strings
+        // Try to decide Levenshtein distance.
+        // levenshtein() can accept only small strings.
         $str1Len = self::length($str1);
         $str2Len = self::length($str2);
 
@@ -243,8 +250,7 @@ class Str
         }
 
         /*
-         * Try to decide by ASCII-comparing
-         * ('понедельник' == 'ponedelnik')
+         * Handle (partially) transliterated strings ('строка' == 'sтроkа')
          */
 
         if ($str1 === self::EMPTY || $str2 === self::EMPTY) {
@@ -268,7 +274,7 @@ class Str
         $ascii1 = self::replace("'", self::EMPTY, self::ascii(self::after($str1, $firstChar1)));
         $ascii2 = self::replace("'", self::EMPTY, self::ascii(self::after($str2, $firstChar2)));
 
-        // Compare all other letter
+        // Compare all other letters
         return $ascii1 === $ascii2;
     }
 
