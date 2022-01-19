@@ -357,7 +357,7 @@ class Sheet
 
         $id = Str::limit($id);
 
-        $this->id = $id . '__' . Str::random(6);
+        $this->id = $id . '__' . Str::random(7);
     }
 
     /**
