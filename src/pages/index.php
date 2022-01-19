@@ -12,6 +12,7 @@ $allowedExtensionsAsString = implode(', ', $config->allowedExtensions);
 
 $pageWithFiles = $config->pageWithScheduleFiles;
 
+$linksGettingCurlError = '';
 $links = Helpers::getScheduleFilesLinks($linksGettingCurlError);
 
 $session = new Session();

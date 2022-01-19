@@ -11,6 +11,19 @@ use Src\Config\AppConfig;
 class Helpers
 {
     /**
+     * Source: @link https://www.php.net/manual/ru/function.memory-get-usage.php#96280
+     *
+     * @param int $size
+     * @return string
+     */
+    public static function formatBytes(int $size): string
+    {
+        static $unit = ['b','KB','MB','GB','TB','PB'];
+
+        return @round($size/(1024 ** ($i = floor(log($size, 1024)))),2).Str::SPACE.$unit[$i];
+    }
+
+    /**
      * @param string $link
      * @return string
      */
@@ -22,19 +35,74 @@ class Helpers
             return Str::EMPTY;
         }
 
-        return $urlParts['scheme'] . '://' . $urlParts['host'];
+        $host = $urlParts['host'];
+
+        if (!empty($urlParts['scheme'])) {
+            $host = $urlParts['scheme'] . '://' . $host;
+        }
+
+        return $host;
     }
 
     /**
-     * Get part before GET-params in URI.
-     * Example: return "/page" from "/page?p1=v1&p2=v2"
-     *
-     * @param string $uri
-     * @return string
+     * @param string $curlError
+     * @return array
      */
-    public static function uriWithoutGetPart(string $uri): string
+    public static function getScheduleFilesLinks(string &$curlError = Str::EMPTY): array
     {
-        return strtok($uri, '?');
+        $config = AppConfig::getInstance();
+
+        $pageWithFiles = $config->pageWithScheduleFiles;
+        $html = self::httpGet($pageWithFiles, $curlError);
+
+        $links = [];
+
+        if ($curlError || empty($html)) {
+            return $links;
+        }
+
+        $doc = new DOMDocument;
+
+        @$doc->loadHTML($html);
+
+        $xpath = new DOMXPath($doc);
+
+        $aTags = $xpath->query('//body//a');
+        $host = self::getHost($pageWithFiles);
+
+        /** @var DOMElement[] $aTags */
+        foreach ($aTags as $a) {
+            $linkUri = Security::sanitizeString($a->getAttribute('href'));
+
+            if (!Str::endsWith($linkUri, $config->allowedExtensions)) {
+                continue;
+            }
+
+            $linkUri = "$host/$linkUri";
+
+            $linkUri = Security::sanitizeScheduleLink($linkUri);
+            if (!Security::isScheduleLinkValid($linkUri)) {
+                continue;
+            }
+
+            $linkText = Security::sanitizeString($a->textContent);
+
+            $links[] = [
+                'uri' => $linkUri,
+                'text' => $linkText,
+            ];
+        }
+
+        return $links;
+    }
+
+    /**
+     * @param string $location Ex.: '/terms-and-conditions'
+     */
+    public static function goToLocation(string $location): void
+    {
+        header('Location: '.$location);
+        die(0);
     }
 
     /**
@@ -43,7 +111,7 @@ class Helpers
      * @param string $curlError
      * @return ?string
      */
-    public static function httpGet(string $link, &$curlError = Str::EMPTY, int $timeout = 5): ?string
+    public static function httpGet(string $link, string &$curlError = Str::EMPTY, int $timeout = 5): ?string
     {
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $link);
@@ -107,78 +175,6 @@ class Helpers
     }
 
     /**
-     * @param string $string
-     * @param bool $caseInsensitive
-     * @return bool
-     */
-    public static function isRomanNumber(string $string, bool $caseInsensitive = true): bool
-    {
-        if ($string === Str::EMPTY) {
-            return false;
-        }
-
-        $regex = '/^M*(C[MD]|D?C{0,3})(X[CL]|L?X{0,3})(I[XV]|V?I{0,3})$/i';
-
-        if (!$caseInsensitive) {
-            $regex = Str::rtrim($regex, 'i');
-        }
-
-        return preg_match($regex, $string) > 0;
-    }
-
-    /**
-     * @param string $curlError
-     * @return array
-     */
-    public static function getScheduleFilesLinks(&$curlError = Str::EMPTY): array
-    {
-        $config = AppConfig::getInstance();
-
-        $pageWithFiles = $config->pageWithScheduleFiles;
-        $html = self::httpGet($pageWithFiles, $curlError);
-
-        $links = [];
-
-        if ($curlError || empty($html)) {
-            return $links;
-        }
-
-        $doc = new DOMDocument;
-
-        @$doc->loadHTML($html);
-
-        $xpath = new DOMXPath($doc);
-
-        $aTags = $xpath->query('//body//a');
-        $host = Helpers::getHost($pageWithFiles);
-
-        /** @var DOMElement[] $aTags */
-        foreach ($aTags as $a) {
-            $linkUri = Security::sanitizeString($a->getAttribute('href'));
-
-            if (!Str::endsWith($linkUri, $config->allowedExtensions)) {
-                continue;
-            }
-
-            $linkUri = "$host/$linkUri";
-
-            $linkUri = Security::sanitizeScheduleLink($linkUri);
-            if (!Security::isScheduleLinkValid($linkUri)) {
-                continue;
-            }
-
-            $linkText = Security::sanitizeString($a->textContent);
-
-            $links[] = [
-                'uri' => $linkUri,
-                'text' => $linkText,
-            ];
-        }
-
-        return $links;
-    }
-
-    /**
      * @return bool
      */
     public static function isCli(): bool
@@ -196,21 +192,34 @@ class Helpers
     }
 
     /**
-     * Source: @link https://www.php.net/manual/ru/function.memory-get-usage.php#96280
-     *
-     * @param int $size
-     * @return string
+     * @param string $string
+     * @param bool $caseInsensitive
+     * @return bool
      */
-    public static function formatBytes(int $size): string
+    public static function isRomanNumber(string $string, bool $caseInsensitive = true): bool
     {
-        static $unit = ['b','KB','MB','GB','TB','PB'];
+        if ($string === Str::EMPTY) {
+            return false;
+        }
 
-        return @round($size/(1024 ** ($i = floor(log($size, 1024)))),2).Str::SPACE.$unit[$i];
+        $regex = '/^M*(C[MD]|D?C{0,3})(X[CL]|L?X{0,3})(I[XV]|V?I{0,3})$/i';
+
+        if (!$caseInsensitive) {
+            $regex = \rtrim($regex, 'i'); // multibyte support is not necessary here
+        }
+
+        return preg_match($regex, $string) > 0;
     }
 
-    public static function goToLocation(string $location): void
+    /**
+     * Get part before GET-params in URI.
+     * Example: return "/page" from "/page?p1=v1&p2=v2"
+     *
+     * @param string $uri
+     * @return string
+     */
+    public static function uriWithoutGetPart(string $uri): string
     {
-        header('Location: '.$location);
-        die(0);
+        return strtok($uri, '?');
     }
 }

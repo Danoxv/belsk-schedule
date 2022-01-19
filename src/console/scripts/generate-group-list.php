@@ -59,7 +59,7 @@ foreach ($links as $link) {
         continue;
     }
 
-    var_dump("Process [{$link['uri']}]...");
+    var_dump("Process '{$link['uri']}'...");
 
     foreach ($spreadsheet->getAllSheets() as $worksheet) {
         $sheet = new Sheet($worksheet, $sheetProcessingConfig);

@@ -58,6 +58,7 @@ if ($scheduleLink) {
     $originalFileName = $scheduleLink;
 
     // Get file and save to temp dir
+    $curlError = '';
     $data = Helpers::httpGet($scheduleLink, $curlError);
 
     if ($data === null) {

@@ -7,70 +7,25 @@ use PhpOffice\PhpSpreadsheet\Exception;
 
 class Coordinate extends \PhpOffice\PhpSpreadsheet\Cell\Coordinate
 {
+    public const FIRST_ROW = 1;
+
     public const FIRST_COL = 'A';
     private const LAST_COL = 'ZZZ';
 
-    public const FIRST_ROW = 1;
-
     /**
-     * @param string $column
-     * @return string|null
-     * @throws Exception
+     * @param string $coordinate 'A1'
+     * @return array ['A', 1]
      */
-    public static function nextColumn(string $column): ?string
+    public static function explodeCoordinate(string $coordinate): array
     {
-        $column = strtoupper($column); // multibyte support is not necessary here
+        $coordinate = \strtoupper($coordinate); // multibyte support is not necessary here
 
-        if ($column === self::LAST_COL) {
-            return null;
-        }
+        $col = Str::EMPTY;
+        $row = 0;
 
-        return self::stringFromColumnIndex(self::columnIndexFromString($column) + 1);
-    }
+        sscanf($coordinate, '%[A-Z]%d', $col, $row);
 
-    /**
-     * @param string $column
-     * @return string|null
-     * @throws Exception
-     */
-    public static function prevColumn(string $column): ?string
-    {
-        $column = strtoupper($column); // multibyte support is not necessary here
-
-        if ($column === self::FIRST_COL) {
-            return null;
-        }
-
-        return self::stringFromColumnIndex(self::columnIndexFromString($column) - 1);
-    }
-
-    /**
-     * @param int $row
-     * @return int
-     */
-    public static function nextRow(int $row): int
-    {
-        return $row + 1;
-    }
-
-    /**
-     * @param int $row
-     * @return int|null
-     * @throws Exception
-     */
-    public static function prevRow(int $row): ?int
-    {
-        if ($row === self::FIRST_ROW) {
-            return null;
-        }
-
-        $prevRow = $row - 1;
-
-        if ($prevRow < self::FIRST_ROW) {
-            throw new Exception('Row can not be less than ' . self::FIRST_ROW);
-        }
-
-        return $prevRow;
+        return [$col, $row];
     }
 
     /**
@@ -105,18 +60,63 @@ class Coordinate extends \PhpOffice\PhpSpreadsheet\Cell\Coordinate
     }
 
     /**
-     * @param string $coordinate 'A1'
-     * @return array ['A', 1]
+     * @param string $column
+     * @return string|null
+     * @throws Exception
      */
-    public static function explodeCoordinate(string $coordinate): array
+    public static function nextColumn(string $column): ?string
     {
-        $coordinate = strtoupper($coordinate); // multibyte support is not necessary here
+        $column = \strtoupper($column); // multibyte support is not necessary here
 
-        $col = Str::EMPTY;
-        $row = 0;
+        if ($column === self::LAST_COL) {
+            return null;
+        }
 
-        sscanf($coordinate, '%[A-Z]%d', $col, $row);
+        return self::stringFromColumnIndex(self::columnIndexFromString($column) + 1);
+    }
 
-        return [$col, $row];
+    /**
+     * @param int $row
+     * @return int
+     */
+    public static function nextRow(int $row): int
+    {
+        return $row + 1;
+    }
+
+    /**
+     * @param string $column
+     * @return string|null
+     * @throws Exception
+     */
+    public static function prevColumn(string $column): ?string
+    {
+        $column = \strtoupper($column); // multibyte support is not necessary here
+
+        if ($column === self::FIRST_COL) {
+            return null;
+        }
+
+        return self::stringFromColumnIndex(self::columnIndexFromString($column) - 1);
+    }
+
+    /**
+     * @param int $row
+     * @return int|null
+     * @throws Exception
+     */
+    public static function prevRow(int $row): ?int
+    {
+        if ($row === self::FIRST_ROW) {
+            return null;
+        }
+
+        $prevRow = $row - 1;
+
+        if ($prevRow < self::FIRST_ROW) {
+            throw new Exception('Row can not be less than ' . self::FIRST_ROW);
+        }
+
+        return $prevRow;
     }
 }

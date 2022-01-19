@@ -8,44 +8,6 @@ use Src\Config\AppConfig;
 class Security
 {
     /**
-     * 1) Cast input to string;
-     * 2) normalizes to UTF-8 NFC, converting from WINDOWS-1252 when needed;
-     * 3) strip HTML and PHP tags from a string;
-     * 4) convert all applicable characters to HTML entities;
-     * 5) remove invisible characters (like "\0");
-     * 6) optionally apply >= 8-Bit safe trim().
-     *
-     * @param mixed $var
-     * @param bool $applyTrim
-     * @return string
-     */
-    public static function sanitizeString($var, bool $applyTrim = false): string
-    {
-        // 1) Cast input to string
-        $var = (string) $var;
-
-        $var =
-            // 5) remove invisible characters (like "\0")
-            Str::removeInvisibleCharacters(
-                // 4) convert all applicable characters to HTML entities
-                Str::htmlEscape(
-                    // 3) strip HTML and PHP tags from a string
-                    Str::removeHtmlPhpTags(
-                        // 2) normalizes to UTF-8 NFC, converting from WINDOWS-1252 when needed
-                        Str::filter($var)
-                    )
-                )
-            );
-
-        // 6) optionally apply multibyte-safe trim()
-        if ($applyTrim) {
-            $var = Str::trim($var);
-        }
-
-        return $var;
-    }
-
-    /**
      * Gets a specific external variable by name and filters it as string.
      * @link https://php.net/manual/function.filter-input.php
      *
@@ -62,6 +24,23 @@ class Security
     {
         $input = filter_input($type, $varName);
         return self::sanitizeString($input, true);
+    }
+
+    /**
+     * @param string $link
+     * @return bool
+     */
+    public static function isScheduleLinkValid(string $link): bool
+    {
+        if ($link === Str::EMPTY) {
+            return false;
+        }
+
+        $config = AppConfig::getInstance();
+
+        return
+            Str::endsWith($link, $config->allowedExtensions) &&
+            Helpers::getHost($link) === Helpers::getHost($config->pageWithScheduleFiles);
     }
 
     /**
@@ -84,34 +63,6 @@ class Security
     }
 
     /**
-     * @param string $link
-     * @return bool
-     */
-    public static function isScheduleLinkValid(string $link): bool
-    {
-        if ($link === Str::EMPTY) {
-            return false;
-        }
-
-        $config = AppConfig::getInstance();
-
-        return
-            Str::endsWith($link, $config->allowedExtensions) &&
-            Helpers::getHost($link) === Helpers::getHost($config->pageWithScheduleFiles);
-    }
-
-    /**
-     * @param string $scheduleLink
-     * @return string
-     */
-    public static function sanitizeScheduleLink(string $scheduleLink): string
-    {
-        // TODO Hacky, need to process other possible replacements.
-        // urlencode() / rawurlencode() and many others doesn't work
-        return Str::replace(Str::SPACE, '%20', $scheduleLink);
-    }
-
-    /**
      * @param string $fileName
      * @return string
      */
@@ -131,5 +82,54 @@ class Security
 
         // Revert "dot" symbol
         return Str::insertBefore('csv', '.', $fileName);
+    }
+
+    /**
+     * @param string $scheduleLink
+     * @return string
+     */
+    public static function sanitizeScheduleLink(string $scheduleLink): string
+    {
+        // TODO Hacky, need to process other possible replacements.
+        // urlencode() / rawurlencode() and many others doesn't work
+        return Str::replace(Str::SPACE, '%20', $scheduleLink);
+    }
+
+    /**
+     * 1) Cast input to string;
+     * 2) normalizes to UTF-8 NFC, converting from WINDOWS-1252 when needed;
+     * 3) strip HTML and PHP tags from a string;
+     * 4) convert all applicable characters to HTML entities;
+     * 5) remove invisible characters (like "\0");
+     * 6) optionally apply >= 8-Bit safe trim().
+     *
+     * @param mixed $var
+     * @param bool $applyTrim
+     * @return string
+     */
+    public static function sanitizeString($var, bool $applyTrim = false): string
+    {
+        // 1) Cast input to string
+        $var = (string) $var;
+
+        $var =
+            // 5) remove invisible characters (like "\0")
+            Str::removeInvisibleCharacters(
+            // 4) convert all applicable characters to HTML entities
+                Str::htmlEscape(
+                // 3) strip HTML and PHP tags from a string
+                    Str::removeHtmlPhpTags(
+                    // 2) normalizes to UTF-8 NFC, converting from WINDOWS-1252 when needed
+                        Str::normalize($var)
+                    )
+                )
+            );
+
+        // 6) optionally apply multibyte-safe trim()
+        if ($applyTrim) {
+            $var = Str::trim($var);
+        }
+
+        return $var;
     }
 }

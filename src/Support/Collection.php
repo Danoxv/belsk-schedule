@@ -33,6 +33,68 @@ class Collection implements \IteratorAggregate
     }
 
     /**
+     * Count the number of items in the collection.
+     *
+     * @return int
+     */
+    public function count()
+    {
+        return \count($this->items);
+    }
+
+    /**
+     * Run a filter over each of the items.
+     *
+     * @param  callable|null  $callback
+     * @return static
+     */
+    public function filter(callable $callback = null)
+    {
+        if ($callback) {
+            return new static(\array_filter($this->items, $callback, ARRAY_FILTER_USE_BOTH));
+        }
+
+        return new static(\array_filter($this->items));
+    }
+
+    /**
+     * Get the first item from the collection.
+     *
+     * @return mixed|null
+     */
+    public function first()
+    {
+        $firstKey = array_key_first($this->items);
+
+        if ($firstKey === null) {
+            return null;
+        }
+
+        return $this->items[$firstKey];
+    }
+
+    /**
+     * Get an iterator for the items.
+     *
+     * @return ArrayIterator
+     */
+    public function getIterator()
+    {
+        return new ArrayIterator($this->items);
+    }
+
+    /**
+     * Concatenate values of a given key as a string.
+     *
+     * @param  string  $separator
+     * @return string
+     */
+    public function implode(string $separator = Str::EMPTY): string
+    {
+        return \implode($separator, $this->items);
+    }
+
+    /**
      * Determine if the collection is empty or not.
      *
      * @return bool
@@ -53,34 +115,13 @@ class Collection implements \IteratorAggregate
     }
 
     /**
-     * Get the first item from the collection.
+     * Get the keys of the collection items.
      *
-     * @return mixed|null
-     */
-    public function first()
-    {
-        $firstKey = array_key_first($this->items);
-
-        if ($firstKey === null) {
-            return null;
-        }
-
-        return $this->items[$firstKey];
-    }
-
-    /**
-     * Run a filter over each of the items.
-     *
-     * @param  callable|null  $callback
      * @return static
      */
-    public function filter(callable $callback = null)
+    public function keys()
     {
-        if ($callback) {
-            return new static(\array_filter($this->items, $callback, ARRAY_FILTER_USE_BOTH));
-        }
-
-        return new static(\array_filter($this->items));
+        return new static(\array_keys($this->items));
     }
 
     /**
@@ -102,16 +143,6 @@ class Collection implements \IteratorAggregate
     }
 
     /**
-     * Get the keys of the collection items.
-     *
-     * @return static
-     */
-    public function keys()
-    {
-        return new static(\array_keys($this->items));
-    }
-
-    /**
      * Reset the keys on the underlying array.
      *
      * @return static
@@ -119,36 +150,5 @@ class Collection implements \IteratorAggregate
     public function values()
     {
         return new static(\array_values($this->items));
-    }
-
-    /**
-     * Concatenate values of a given key as a string.
-     *
-     * @param  string  $separator
-     * @return string
-     */
-    public function implode(string $separator = Str::EMPTY): string
-    {
-        return \implode($separator, $this->items);
-    }
-
-    /**
-     * Count the number of items in the collection.
-     *
-     * @return int
-     */
-    public function count()
-    {
-        return \count($this->items);
-    }
-
-    /**
-     * Get an iterator for the items.
-     *
-     * @return ArrayIterator
-     */
-    public function getIterator()
-    {
-        return new ArrayIterator($this->items);
     }
 }
