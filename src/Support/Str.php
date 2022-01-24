@@ -19,6 +19,8 @@ class Str
     public const EMPTY = '';
     public const SPACE = ' ';
 
+    private const MAX_LEVENSHTEIN_STR_LEN = 255;
+
     /**
      * Return the remainder of a string after the first occurrence of a given value.
      *
@@ -183,8 +185,8 @@ class Str
      * (by case-insensitive, whitespace-less and symbol-less comparison).
      * Allow 85% of similarity and max 3 typos.
      *
-     * isSimilar('понедельник', ' О Не деЛЬ НИк!!! '); // true
-     * isSimilar('понедельник', 'pоне"del"nik(:'); // true
+     * Str::isSimilar('понедельник', ' О Не деЛЬ НИк!!! '); // true
+     * Str::isSimilar('понедельник', 'pоне"del"nik(:'); // true
      *
      * @param string $str1
      * @param string $str2
@@ -228,7 +230,7 @@ class Str
         $str1Len = self::length($str1);
         $str2Len = self::length($str2);
 
-        if ($str1Len <= 255 && $str2Len <= 255) {
+        if ($str1Len <= self::MAX_LEVENSHTEIN_STR_LEN && $str2Len <= self::MAX_LEVENSHTEIN_STR_LEN) {
             $distance = self::levenshtein($str1, $str2);
 
             // Strings are equal
@@ -293,29 +295,17 @@ class Str
      * Calculate Levenshtein distance between two strings.
      *
      * @see https://php.net/manual/en/function.levenshtein.php
-     * Source: @link https://github.com/KEINOS/mb_levenshtein
      *
      * @param string $str1
      * @param string $str2
+     * @param int $insertionCost
+     * @param int $replacementCost
+     * @param int $deletionCost
      * @return int
      */
-    public static function levenshtein(string $str1, string $str2): int
+    public static function levenshtein(string $str1, string $str2, int $insertionCost = 1, int $replacementCost = 1, int $deletionCost = 1): int
     {
-        if ($str1 === $str2) {
-            return 0;
-        }
-
-        $map = [];
-        self::convertMbAscii($str1, $map);
-        self::convertMbAscii($str2, $map);
-
-        $distance = @\levenshtein($str1, $str2);
-
-        if ($distance === -1) {
-            throw new \RuntimeException('levenshtein(): Argument string(s) too long');
-        }
-
-        return $distance;
+        return UTF8::levenshtein($str1, $str2, $insertionCost, $replacementCost, $deletionCost);
     }
 
     /**
@@ -601,39 +591,5 @@ class Str
     public static function upper(string $value): string
     {
         return UTF8::strtoupper($value);
-    }
-
-    /**
-     * Helper for self::levenshtein().
-     * Convert an UTF-8 encoded string to a single-byte string.
-     *
-     * @see https://github.com/KEINOS/mb_levenshtein/blob/master/mb_levenshtein.php
-     *
-     * @param string $str
-     * @param array $map
-     */
-    private static function convertMbAscii(string &$str, array &$map): void
-    {
-        if ($str === self::EMPTY) {
-            return;
-        }
-
-        // find all utf-8 characters
-        $matches = [];
-        if (!preg_match_all('/[\xC0-\xF7][\x80-\xBF]+/', $str, $matches)) {
-            return; // plain ascii string
-        }
-
-        // update the encoding map with the characters not already met
-        $count = count($map);
-        foreach ($matches[0] as $mbc) {
-            if (!isset($map[$mbc])) {
-                $map[$mbc] = chr(128 + $count);
-                $count++;
-            }
-        }
-
-        // finally remap non-ascii characters
-        $str = strtr($str, $map);
     }
 }
