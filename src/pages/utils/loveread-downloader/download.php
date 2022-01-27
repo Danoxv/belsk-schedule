@@ -54,7 +54,10 @@ if ($error) {
  */
 function downloadFromLoveread(int $id, string &$error = '')
 {
+    // Config
     $domain = 'http://loveread.ec';
+    $headInfo = '#### Скачано из {{url}} c помощью http://d66237p1.beget.tech/utils/loveread-downloader';
+    $stripPatterns = ['~(\<(/?[^>]+)>)~is', '~&#769;~', '~&#039;~', '~&#252;~'];
 
     $firstPageHtml = @Str::fileGetContents(
         "$domain/read_book.php?id=$id&p=1",
@@ -103,8 +106,6 @@ function downloadFromLoveread(int $id, string &$error = '')
     header('Content-type: application/octet-stream');
     header('Content-Disposition: attachment; filename="' . $bookTitle . '.txt"');
 
-    $stripPatterns = ['~(\<(/?[^>]+)>)~is', '~&#769;~', '~&#039;~', '~&#252;~'];
-
     $contentIsFound = false;
     for ($p = 1; $p <= $pagesCount; $p++) {
         $url = "$domain/read_book.php?id=$id&p=$p";
@@ -112,8 +113,13 @@ function downloadFromLoveread(int $id, string &$error = '')
 
         if (preg_match('~<p.*class=MsoNormal>(.*?)</p>~is', $html, $matches)) {
             $contentIsFound = true;
-            $content = preg_replace($stripPatterns, '', $matches[0]);
-            echo $content;
+
+            if ($p === 1) {
+                echo Str::replace('{{url}}', $url, $headInfo);
+            }
+
+            // Put content to file
+            echo preg_replace($stripPatterns, '', $matches[0]);
         }
     }
 
