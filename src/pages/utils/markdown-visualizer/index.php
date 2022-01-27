@@ -46,7 +46,7 @@ $config = AppConfig::getInstance();
           return;
         }
 
-        xhr.send('markdownContent=' + markdownContent);
+        xhr.send('markdownContent=' + encodeURIComponent(markdownContent));
       }
 
       function applyMarkdownExample() {
