@@ -106,33 +106,33 @@ class Security
      * 5) remove invisible characters (like "\0");
      * 6) optionally apply >= 8-Bit safe trim().
      *
-     * @param mixed $var
+     * @param mixed $string
      * @param bool $applyTrim
      * @return string
      */
-    public static function sanitizeString($var, bool $applyTrim = false): string
+    public static function sanitizeString($string, bool $applyTrim = false): string
     {
         // 1) Cast input to string
-        $var = (string) $var;
+        $string = Str::toString($string, '');
 
-        $var =
+        $string =
             // 5) remove invisible characters (like "\0")
             Str::removeInvisibleCharacters(
-            // 4) convert all applicable characters to HTML entities
+                // 4) convert all applicable characters to HTML entities
                 Str::htmlEscape(
-                // 3) strip HTML and PHP tags from a string
+                    // 3) strip HTML and PHP tags from a string
                     Str::removeHtmlPhpTags(
-                    // 2) normalizes to UTF-8 NFC, converting from WINDOWS-1252 when needed
-                        Str::normalize($var)
+                        // 2) normalizes to UTF-8 NFC, converting from WINDOWS-1252 when needed
+                        Str::normalize($string)
                     )
                 )
             );
 
         // 6) optionally apply multibyte-safe trim()
         if ($applyTrim) {
-            $var = Str::trim($var);
+            $string = Str::trim($string);
         }
 
-        return $var;
+        return $string;
     }
 }

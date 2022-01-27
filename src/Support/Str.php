@@ -98,16 +98,6 @@ class Str
     }
 
     /**
-     * @param string $haystack
-     * @param string $needle
-     * @return bool
-     */
-    public static function containsOne(string $haystack, string $needle): bool
-    {
-        return self::substrCount($haystack, $needle) === 1;
-    }
-
-    /**
      * Determine if a given string ends with a given substring.
      *
      * @param  string  $haystack
@@ -626,6 +616,19 @@ class Str
     public static function toInt(string $string, $fallback = null)
     {
         return UTF8::to_int($string) ?? $fallback;
+    }
+
+    /**
+     * Returns the given input as string, or $fallback if the input isn't int|float|string
+     * and do not implement the "__toString()" method.
+     *
+     * @param mixed $var
+     * @param null $fallback
+     * @return string|mixed
+     */
+    public static function toString($var, $fallback = null)
+    {
+        return UTF8::to_string($var) ?? $fallback;
     }
 
     /**
