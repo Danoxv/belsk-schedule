@@ -34,6 +34,15 @@ $config = AppConfig::getInstance();
                 Скачать любую книгу из LoveRead
             </td>
         </tr>
+        <tr>
+            <td>
+                <a href="/utils/markdown-visualizer">Markdown visualizer</a>
+            </td>
+            <td>
+                Визуализация и преобразование
+                <a href="https://htmlacademy.ru/blog/boost/frontend/markdown">Markdown</a> в HTML
+            </td>
+        </tr>
         </tbody>
     </table>
 

@@ -11,10 +11,15 @@ $_routes = [
     /*
      * Utils
      */
+
     '/utils' => 'pages/utils/index.php',
     // LoveRead downloader
     '/utils/loveread-downloader'            => 'pages/utils/loveread-downloader/index.php',
     '/utils/loveread-downloader/download'   => 'pages/utils/loveread-downloader/download.php',
+    // Markdown visualizer
+    '/utils/markdown-visualizer'            => 'pages/utils/markdown-visualizer/index.php',
+    '/utils/markdown-visualizer/visualize'  => 'pages/utils/markdown-visualizer/visualize.php',
+    '/utils/markdown-visualizer/get-example'=> 'pages/utils/markdown-visualizer/get-example.php',
 ];
 
 if (AppConfig::getInstance()->enableSystemPages) {
@@ -22,6 +27,7 @@ if (AppConfig::getInstance()->enableSystemPages) {
         /*
          * System pages
          */
+
         // Opcache GUI
         '/system/opcache'       => 'pages/system/opcache-gui-3.3.0/index.php',
         // Visits

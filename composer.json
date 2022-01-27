@@ -4,7 +4,8 @@
         "ext-curl": "*",
         "ext-dom": "*",
         "phpoffice/phpspreadsheet": "^1.21",
-        "voku/portable-utf8": "^6.0"
+        "voku/portable-utf8": "^6.0",
+        "league/commonmark": "^2.2"
     },
     "autoload": {
         "psr-4": {
