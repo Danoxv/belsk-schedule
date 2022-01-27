@@ -147,6 +147,34 @@ class Str
     }
 
     /**
+     * Reads entire file into a string.
+     *
+     * WARNING: Do not use UTF-8 Option ($convertToUtf8) for binary files (e.g.: images)!!!
+     *
+     * @see http://php.net/manual/en/function.file-get-contents.php
+     *
+     * @param string $fileName
+     * @param bool $convertToUtf8
+     * @param string $fromEncoding
+     * @return false|string
+     */
+    public static function fileGetContents(string $fileName, bool $convertToUtf8 = true, $fromEncoding = '')
+    {
+        $fromEncoding = self::normalizeEncoding($fromEncoding);
+
+        return UTF8::file_get_contents(
+            $fileName,
+            false,
+            null,
+            null,
+            null,
+            5,
+            $convertToUtf8,
+            $fromEncoding
+        );
+    }
+
+    /**
      * Create a escape html version of the string.
      *
      * @param string $string
@@ -524,6 +552,23 @@ class Str
     }
 
     /**
+     * Get part of a string.
+     *
+     * @see http://php.net/manual/function.mb-substr.php
+     *
+     * @param string   $string     The string being checked.
+     * @param int      $offset     The first position used in str.
+     * @param int|null $length     [optional] The maximum length of the returned string.
+     *
+     * @return string|false The portion of $string specified by the offset and length parameters.
+     *                      If $string is shorter than offset characters long, FALSE will be returned.
+     */
+    public static function substr(string $string, int $offset = 0, int $length = null)
+    {
+        return UTF8::substr($string, $offset, $length);
+    }
+
+    /**
      * Count the number of substring occurrences.
      *
      * @see http://php.net/manual/function.substr-count.php
@@ -572,6 +617,18 @@ class Str
     }
 
     /**
+     * Returns the given string as an integer, or $fallback if the string isn't numeric.
+     *
+     * @param string $string
+     * @param null $fallback
+     * @return int|mixed
+     */
+    public static function toInt(string $string, $fallback = null)
+    {
+        return UTF8::to_int($string) ?? $fallback;
+    }
+
+    /**
      * Make a string's first character uppercase.
      *
      * @param  string  $string
@@ -591,5 +648,18 @@ class Str
     public static function upper(string $value): string
     {
         return UTF8::strtoupper($value);
+    }
+
+    /**
+     * @param string $encoding Ex. windows-1251
+     * @return string Ex. WINDOWS-1251
+     */
+    private static function normalizeEncoding(string $encoding): string
+    {
+        if ($encoding === '') {
+            return '';
+        }
+
+        return \strtoupper(\trim($encoding));
     }
 }

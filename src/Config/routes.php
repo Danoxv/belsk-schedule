@@ -13,8 +13,8 @@ $_routes = [
      */
     '/utils' => 'pages/utils/index.php',
     // LoveRead downloader
-    '/utils/loveread-downloader'            => 'pages/loweread-downloader/index.php',
-    '/utils/loveread-downloader/download'   => 'pages/loweread-downloader/download.php',
+    '/utils/loveread-downloader'            => 'pages/utils/loveread-downloader/index.php',
+    '/utils/loveread-downloader/download'   => 'pages/utils/loveread-downloader/download.php',
 ];
 
 if (AppConfig::getInstance()->enableSystemPages) {

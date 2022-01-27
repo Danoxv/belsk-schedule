@@ -29,12 +29,12 @@ $config = AppConfig::getInstance();
             <label for="link" class="form-label">Ссылка на книгу</label>
             <input name="link" type="text" class="form-control" id="link" aria-describedby="linkHelp" required="required" />
             <div id="linkHelp" class="form-text">
-                Вставьте ссылку на книгу из <a href="http://loveread.ec/">loveread.ec</a>. Например, <pre>http://loveread.ec/view_global.php?id=2555&p=1</pre>.
+                Вставьте ссылку на книгу из <a href="http://loveread.ec/">loveread.ec</a>. Например, <code>http://loveread.ec/view_global.php?id=2555&p=1</code>.
             </div>
         </div>
         <button type="submit" class="btn btn-primary">Скачать</button>
     </form>
-
+    <br />
     <a class="btn btn-primary" href="/utils" role="button">Утилиты</a>
     <a class="btn btn-primary" href="/" role="button">На главную</a>
 </div>

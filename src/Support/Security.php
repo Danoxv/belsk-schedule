@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Src\Support;
 
 use Src\Config\AppConfig;
+use voku\helper\UTF8;
 
 class Security
 {
@@ -68,20 +69,22 @@ class Security
      */
     public static function sanitizeCsvFilename(string $fileName): string
     {
-        // Must contains one "dot" (before extension)
-        if (!Str::containsOne($fileName, '.')) {
+        if (!Str::endsWith($fileName, '.csv')) {
             return Str::EMPTY;
         }
 
-        // Remove any funky symbol (including "dot")
-        $fileName = Str::slug($fileName);
+        return self::normalizeFilename($fileName);
+    }
 
-        if ($fileName === Str::EMPTY) {
-            return Str::EMPTY;
-        }
-
-        // Revert "dot" symbol
-        return Str::insertBefore('csv', '.', $fileName);
+    /**
+     * Convert given string to safe filename (and keep string case).
+     *
+     * @param string $fileName
+     * @return string
+     */
+    public static function normalizeFilename(string $fileName): string
+    {
+        return UTF8::to_filename($fileName, true);
     }
 
     /**
