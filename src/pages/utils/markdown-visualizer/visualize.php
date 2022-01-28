@@ -7,7 +7,7 @@ use Src\Support\Str;
 
 $markdownContent = Security::filterInputString(INPUT_POST, 'markdownContent');
 
-$markdownSpecialSymbols = ['#', '`', '*', '_', '{', '}', '[', ']', '(', ')', '+', '-', '!'];
+$markdownSpecialSymbols = ["\n", "\r", '#', '*', '_', '~', '`', '{', '}', '[', ']', '(', ')', '+', '-', '!'];
 
 if ($markdownContent === '' || !Str::contains($markdownContent, $markdownSpecialSymbols)) {
     echo $markdownContent;

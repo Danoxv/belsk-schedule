@@ -116,7 +116,14 @@ $session = new Session();
                 </div>
             </div>
 
-            <button type="submit" class="btn btn-primary">Отправить</button>
+            <div class="row">
+                <div class="col">
+                    <button type="submit" class="btn btn-primary">Отправить</button>
+                </div>
+                <div class="col text-end">
+                    <a href="/utils">Другие утилиты</a>
+                </div>
+            </div>
         </form>
     </div>
 </body>

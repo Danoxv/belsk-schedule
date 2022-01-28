@@ -1,18 +1,17 @@
-<?php
-declare(strict_types=1);
-
-echo <<<_MD
 # GitHub-Flavored Markdown
 
 ## Краткое руководство
 
 Почитать подробнее про Markdown можно тут:
+* [Markdown: что это и кому нужно](https://thecode.media/markdown/)
 * [Github](https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax) (eng)
-* [HTML Academy](https://htmlacademy.ru/blog/boost/frontend/markdown) 
+* [HTML Academy](https://htmlacademy.ru/blog/boost/frontend/markdown)
 * [Github gist](https://gist.github.com/Jekins/2bf2d0638163f1294637)
 * [wilsonmar.github.io](https://wilsonmar.github.io/markdown-text-for-github-from-html/) (eng)
 * [AX.DIGITAL](https://ax.digital/markdown/)
 * [Hexlet Guides](https://guides.hexlet.io/markdown/)
+* [Расширенный синтаксис](https://ru.markdown.net.br/rasshirennyy-sintaksis/)
+* [Markdown разметка | Vivaldi Browser Help](https://help.vivaldi.com/ru/services-ru/forum-ru/markdown-formatting/)
 
 **Markdown — язык разметки текстов. Такие тексты легко писать и читать. Их можно без труда сконвертировать в HTML. Большинство программистов предпочитают Markdown для написания документации, описаний своих проектов, написания блогов и так далее.**
 
@@ -43,52 +42,65 @@ Markdown — это набор подобных правил.
 
 ### Выделение текста
 
-```markdown
 *Этот текст будет наклонным (курсив)*
-_Этот текст будет наклонным (курсив)_
+
+_Этот текст также будет наклонным (курсив)_
 
 **Этот текст будет жирным**
-__Этот текст будет жирным__
 
-_Можно **вставлять** один тип в другой_
-```
+__Этот текст также будет жирным__
+
+~~Этот текст будет зачёрнутым~~
+
+_Можно **вставлять** один ~~тип~~ в другой_
 
 ### Заголовки
 
-```
+`Вариации заголовков:`
+
 # Это самый крупный заголовок, он превращается в тег h1
 ## h2
 ### h3
 #### h4
 ##### h5
 ###### h6
-```
+
+`Второстепенный титул:`
+
+Я заголовок
+==========
+Я второстепенный титул
+----------
+
+### Разделители
+
+Варианты разделителей:
+
+***
+содержание
+* * *
+содержание
+******
+содержание
 
 ### Ссылки
 
-```markdown
 https://hexlet.io — текст простой ссылки станет кликабельной ссылкой автоматически
-```
 
 Ссылкой можно сделать любой текст:
 
-```markdown
 [Это ссылка на Хекслет](https://hexlet.io)
-```
 
 ### Цитата
 
-```markdown
 > Это мудрая цитата
 > Мудрого человека.
-```
 
 ### Картинки
 
-```markdown
-![Это опциональный alt-текст](/assets/images/markdown/markdown.png)
-```
+![Это опциональный alt-текст](https://github.com/adam-p/markdown-here/raw/master/src/common/images/icon48.png)
 
+В картинках можно указывать относительные ссылки, как-то: `/assets/images/markdown/markdown.png`
 * Картинка без `alt` текста
 
 ![](//placehold.it/150x100)
@@ -117,9 +129,8 @@ https://hexlet.io — текст простой ссылки станет кли
 
 Для выделения кода (или любого неотформатированного текста) используются специальные символы — обратные тики: `` ` ``
 
-```
 Иногда нужно добавить кусок кода `function(12);` в обычную строчку текста.
-```
+
 А иногда нужно вставить целый блок кода:
 
 ```javascript
@@ -132,10 +143,10 @@ const func = (num) => {
 ```
 
 ```php
-\$str = 'string';
+$str = 'string';
 
 function rand() {
-    return 42;
+  return 42;
 }
 ```
 
@@ -143,21 +154,30 @@ function rand() {
 
 Непронумерованный список:
 
-```markdown
 * Пункт
 * Еще один пункт
-  * Подпункт
-  * Еще один подпункт
-```
+* Подпункт
+* Еще один подпункт
+
+Альтернативный вариант непронумерованного списока:
+
++ красный
++ зеленый
++ синий
 
 Пронумерованный список:
 
-```markdown
 1. Пункт
 1. Еще один пункт
-  1. Подпункт
-  1. Еще один подпункт
-```
+1. Подпункт
+1. Еще один подпункт
+
+Вложенный список:
+
+1. First list item
+    - First nested list item
+        - Second nested list item
+
 
 В пронумерованном списке можно использовать любые числа — это не важно. При конвертации в HTML или другой формат числа станут правильными и последовательными (1, 2, 3 и т.д.).
 
@@ -190,11 +210,10 @@ Content Cell  | Content Cell
 
 | Left-Aligned  | Center Aligned  | Right Aligned |
 |:------------- |:---------------:| -------------:|
-| col 3 is      | some wordy text |     **\$1600** |
-| col 2 is      | centered        |         \$12   |
-| zebra stripes | are neat        |        ~~\$1~~ |
+| col 3 is      | some wordy text |     **$1600** |
+| col 2 is      | centered        |         $12   |
+| zebra stripes | are neat        |        ~~$1~~ |
 
 Внутри таблиц можно использовать ссылки, наклонный, жирный или зачеркнутый текст.
-_MD;
 
-die(0);
+<?php die(0); ?>
