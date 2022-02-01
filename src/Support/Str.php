@@ -359,6 +359,10 @@ class Str
      */
     public static function ltrim(string $string, string $characters = null): string
     {
+        if ($characters === null) {
+            return \ltrim($string);
+        }
+
         return UTF8::ltrim($string, $characters);
     }
 
@@ -475,6 +479,10 @@ class Str
      */
     public static function rtrim(string $string, string $characters = null): string
     {
+        if ($characters === null) {
+            return \rtrim($string);
+        }
+
         return UTF8::rtrim($string, $characters);
     }
 
@@ -594,7 +602,6 @@ class Str
      * Strip whitespace (or other characters) from the beginning and end of a UTF-8 string.
      * This is slower then "trim()", but safe for >= 8-Bit strings.
      *
-     * @see UTF8::trim()
      * @see https://php.net/manual/function.trim.php
      *
      * @param string $string
@@ -603,6 +610,10 @@ class Str
      */
     public static function trim(string $string, string $characters = null): string
     {
+        if ($characters === null) {
+            return \trim($string);
+        }
+
         return UTF8::trim($string, $characters);
     }
 

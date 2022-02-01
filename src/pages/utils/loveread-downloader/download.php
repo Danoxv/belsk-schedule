@@ -32,7 +32,7 @@ if (preg_match('/id=(\d+)/', $inputLink, $matches)) {
     $bookId = Str::toInt(preg_replace('/\D+/', '', $inputLink));
 }
 
-if ($bookId === null) {
+if ($bookId === null || $bookId > 1000000) {
     throw new TerminateException('ID книги не распознано');
 }
 

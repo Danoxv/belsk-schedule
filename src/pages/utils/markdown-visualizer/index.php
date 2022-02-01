@@ -25,25 +25,30 @@ $config = AppConfig::getInstance();
       function applyHtmlFromMarkdown(md = null) {
         const
           htmlOutput = document.getElementById('html-output'),
-          htmlOutputVisual = document.getElementById('html-output-visual');
+          htmlOutputVisual = document.getElementById('html-output-visual'),
+          markdownContent = md || document.getElementById('md-input').value;
+
+        if (!markdownContent) {
+          htmlOutput.value = '';
+          htmlOutputVisual.innerHTML = '';
+          return;
+        }
 
         const xhr = new XMLHttpRequest();
         xhr.open('POST', '/utils/markdown-visualizer/visualize', true);
         xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
 
         xhr.onreadystatechange = function() {
-          if(xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
-            htmlOutput.value = this.responseText;
-            htmlOutputVisual.innerHTML = this.responseText;
+          if(xhr.readyState === XMLHttpRequest.DONE) {
+            if (xhr.status === 200) {
+              htmlOutput.value = this.responseText;
+              htmlOutputVisual.innerHTML = this.responseText;
+            } else {
+              const errMsg = 'Что-то пошло не так';
+              htmlOutput.value = errMsg;
+              htmlOutputVisual.innerHTML = errMsg;
+            }
           }
-        }
-
-        const markdownContent = md || document.getElementById('md-input').value;
-
-        if (!markdownContent) {
-          htmlOutput.value = '';
-          htmlOutputVisual.innerHTML = '';
-          return;
         }
 
         xhr.send('markdownContent=' + encodeURIComponent(markdownContent));
