@@ -62,7 +62,7 @@ $_memoryUsage = Helpers::formatBytes(memory_get_usage());
 $_finish = round(microtime(true) - $_start, 2);
 
 echo "<div class='card'>
-  <div class='card-body'>
+  <div class='card-body text-end'>
     <code>v{$_config->version['number']} {$_config->version['stability']} | $_finish sec | $_memoryUsage | <a href='https://github.com/NewEXE/belsk-schedule'>GitHub</a></code>
   </div>
 </div>";

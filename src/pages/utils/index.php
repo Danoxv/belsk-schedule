@@ -31,7 +31,7 @@ $config = AppConfig::getInstance();
                 <a href="/utils/loveread-downloader">LoveRead.ec downloader</a>
             </td>
             <td>
-                Скачать любую книгу из LoveRead
+                Скачать любую книгу из <a href="http://loveread.ec/">LoveRead</a>
             </td>
         </tr>
         <tr>
