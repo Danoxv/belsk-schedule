@@ -29,18 +29,19 @@ $config = AppConfig::getInstance();
     </p>
     <h5>1) Присоединяйся к DDoS-атакам на сайты русской пропаганды и инфраструктуры:</h5>
     <p>Внимание! Безопаснее заходить с VPN.</p>
+    <p>Координированные атаки: 🇺🇦 <a href="https://t.me/itarmyofukraine2022" target="_blank">IT ARMY of Ukraine</a> (Telegram)</p>
     <ul>
         <li>
-            <a href="https://gist.github.com/NewEXE/a284a7ca0c3a2ddd2894907bb1787c63">Python-скрипт</a>, необходим установлен Docker
+            <a href="https://gist.github.com/NewEXE/a284a7ca0c3a2ddd2894907bb1787c63" target="_blank">Python-скрипт</a>, необходим установлен Docker
         </li>
         <li>
-            <a href="http://www.notwar.ho.ua/">http://www.notwar.ho.ua</a> - оптимальный вариант
+            <a href="http://www.notwar.ho.ua/" target="_blank">http://www.notwar.ho.ua</a> - оптимальный вариант
         </li>
         <li>
-            <a href="https://ban-dera.com/">https://ban-dera.com</a> - сразу начинается сильная бомбардировка
+            <a href="https://ban-dera.com/" target="_blank">https://ban-dera.com</a> - сразу начинается сильная бомбардировка
         </li>
         <li>
-            <a href="https://lookquizru.xyz/">https://lookquizru.xyz</a> - похоже, работает некорректно
+            <a href="https://lookquizru.xyz/" target="_blank">https://lookquizru.xyz</a> - похоже, работает некорректно
         </li>
     </ul>
     <br />
