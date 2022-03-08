@@ -43,6 +43,14 @@ $config = AppConfig::getInstance();
                 <a href="https://htmlacademy.ru/blog/boost/frontend/markdown">Markdown</a> в HTML
             </td>
         </tr>
+        <tr>
+            <td>
+                <a href="/utils/help-ukraine">Помочь Украине</a>
+            </td>
+            <td>
+                Узнать, как можно помочь Украине в войне с Россией
+            </td>
+        </tr>
         </tbody>
     </table>
 

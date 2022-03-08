@@ -20,6 +20,8 @@ $_routes = [
     '/utils/markdown-visualizer'            => 'pages/utils/markdown-visualizer/index.php',
     '/utils/markdown-visualizer/visualize'  => 'pages/utils/markdown-visualizer/visualize.php',
     '/utils/markdown-visualizer/get-example'=> 'pages/utils/markdown-visualizer/get-example.php',
+    // Help Ukraine
+    '/utils/help-ukraine'                   => 'pages/utils/help-ukraine/index.php',
 ];
 
 if (AppConfig::getInstance()->enableSystemPages) {

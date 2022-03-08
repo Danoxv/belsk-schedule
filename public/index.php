@@ -40,6 +40,12 @@ $_requestUri = Src\Support\Helpers::uriWithoutGetPart($_requestUri);
 
 $_routes = require ROOT . '/src/Config/routes.php';
 
+echo '<div class="card">
+  <div class="card-body text-center navbar-brand">
+    🇺🇦🇺🇦🇺🇦 <a href="/utils/help-ukraine">Помочь Украине</a> 🇺🇦🇺🇦🇺🇦
+  </div>
+</div>';
+
 try {
     if (!isset($_routes[$_requestUri])) {
         throw new Src\Exceptions\TerminateException('Страница не найдена (404)', TerminateException::TYPE_WARNING, 404);
