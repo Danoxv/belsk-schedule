@@ -5,9 +5,7 @@
 * Представление информации о занятиях для выбранной учебной группы, с возможностью скачать в формате PDF.
 
 ## Демо
-* http://d66237p1.beget.tech/
-* http://belsk.pp.ua (алиас)
-* http://school-schedule.byethost7.com/ (алиас)
+* http://belsk.pp.ua
 
 ## Требования
 * PHP >= 7.4
