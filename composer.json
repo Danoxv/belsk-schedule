@@ -1,6 +1,6 @@
 {
     "require": {
-        "php": "^7.4 || ^8.0",
+        "php": "^8.0.2",
         "ext-curl": "*",
         "ext-dom": "*",
         "phpoffice/phpspreadsheet": "^1.21",
