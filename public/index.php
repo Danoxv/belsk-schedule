@@ -40,11 +40,13 @@ $_requestUri = Src\Support\Helpers::uriWithoutGetPart($_requestUri);
 
 $_routes = require ROOT . '/src/Config/routes.php';
 
-echo '<div class="card">
+if (!$_isCli) {
+    echo '<div class="card">
   <div class="card-body text-center navbar-brand">
-    🇺🇦🇺🇦🇺🇦 <a href="/utils/help-ukraine">Помочь Украине</a> 🇺🇦🇺🇦🇺🇦
+    🇺🇦🇺🇦🇺🇦 <a href="https://ua-help.pp.ua/ru/" target="_blank">Помочь Украине</a> 🇺🇦🇺🇦🇺🇦
   </div>
 </div>';
+}
 
 try {
     if (!isset($_routes[$_requestUri])) {
