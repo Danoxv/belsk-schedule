@@ -45,7 +45,7 @@ $config = AppConfig::getInstance();
         </tr>
         <tr>
             <td>
-                <a href="/utils/help-ukraine">Помочь Украине</a>
+                <a href="https://ua-help.pp.ua/ru" target="_blank">Помочь Украине</a>
             </td>
             <td>
                 Узнать, как можно помочь Украине в войне с Россией
