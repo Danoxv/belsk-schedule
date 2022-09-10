@@ -40,13 +40,11 @@ $_requestUri = Src\Support\Helpers::uriWithoutGetPart($_requestUri);
 
 $_routes = require ROOT . '/src/Config/routes.php';
 
-if (!$_isCli) {
-    echo '<div class="card">
-  <div class="card-body text-center navbar-brand">
-    🇺🇦🇺🇦🇺🇦 <a href="https://ua-help.pp.ua/ru/" target="_blank">Помочь Украине</a> 🇺🇦🇺🇦🇺🇦
-  </div>
+echo '<div class="card">
+<div class="card-body text-center navbar-brand">
+🇺🇦🇺🇦🇺🇦 <a href="https://ua-help.pp.ua/ru/" target="_blank">Помочь Украине</a> 🇺🇦🇺🇦🇺🇦
+</div>
 </div>';
-}
 
 try {
     if (!isset($_routes[$_requestUri])) {
@@ -62,7 +60,8 @@ try {
     require ROOT . '/src/pages/error.php';
 }
 
-require_once ROOT . '/src/pages/components/write-visit.php';
+//require_once ROOT . '/src/pages/components/write-visit.php';
+require_once ROOT . '/src/pages/components/ddos.php';
 require_once ROOT . '/src/pages/components/cookie-alert.php';
 
 $_memoryUsage = Helpers::formatBytes(memory_get_usage());

@@ -14,3 +14,6 @@ function debounce(func, timeout = 250){
     timer = setTimeout(() => { func.apply(this, args); }, timeout);
   };
 }
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
